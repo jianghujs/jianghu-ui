@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>JianghuJS UI - CDN 使用示例</title>
+
+  <!-- Vuetify CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <!-- Material Design Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <!-- Roboto 字体 -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <v-app>
+      <!-- 顶部导航栏 -->
+      <v-app-bar app color="primary" dark>
+        <v-toolbar-title>JianghuJS UI 示例</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon href="https://github.com/jianghujs/jianghu-ui" target="_blank">
+          <v-icon>mdi-github</v-icon>
+        </v-btn>
+      </v-app-bar>
+
+      <!-- 主要内容 -->
+      <v-main>
+        <v-container>
+          <!-- 欢迎部分 -->
+          <v-row class="mb-8">
+            <v-col cols="12">
+              <h1 class="text-h3 mb-4">欢迎使用 JianghuJS UI</h1>
+              <p class="text-h6 grey--text">基于 Vue 2 和 Vuetify 2 的现代化 UI 组件库</p>
+            </v-col>
+          </v-row>
+
+          <!-- 按钮示例 -->
+          <v-row class="mb-6">
+            <v-col cols="12">
+              <h2 class="text-h4 mb-4">按钮组件</h2>
+              <v-card>
+                <v-card-text>
+                  <div class="d-flex flex-wrap" style="gap: 10px;">
+                    <v-btn color="primary">Primary</v-btn>
+                    <v-btn color="secondary">Secondary</v-btn>
+                    <v-btn color="success">Success</v-btn>
+                    <v-btn color="error">Error</v-btn>
+                    <v-btn color="warning">Warning</v-btn>
+                    <v-btn color="info">Info</v-btn>
+                  </div>
+                  <v-divider class="my-4"></v-divider>
+                  <div class="d-flex flex-wrap" style="gap: 10px;">
+                    <v-btn color="primary" outlined>Outlined</v-btn>
+                    <v-btn color="primary" text>Text</v-btn>
+                    <v-btn color="primary" rounded>Rounded</v-btn>
+                    <v-btn color="primary" loading>Loading</v-btn>
+                    <v-btn color="primary" disabled>Disabled</v-btn>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+
+          <!-- 卡片示例 -->
+          <v-row class="mb-6">
+            <v-col cols="12">
+              <h2 class="text-h4 mb-4">卡片组件</h2>
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-card hover>
+                <v-img
+                  src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
+                  height="200px"
+                ></v-img>
+                <v-card-title>卡片标题</v-card-title>
+                <v-card-subtitle>卡片副标题</v-card-subtitle>
+                <v-card-text>
+                  这是卡片的内容区域，可以放置任何内容。
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn text color="primary">操作</v-btn>
+                  <v-btn text color="primary">更多</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-card hover outlined>
+                <v-card-title>边框卡片</v-card-title>
+                <v-card-text>
+                  这是一个带边框样式的卡片组件。
+                </v-card-text>
+              </v-card>
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-card hover color="primary" dark>
+                <v-card-title>彩色卡片</v-card-title>
+                <v-card-text>
+                  这是一个带背景色的卡片组件。
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+
+          <!-- 表格示例 -->
+          <v-row class="mb-6">
+            <v-col cols="12">
+              <h2 class="text-h4 mb-4">表格组件</h2>
+              <v-card>
+                <v-card-title>
+                  用户列表
+                  <v-spacer></v-spacer>
+                  <v-text-field
+                    v-model="search"
+                    append-icon="mdi-magnify"
+                    label="搜索"
+                    single-line
+                    hide-details
+                  ></v-text-field>
+                </v-card-title>
+                <v-data-table
+                  :headers="tableHeaders"
+                  :items="tableItems"
+                  :search="search"
+                  :items-per-page="5"
+                >
+                  <template v-slot:item.status="{ item }">
+                    <v-chip
+                      :color="item.status === '活跃' ? 'success' : 'error'"
+                      small
+                      dark
+                    >
+                      {{ item.status }}
+                    </v-chip>
+                  </template>
+                </v-data-table>
+              </v-card>
+            </v-col>
+          </v-row>
+
+          <!-- 表单示例 -->
+          <v-row class="mb-6">
+            <v-col cols="12">
+              <h2 class="text-h4 mb-4">表单组件</h2>
+              <v-card>
+                <v-card-title>用户注册</v-card-title>
+                <v-card-text>
+                  <v-form ref="form" v-model="valid">
+                    <v-row>
+                      <v-col cols="12" md="6">
+                        <v-text-field
+                          v-model="form.username"
+                          label="用户名"
+                          :rules="[v => !!v || '用户名不能为空']"
+                          required
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-text-field
+                          v-model="form.email"
+                          label="邮箱"
+                          type="email"
+                          :rules="emailRules"
+                          required
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-text-field
+                          v-model="form.password"
+                          label="密码"
+                          type="password"
+                          :rules="[v => !!v || '密码不能为空', v => v.length >= 6 || '密码至少6位']"
+                          required
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-select
+                          v-model="form.role"
+                          :items="['用户', '管理员', '编辑']"
+                          label="角色"
+                          required
+                        ></v-select>
+                      </v-col>
+                      <v-col cols="12">
+                        <v-checkbox
+                          v-model="form.agree"
+                          label="我同意服务条款和隐私政策"
+                          :rules="[v => !!v || '必须同意条款']"
+                          required
+                        ></v-checkbox>
+                      </v-col>
+                    </v-row>
+                  </v-form>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="secondary" @click="resetForm">重置</v-btn>
+                  <v-btn color="primary" :disabled="!valid" @click="submitForm">提交</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+          </v-row>
+
+          <!-- 页脚 -->
+          <v-row>
+            <v-col cols="12" class="text-center grey--text">
+              <p>© 2025 JianghuJS UI. MIT License.</p>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-main>
+
+      <!-- 消息提示 -->
+      <v-snackbar v-model="snackbar" :timeout="3000" :color="snackbarColor">
+        {{ snackbarText }}
+        <template v-slot:action="{ attrs }">
+          <v-btn text v-bind="attrs" @click="snackbar = false">关闭</v-btn>
+        </template>
+      </v-snackbar>
+    </v-app>
+  </div>
+
+  <!-- Vue 2 -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7/dist/vue.js"></script>
+  <!-- Vuetify -->
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+
+  <script>
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify({
+        theme: {
+          themes: {
+            light: {
+              primary: '#1976D2',
+              secondary: '#424242',
+              accent: '#82B1FF',
+              error: '#FF5252',
+              info: '#2196F3',
+              success: '#4CAF50',
+              warning: '#FB8C00',
+            },
+          },
+        },
+      }),
+      data: {
+        // 表格数据
+        search: '',
+        tableHeaders: [
+          { text: 'ID', value: 'id' },
+          { text: '姓名', value: 'name' },
+          { text: '邮箱', value: 'email' },
+          { text: '角色', value: 'role' },
+          { text: '状态', value: 'status' },
+        ],
+        tableItems: [
+          { id: 1, name: '张三', email: 'zhangsan@example.com', role: '管理员', status: '活跃' },
+          { id: 2, name: '李四', email: 'lisi@example.com', role: '用户', status: '活跃' },
+          { id: 3, name: '王五', email: 'wangwu@example.com', role: '用户', status: '禁用' },
+          { id: 4, name: '赵六', email: 'zhaoliu@example.com', role: '编辑', status: '活跃' },
+          { id: 5, name: '孙七', email: 'sunqi@example.com', role: '用户', status: '活跃' },
+        ],
+
+        // 表单数据
+        valid: false,
+        form: {
+          username: '',
+          email: '',
+          password: '',
+          role: '',
+          agree: false,
+        },
+        emailRules: [
+          v => !!v || '邮箱不能为空',
+          v => /.+@.+\..+/.test(v) || '邮箱格式不正确',
+        ],
+
+        // 消息提示
+        snackbar: false,
+        snackbarText: '',
+        snackbarColor: 'success',
+      },
+      methods: {
+        submitForm() {
+          if (this.$refs.form.validate()) {
+            this.snackbarText = '表单提交成功！';
+            this.snackbarColor = 'success';
+            this.snackbar = true;
+            console.log('表单数据:', this.form);
+          }
+        },
+        resetForm() {
+          this.$refs.form.reset();
+          this.snackbarText = '表单已重置';
+          this.snackbarColor = 'info';
+          this.snackbar = true;
+        },
+      },
+    });
+  </script>
+</body>
+</html>

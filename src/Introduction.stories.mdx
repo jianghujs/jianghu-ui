@@ -1,0 +1,159 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="介绍/快速开始" />
+
+# JianghuJS UI 组件库
+
+欢迎使用 **JianghuJS UI** 组件库！这是一个基于 Vue 2 和 Vuetify 2 构建的现代化 UI 组件库，专为 JianghuJS 项目设计。
+
+## 特性
+
+- 🚀 **开箱即用** - 无需复杂配置，直接通过 CDN 引入即可使用
+- 🎨 **Material Design** - 基于 Vuetify 2，遵循 Material Design 设计规范
+- 📱 **响应式设计** - 完美适配各种屏幕尺寸
+- 🔧 **高度可定制** - 丰富的 props 和插槽支持
+- 📖 **完善的文档** - 通过 Storybook 提供交互式文档和示例
+
+## 快速开始
+
+### 1. CDN 引入（推荐）
+
+在 HTML 文件的 `<head>` 标签中引入必要的资源:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Vuetify CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <!-- Material Design Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <!-- Roboto 字体 -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- 你的应用内容 -->
+  </div>
+
+  <!-- Vue 2 -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7/dist/vue.js"></script>
+  <!-- Vuetify -->
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+  <!-- 你的应用代码 -->
+  <script src="./your-app.js"></script>
+</body>
+</html>
+```
+
+### 2. 初始化 Vue 应用
+
+```javascript
+new Vue({
+  el: '#app',
+  vuetify: new Vuetify(),
+  // 你的组件和配置
+});
+```
+
+### 3. 使用组件
+
+```vue
+<template>
+  <v-app>
+    <jh-button label="点击我" color="primary" @click="handleClick" />
+  </v-app>
+</template>
+
+<script>
+export default {
+  methods: {
+    handleClick() {
+      alert('按钮被点击了！');
+    }
+  }
+}
+</script>
+```
+
+## 组件列表
+
+### 基础组件
+- **JhButton** - 按钮组件，支持多种样式和状态
+- **JhCard** - 卡片组件，用于展示内容块
+
+### 数据展示
+- **JhTable** - 数据表格组件，支持排序、搜索、分页等功能
+
+### 表单组件
+- **JhForm** - 表单组件，支持多种输入类型和验证
+
+## 主题定制
+
+你可以在初始化 Vuetify 时自定义主题颜色:
+
+```javascript
+new Vue({
+  el: '#app',
+  vuetify: new Vuetify({
+    theme: {
+      themes: {
+        light: {
+          primary: '#1976D2',
+          secondary: '#424242',
+          accent: '#82B1FF',
+          error: '#FF5252',
+          info: '#2196F3',
+          success: '#4CAF50',
+          warning: '#FB8C00',
+        },
+      },
+    },
+  }),
+});
+```
+
+## 开发指南
+
+### 本地开发
+
+```bash
+# 安装依赖
+npm install
+
+# 启动 Storybook
+npm run storybook
+
+# 访问 http://localhost:6006
+```
+
+### 构建文档
+
+```bash
+# 构建静态文档站点
+npm run build-storybook
+
+# 预览构建结果
+npm run serve-storybook
+```
+
+## 浏览器支持
+
+- Chrome (最新版)
+- Firefox (最新版)
+- Safari (最新版)
+- Edge (最新版)
+
+## 相关资源
+
+- [Vue 2 官方文档](https://v2.vuejs.org/)
+- [Vuetify 2 官方文档](https://v2.vuetifyjs.com/)
+- [Material Design Icons](https://materialdesignicons.com/)
+
+## 贡献指南
+
+欢迎提交 Issue 和 Pull Request！
+
+## 许可证
+
+MIT License
