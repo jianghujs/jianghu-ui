@@ -111,7 +111,7 @@ const generateProjectData = (count = 20) => {
 };
 
 export default {
-  title: 'Pro Components/JhProTable',
+  title: '数据展示/JhProTable',
   component: JhProTable,
   tags: ['autodocs'],
 };

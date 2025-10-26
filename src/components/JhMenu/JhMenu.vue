@@ -149,7 +149,7 @@
     <v-app-bar app clipped-left height="52" class="jh-page-header px-8" flat>
       <!-- 手机端左侧菜单开启按钮 -->
       <div
-        v-if="!hideDrawers"
+        v-if="!hideDrawers && isMobile"
         class="hidden-md-and-up d-flex flex-column justify-center align-start"
         style="width: 60px; cursor: pointer"
         @click="mobileMenuDrawer = !mobileMenuDrawer"
@@ -243,6 +243,7 @@
           <div
             class="jh-avatar-menu-btn d-flex flex-column justify-center align-end hidden-sm-and-up"
             @click="mobileUserMenuDrawer = !mobileUserMenuDrawer"
+            v-if="isMobile"
           >
             <div class="text-center">
               <v-icon :size="24" color="success">mdi-account-circle</v-icon>
@@ -257,7 +258,7 @@
           <!-- PC端用户信息 -->
           <v-menu offset-y>
             <template v-slot:activator="{ on, attrs }">
-              <div v-bind="attrs" v-on="on" class="jh-avatar-menu-btn d-flex align-center px-1 hidden-xs-only">
+              <div v-if="!isMobile" v-bind="attrs" v-on="on" class="jh-avatar-menu-btn d-flex align-center px-1 hidden-xs-only">
                 <v-icon :size="32" color="grey lighten-2">mdi-account-circle</v-icon>
                 <div class="ml-1">
                   <p class="caption black--text mb-0">{{ userInfo.username }}</p>
@@ -381,6 +382,7 @@ export default {
       mobileUserMenuDrawer: false,
       currentMenuIndex: this.activeMenuIndex,
       currentSecondMenuId: this.activeSecondMenuId,
+      isMobile: window.innerWidth < 600
     };
   },
   watch: {
@@ -443,6 +445,9 @@ export default {
 .jh-toolbar-title {
   height: 51px;
   line-height: 51px;
+}
+.v-toolbar__title {
+  min-width: 200px;
 }
 
 .jh-menu-drawer-close-float-btn {

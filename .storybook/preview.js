@@ -3,6 +3,10 @@ import Vuetify from 'vuetify';
 import 'vuetify/dist/vuetify.min.css';
 import '@mdi/font/css/materialdesignicons.css';
 
+// Import global custom styles
+import '../src/style/globalCSSVuetifyV4.css';
+import '../src/style/globalCSSJHV4.css';
+
 // 注册 Vuetify 插件
 Vue.use(Vuetify);
 

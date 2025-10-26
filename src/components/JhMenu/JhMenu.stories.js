@@ -72,7 +72,7 @@ const sampleUserInfo = {
 };
 
 export default {
-  title: 'Components/JhMenu',
+  title: '基础组件/JhMenu',
   component: JhMenu,
   tags: ['autodocs'],
   argTypes: {

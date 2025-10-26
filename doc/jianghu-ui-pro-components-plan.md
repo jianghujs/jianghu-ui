@@ -50,7 +50,7 @@
 | 组件名称 | 优先级 | 对应 AntD Pro | 功能描述 |
 |---------|--------|--------------|----------|
 | JhProLayout | P1 | ProLayout | 高级布局，侧边栏+顶栏+内容区 |
-| JhPageContainer | P0 | PageContainer | 页容器，带面包屑和标题 |
+| JhPageContainer (JhProContainer) | P0 | PageContainer | 页面容器，提供统一的页面头部(标题、面包屑、标签页、返回按钮、额外操作区)、内容区域和页脚 |
 | JhProCard | P1 | ProCard | 高级卡片，支持分栏、Tab、折叠 |
 | JhStatisticCard | P2 | StatisticCard | 统计数据卡片 |
 | JhCheckCard | P2 | CheckCard | 多选卡片 |
@@ -2082,25 +2082,50 @@ export default {
 
 ---
 
-### 3.9 JhPageContainer - 页面容器
+### 3.9 JhPageContainer (JhProContainer) - 页面容器
+
+参考 Ant Design Pro PageContainer 组件设计。
 
 #### 3.9.1 功能特性
-1. 标准页面容器，提供统一的页面头部
-2. 自动生成面包屑导航
-3. 支持页面标题、副标题、描述
-4. 支持页面级操作按钮
-5. 支持页签切换
-6. 支持返回按钮
 
-#### 3.9.2 API 设计
+1. **页面头部 (Page Header)**
+   - 页面标题 (title)
+   - 页面子标题/描述 (subTitle / description)
+   - 面包屑导航 (breadcrumb) - 自动或手动配置
+   - 返回按钮 (backIcon / onBack)
+   - 额外操作区域 (extra) - 页面级按钮插槽
+   - 标签页切换 (tabs)
+   - 头部固定 (fixedHeader)
+
+2. **内容区域 (Content)**
+   - 主要内容区域 (default slot)
+   - 内容加载状态 (loading)
+   - 空状态提示
+
+3. **页脚区域 (Footer)**
+   - 底部操作按钮区域 (footer slot)
+   - 固定底部 (fixedFooter)
+
+4. **其他特性**
+   - 响应式布局
+   - 自定义样式类
+   - 水印支持
+   - 页面级进度条
+
+#### 3.9.2 完整 API 设计
 
 ```vue
 <template>
   <jh-page-container
     title="用户管理"
+    sub-title="管理系统用户的基本信息"
     :breadcrumb="breadcrumb"
+    :show-back="true"
+    @back="handleBack"
     :tabs="tabs"
     :tab-active-key.sync="activeTab"
+    :loading="pageLoading"
+    :fixed-header="true"
   >
     <!-- 页面标题右侧操作区 -->
     <template #extra>
@@ -2108,10 +2133,32 @@ export default {
         <v-icon left>mdi-plus</v-icon>
         新增用户
       </v-btn>
+      <v-btn color="default" class="ml-2" @click="handleExport">
+        <v-icon left>mdi-download</v-icon>
+        导出
+      </v-btn>
     </template>
 
-    <!-- 页面内容 -->
-    <jh-pro-table :columns="columns" :request="fetchData" />
+    <!-- 标签右侧额外内容 -->
+    <template #tab-bar-extra>
+      <v-btn icon small>
+        <v-icon>mdi-refresh</v-icon>
+      </v-btn>
+    </template>
+
+    <!-- 页面主要内容 -->
+    <jh-pro-table
+      :columns="columns"
+      :request="fetchData"
+      @selection-change="handleSelectionChange"
+    />
+
+    <!-- 页脚操作按钮 -->
+    <template #footer>
+      <v-btn color="primary" :disabled="selectedRows.length === 0">
+        批量删除 ({{ selectedRows.length }})
+      </v-btn>
+    </template>
   </jh-page-container>
 </template>
 
@@ -2119,22 +2166,490 @@ export default {
 export default {
   data() {
     return {
+      pageLoading: false,
+      selectedRows: [],
+
+      // 面包屑配置
       breadcrumb: [
-        { text: '首页', to: '/' },
+        { text: '首页', to: '/', icon: 'mdi-home' },
         { text: '系统管理', to: '/system' },
-        { text: '用户管理' },
+        { text: '用户管理', disabled: true },
       ],
+
+      // 标签页配置
       tabs: [
-        { key: 'all', label: '全部用户' },
-        { key: 'active', label: '在职' },
-        { key: 'inactive', label: '离职' },
+        {
+          key: 'all',
+          label: '全部用户',
+          icon: 'mdi-account-multiple',
+        },
+        {
+          key: 'active',
+          label: '在职用户',
+          badge: 120,
+        },
+        {
+          key: 'inactive',
+          label: '离职用户',
+          badge: 30,
+        },
       ],
       activeTab: 'all',
+
+      columns: [...],
     };
+  },
+  methods: {
+    handleBack() {
+      this.$router.go(-1);
+    },
+    handleAdd() {
+      // 新增用户
+    },
+    handleExport() {
+      // 导出数据
+    },
+    handleSelectionChange({ selectedRows }) {
+      this.selectedRows = selectedRows;
+    },
+    async fetchData(params) {
+      // 加载数据
+    },
   },
 };
 </script>
 ```
+
+#### 3.9.3 Props 定义
+
+```javascript
+props: {
+  // ========== 页面头部 ==========
+
+  // 页面标题
+  title: {
+    type: String,
+    default: '',
+  },
+
+  // 页面子标题/描述
+  subTitle: {
+    type: String,
+    default: '',
+  },
+
+  // 页面描述 (更详细的说明文字)
+  description: {
+    type: String,
+    default: '',
+  },
+
+  // 面包屑配置 (数组或自动生成)
+  breadcrumb: {
+    type: [Array, Boolean],
+    default: () => [],
+    // false 表示隐藏面包屑
+    // [] 表示使用路由自动生成
+    // 手动配置: [{ text, to, icon, disabled }]
+  },
+
+  // 是否显示返回按钮
+  showBack: {
+    type: Boolean,
+    default: false,
+  },
+
+  // 返回按钮图标
+  backIcon: {
+    type: String,
+    default: 'mdi-arrow-left',
+  },
+
+  // 标签页配置
+  tabs: {
+    type: Array,
+    default: null,
+    // [{ key, label, icon, badge, disabled }]
+  },
+
+  // 当前激活的标签页 key
+  tabActiveKey: {
+    type: String,
+    default: '',
+  },
+
+  // 标签页变化事件
+  tabBarExtraContent: {
+    type: String,
+    default: '',
+  },
+
+  // ========== 布局控制 ==========
+
+  // 是否固定头部
+  fixedHeader: {
+    type: Boolean,
+    default: false,
+  },
+
+  // 头部样式
+  headerStyle: {
+    type: Object,
+    default: () => ({}),
+  },
+
+  // 内容样式
+  contentStyle: {
+    type: Object,
+    default: () => ({}),
+  },
+
+  // 内容内边距
+  contentPadding: {
+    type: [String, Number],
+    default: 24,
+  },
+
+  // 是否显示内容卡片背景
+  contentCard: {
+    type: Boolean,
+    default: true,
+  },
+
+  // ========== 状态控制 ==========
+
+  // 加载状态
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+
+  // 是否显示页面级进度条
+  showProgressBar: {
+    type: Boolean,
+    default: false,
+  },
+
+  // ========== 页脚控制 ==========
+
+  // 是否显示页脚
+  showFooter: {
+    type: Boolean,
+    default: false,
+  },
+
+  // 是否固定页脚
+  fixedFooter: {
+    type: Boolean,
+    default: false,
+  },
+
+  // 页脚样式
+  footerStyle: {
+    type: Object,
+    default: () => ({}),
+  },
+
+  // ========== 其他 ==========
+
+  // 水印配置
+  watermark: {
+    type: [Object, Boolean],
+    default: false,
+    // { text, fontSize, color, opacity, rotate }
+  },
+
+  // 自定义样式类
+  contentClass: {
+    type: String,
+    default: '',
+  },
+
+  // 页面级空状态
+  empty: {
+    type: Boolean,
+    default: false,
+  },
+
+  // 空状态文本
+  emptyText: {
+    type: String,
+    default: '暂无数据',
+  },
+}
+```
+
+#### 3.9.4 Events 定义
+
+```javascript
+// 返回按钮点击
+this.$emit('back');
+
+// 标签页切换
+this.$emit('tab-change', { activeKey, prevKey });
+
+// update:tabActiveKey (支持 .sync 修饰符)
+this.$emit('update:tabActiveKey', newKey);
+```
+
+#### 3.9.5 Slots 定义
+
+```javascript
+// 头部插槽
+slots: {
+  // 标题前面的内容 (如图标)
+  'title-prefix': {},
+
+  // 标题后面的内容 (如标签)
+  'title-suffix': {},
+
+  // 额外操作区域 (页面级按钮)
+  'extra': {},
+
+  // 标签页右侧额外内容
+  'tab-bar-extra': {},
+
+  // 自定义头部 (完全自定义)
+  'header': {},
+
+  // 主要内容区域
+  'default': {},
+
+  // 页脚操作区域
+  'footer': {},
+}
+```
+
+#### 3.9.6 Methods 定义
+
+```javascript
+// 刷新页面内容
+this.$refs.pageContainerRef.refresh();
+
+// 设置加载状态
+this.$refs.pageContainerRef.setLoading(true);
+
+// 切换标签页
+this.$refs.pageContainerRef.setActiveTab('active');
+```
+
+#### 3.9.7 使用场景示例
+
+##### 场景1: 标准列表页
+
+```vue
+<template>
+  <jh-page-container
+    title="商品列表"
+    :breadcrumb="breadcrumb"
+    :tabs="tabs"
+    :tab-active-key.sync="activeTab"
+  >
+    <template #extra>
+      <v-btn color="primary" @click="handleAdd">
+        <v-icon left>mdi-plus</v-icon>
+        新增商品
+      </v-btn>
+    </template>
+
+    <jh-pro-table
+      :columns="columns"
+      :request="fetchProducts"
+    />
+  </jh-page-container>
+</template>
+```
+
+##### 场景2: 详情页 (带返回)
+
+```vue
+<template>
+  <jh-page-container
+    title="用户详情"
+    :sub-title="`ID: ${userData.id}`"
+    :breadcrumb="breadcrumb"
+    :show-back="true"
+    @back="handleBack"
+    :loading="loading"
+  >
+    <template #extra>
+      <v-btn color="primary" @click="handleEdit">
+        <v-icon left>mdi-pencil</v-icon>
+        编辑
+      </v-btn>
+      <v-btn color="error" text class="ml-2" @click="handleDelete">
+        <v-icon left>mdi-delete</v-icon>
+        删除
+      </v-btn>
+    </template>
+
+    <v-row>
+      <v-col cols="12" md="8">
+        <jh-pro-card title="基本信息">
+          <jh-descriptions
+            :data="userData"
+            :schema="userSchema"
+            :column="2"
+          />
+        </jh-pro-card>
+      </v-col>
+
+      <v-col cols="12" md="4">
+        <jh-pro-card title="操作记录">
+          <jh-timeline :items="operationLogs" />
+        </jh-pro-card>
+      </v-col>
+    </v-row>
+  </jh-page-container>
+</template>
+```
+
+##### 场景3: 表单页 (带底部操作)
+
+```vue
+<template>
+  <jh-page-container
+    title="创建订单"
+    :breadcrumb="breadcrumb"
+    :show-back="true"
+    :show-footer="true"
+    :fixed-footer="true"
+  >
+    <jh-steps-form
+      ref="stepsFormRef"
+      :steps="steps"
+    >
+      <!-- 步骤表单内容 -->
+    </jh-steps-form>
+
+    <template #footer>
+      <v-btn text @click="handleCancel">
+        取消
+      </v-btn>
+      <v-btn
+        color="primary"
+        class="ml-2"
+        :loading="submitting"
+        @click="handleSubmit"
+      >
+        提交订单
+      </v-btn>
+    </template>
+  </jh-page-container>
+</template>
+```
+
+##### 场景4: 带水印的页面
+
+```vue
+<template>
+  <jh-page-container
+    title="机密文档管理"
+    :breadcrumb="breadcrumb"
+    :watermark="{
+      text: userInfo.name,
+      fontSize: 16,
+      color: 'rgba(0,0,0,.15)',
+      opacity: 0.5,
+      rotate: -22,
+    }"
+  >
+    <!-- 页面内容 -->
+  </jh-page-container>
+</template>
+```
+
+##### 场景5: 固定头部和底部
+
+```vue
+<template>
+  <jh-page-container
+    title="数据统计"
+    :breadcrumb="breadcrumb"
+    :tabs="tabs"
+    :tab-active-key.sync="activeTab"
+    :fixed-header="true"
+    :show-footer="true"
+    :fixed-footer="true"
+  >
+    <!-- 可滚动的长内容 -->
+    <div style="height: 2000px;">
+      长内容区域...
+    </div>
+
+    <template #footer>
+      <div class="d-flex justify-space-between align-center">
+        <span>已选择 {{ selectedCount }} 项</span>
+        <div>
+          <v-btn text>取消</v-btn>
+          <v-btn color="primary" class="ml-2">确认</v-btn>
+        </div>
+      </div>
+    </template>
+  </jh-page-container>
+</template>
+```
+
+##### 场景6: 空状态页面
+
+```vue
+<template>
+  <jh-page-container
+    title="我的收藏"
+    :breadcrumb="breadcrumb"
+    :empty="favorites.length === 0"
+    empty-text="您还没有收藏任何内容"
+  >
+    <template v-if="favorites.length > 0">
+      <!-- 收藏列表 -->
+    </template>
+  </jh-page-container>
+</template>
+```
+
+#### 3.9.8 样式定制
+
+```vue
+<template>
+  <jh-page-container
+    title="自定义样式页面"
+    :header-style="{ background: 'linear-gradient(to right, #667eea, #764ba2)' }"
+    :content-style="{ background: '#f5f5f5' }"
+    :content-padding="16"
+    content-class="custom-content"
+  >
+    <!-- 内容 -->
+  </jh-page-container>
+</template>
+
+<style scoped>
+.custom-content {
+  min-height: 500px;
+}
+</style>
+```
+
+#### 3.9.9 实现要点
+
+1. **面包屑自动生成**
+   - 如果 `breadcrumb` 为空数组,从路由配置自动生成
+   - 支持路由 meta 中定义面包屑信息
+
+2. **头部固定**
+   - 使用 `position: sticky` 或 `position: fixed`
+   - 滚动时保持头部可见
+
+3. **响应式设计**
+   - 移动端自动调整布局
+   - 标签页在小屏幕下可横向滚动
+
+4. **性能优化**
+   - 虚拟滚动支持 (内容过长时)
+   - 懒加载标签页内容
+
+5. **无障碍支持**
+   - 正确的 ARIA 标签
+   - 键盘导航支持
 
 ---
 
@@ -2550,7 +3065,7 @@ export default {
 **目标**：交付最核心的 CRUD 业务组件，满足 80% 的日常开发需求。
 
 **Week 1: 基础容器与布局**
-- [x] ✅ JhPageContainer - 页面容器（2天）
+- [x] ✅ JhPageContainer (JhProContainer) - 页面容器，包含标题、面包屑、标签页、返回按钮、额外操作区、页脚等完整功能（2天）
 - [x] ✅ JhDrawer - 抽屉（2天）
 - [ ] JhDialog - 增强弹窗（1天）
 
@@ -2885,7 +3400,7 @@ function loadColumnSettings(tableId) {
 | Ant Design Pro | JianghuJS UI | 优先级 | 备注 |
 |---------------|--------------|-------|------|
 | ProLayout | JhProLayout | P1 | 标准中后台布局 |
-| PageContainer | JhPageContainer | P0 | 页面容器 |
+| PageContainer | JhPageContainer (JhProContainer) | P0 | 页面容器，提供标题、面包屑、标签页、返回按钮、额外操作区、页脚等完整功能 |
 | ProCard | JhProCard | P1 | 高级卡片，支持分栏/Tab/折叠 |
 | StatisticCard | JhStatisticCard | P2 | 统计卡片 |
 | CheckCard | JhCheckCard | P2 | 多选卡片 |

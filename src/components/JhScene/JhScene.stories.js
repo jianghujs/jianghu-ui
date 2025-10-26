@@ -28,7 +28,7 @@ const sampleScenes = [
 ];
 
 export default {
-  title: 'Components/JhScene',
+  title: '基础组件/JhScene',
   component: JhScene,
   tags: ['autodocs'],
   argTypes: {

@@ -116,7 +116,10 @@
               v-model="searchValues[field.key]"
               :label="field.label"
               :placeholder="field.placeholder"
-              dense
+              class="jh-v-input"
+                dense
+                single-line
+                filled
               outlined
               hide-details
               clearable
@@ -127,7 +130,10 @@
               v-model="searchValues[field.key]"
               :label="field.label"
               :items="field.options"
-              dense
+             class="jh-v-input"
+                dense
+                single-line
+                filled
               outlined
               hide-details
               clearable
@@ -144,7 +150,10 @@
                   :label="field.label"
                   prepend-inner-icon="mdi-calendar"
                   readonly
-                  dense
+                  class="jh-v-input"
+                dense
+                single-line
+                filled
                   outlined
                   hide-details
                   clearable
@@ -210,8 +219,11 @@
       :item-key="rowKey"
       :options.sync="tableOptions"
       :server-items-length="serverItemsLength"
+      checkbox-color="success"
       :footer-props="footerProps"
       @click:row="handleRowClick"
+      fixed-header
+      :class="`jh-fixed-table-height elevation-0 mt-0 mb-xs-4 zebraLine`"
     >
       <!-- Custom column slots -->
       <template

@@ -1,7 +1,7 @@
 import JhDateRangePicker from './JhDateRangePicker.vue';
 
 export default {
-  title: 'Components/JhDateRangePicker',
+  title: '基础组件/JhDateRangePicker',
   component: JhDateRangePicker,
   tags: ['autodocs'],
   argTypes: {
