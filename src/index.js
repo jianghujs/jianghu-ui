@@ -1,20 +1,23 @@
 // JianghuJS UI Component Library Entry Point
-import JhButton from './components/JhButton/JhButton.vue';
-import JhCard from './components/JhCard/JhCard.vue';
-import JhTable from './components/JhTable/JhTable.vue';
+
+// Basic Components
 import JhForm from './components/JhForm/JhForm.vue';
 import JhMenu from './components/JhMenu/JhMenu.vue';
 import JhScene from './components/JhScene/JhScene.vue';
 import JhDateRangePicker from './components/JhDateRangePicker/JhDateRangePicker.vue';
 
+// Pro Components
+import JhProForm from './components/JhProForm/JhProForm.vue';
+import JhProTable from './components/JhProTable/JhProTable.vue';
+
 const components = {
-  JhButton,
-  JhCard,
-  JhTable,
   JhForm,
   JhMenu,
   JhScene,
   JhDateRangePicker,
+  // Pro Components
+  JhProForm,
+  JhProTable,
 };
 
 // Vue plugin install function
@@ -38,11 +41,12 @@ export default {
 };
 
 export {
-  JhButton,
-  JhCard,
-  JhTable,
+  // Basic Components
   JhForm,
   JhMenu,
   JhScene,
   JhDateRangePicker,
+  // Pro Components
+  JhProForm,
+  JhProTable,
 };
