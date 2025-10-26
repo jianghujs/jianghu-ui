@@ -66,6 +66,7 @@
         <div v-else class="pa-4">
           <jh-pro-form
             ref="proFormRef"
+            label-position="top"
             :fields="fields"
             :initial-data="initialValues"
             :layout="layout"
@@ -231,7 +232,7 @@ export default {
     // 紧凑模式
     dense: {
       type: Boolean,
-      default: false,
+      default: true,
     },
 
     // 提交请求函数

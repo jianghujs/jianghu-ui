@@ -6,7 +6,8 @@
   "scripts": {
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "serve-storybook": "npx http-server storybook-static"
+    "serve-storybook": "npx http-server storybook-static",
+    "deploy": "npm run build-storybook && npx gh-pages -d storybook-static"
   },
   "keywords": [
     "jianghujs",
@@ -23,6 +24,7 @@
     "@storybook/addon-links": "^7.6.17",
     "@storybook/blocks": "^7.6.17",
     "@storybook/vue-webpack5": "^7.6.17",
+    "gh-pages": "^6.1.1",
     "http-server": "^14.1.1",
     "storybook": "^7.6.17",
     "vue": "^2.7.16",

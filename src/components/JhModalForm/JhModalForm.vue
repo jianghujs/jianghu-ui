@@ -29,6 +29,7 @@
           ref="formRef"
           :fields="fields"
           :initial-data="initialValues"
+          label-position="top"
           :layout="layout"
           :label-width="labelWidth"
           :outlined="outlined"
@@ -165,7 +166,7 @@ export default {
     // 紧凑模式
     dense: {
       type: Boolean,
-      default: false,
+      default: true,
     },
 
     // 提交请求函数

@@ -530,7 +530,7 @@ export default {
     // 标签位置（vertical 布局下有效）
     labelPosition: {
       type: String,
-      default: "float",
+      default: "top",
       validator: (v) => ["float", "top"].includes(v),
     },
   },

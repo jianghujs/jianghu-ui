@@ -13,6 +13,12 @@
 
 ## 在线预览
 
+### 在线文档
+
+访问在线 Storybook 文档：**https://jianghujs.github.io/jianghu-ui/**
+
+### 本地预览
+
 启动 Storybook 查看组件文档和示例：
 
 ```bash
@@ -178,6 +184,24 @@ jianghu-ui/
 ├── package.json
 └── README.md
 ```
+
+## 部署
+
+### 自动部署
+
+推送到 `main` 分支时，GitHub Actions 会自动构建并部署 Storybook 到 GitHub Pages。
+
+```bash
+git push origin main
+```
+
+### 手动部署
+
+```bash
+npm run deploy
+```
+
+查看详细部署文档：[DEPLOY.md](./DEPLOY.md)
 
 ## 开发指南
 
