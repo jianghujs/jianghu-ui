@@ -122,7 +122,6 @@ export const 基础表格 = {
     components: { JhProTable },
     data() {
       return {
-        args,
         columns: [
           {
             key: 'id',
@@ -162,20 +161,26 @@ export const 基础表格 = {
             width: 140,
           },
         ],
-        dataSource: generateEmployeeData(20),
       };
+    },
+    methods: {
+      async fetchTableData(params) {
+        return {
+          success: true,
+          data: generateEmployeeData(20),
+          total: 20,
+        };
+      },
     },
     template: `
       <jh-pro-table
-        v-bind="args"
+        :toolbar="false"
         :columns="columns"
-        :data-source="dataSource"
+        :request="fetchTableData"
       />
     `,
   }),
-  args: {
-    toolbar: false,
-  },
+  args: {},
 };
 
 // 2. 带工具栏的表格
@@ -184,7 +189,6 @@ export const 工具栏表格 = {
     components: { JhProTable },
     data() {
       return {
-        args,
         columns: [
           { key: 'id', title: '员工ID', dataIndex: 'id', width: 100 },
           { key: 'name', title: '姓名', dataIndex: 'name', width: 120 },
@@ -194,13 +198,20 @@ export const 工具栏表格 = {
           { key: 'entryDate', title: '入职日期', dataIndex: 'entryDate', width: 120 },
         ],
         dataSource: generateEmployeeData(50),
+        toolbar: {
+          search: true,
+          refresh: true,
+          setting: true,
+          density: true,
+          fullscreen: true,
+        },
       };
     },
     template: `
       <jh-pro-table
-        v-bind="args"
+        :toolbar="toolbar"
         :columns="columns"
-        :data-source="dataSource"
+        :request="fetchTableData"
       >
         <template #toolbar-actions>
           <v-btn color="primary" @click="handleAdd">
@@ -219,6 +230,13 @@ export const 工具栏表格 = {
       </jh-pro-table>
     `,
     methods: {
+      async fetchTableData(params) {
+        return {
+          success: true,
+          data: generateEmployeeData(20),
+          total: 20,
+        };
+      },
       handleAdd() {
         alert('新增员工');
       },
@@ -230,15 +248,7 @@ export const 工具栏表格 = {
       },
     },
   }),
-  args: {
-    toolbar: {
-      search: true,
-      refresh: true,
-      setting: true,
-      density: true,
-      fullscreen: true,
-    },
-  },
+  args: {},
 };
 
 // 3. 带查询表单的表格
@@ -247,7 +257,6 @@ export const 查询表单表格 = {
     components: { JhProTable },
     data() {
       return {
-        args,
         columns: [
           { key: 'id', title: '员工ID', dataIndex: 'id', width: 100 },
           { key: 'name', title: '姓名', dataIndex: 'name', width: 120 },
@@ -300,15 +309,21 @@ export const 查询表单表格 = {
     },
     template: `
       <jh-pro-table
-        v-bind="args"
         :columns="columns"
-        :data-source="dataSource"
+        :request="fetchTableData"
         :search-config="searchConfig"
         @search="handleSearch"
         @reset="handleReset"
       />
     `,
     methods: {
+      async fetchTableData(params) {
+        return {
+          success: true,
+          data: generateEmployeeData(20),
+          total: 20,
+        };
+      },
       handleSearch(values) {
         console.log('查询参数:', values);
       },
@@ -326,7 +341,6 @@ export const 操作列表格 = {
     components: { JhProTable },
     data() {
       return {
-        args,
         columns: [
           { key: 'id', title: '员工ID', dataIndex: 'id', width: 100 },
           { key: 'name', title: '姓名', dataIndex: 'name', width: 120 },
@@ -360,13 +374,19 @@ export const 操作列表格 = {
     },
     template: `
       <jh-pro-table
-        v-bind="args"
         :columns="columns"
-        :data-source="dataSource"
+        :request="fetchTableData"
         :action-column="actionColumn"
       />
     `,
     methods: {
+      async fetchTableData(params) {
+        return {
+          success: true,
+          data: generateEmployeeData(20),
+          total: 20,
+        };
+      },
       handleEdit(row) {
         console.log('编辑:', row);
         alert(`编辑员工: ${row.name}`);
@@ -390,7 +410,6 @@ export const 自定义列渲染 = {
     components: { JhProTable },
     data() {
       return {
-        args,
         columns: [
           { key: 'orderNo', title: '订单号', dataIndex: 'orderNo', width: 180 },
           { key: 'customer', title: '客户', dataIndex: 'customer', width: 120 },
@@ -405,9 +424,9 @@ export const 自定义列渲染 = {
     },
     template: `
       <jh-pro-table
-        v-bind="args"
         :columns="columns"
-        :data-source="dataSource"
+        :request="fetchTableData"
+
       >
         <template #column-totalAmount="{ value }">
           <span style="color: #f5222d; font-weight: bold;">¥{{ value.toLocaleString() }}</span>
@@ -424,6 +443,15 @@ export const 自定义列渲染 = {
         </template>
       </jh-pro-table>
     `,
+    methods: {
+      async fetchTableData(params) {
+        return {
+          success: true,
+          data: generateOrderData(30),
+          total: 30,
+        };
+      },
+    },
   }),
   args: {},
 };
@@ -434,7 +462,6 @@ export const 批量操作表格 = {
     components: { JhProTable },
     data() {
       return {
-        args,
         columns: [
           { key: 'orderNo', title: '订单号', dataIndex: 'orderNo', width: 180 },
           { key: 'customer', title: '客户', dataIndex: 'customer', width: 120 },
@@ -447,14 +474,19 @@ export const 批量操作表格 = {
         rowSelection: {
           type: 'checkbox',
         },
+        toolbar: {
+          search: true,
+          refresh: true,
+          setting: true,
+        },
       };
     },
     template: `
       <jh-pro-table
         ref="tableRef"
-        v-bind="args"
+        :toolbar="toolbar"
         :columns="columns"
-        :data-source="dataSource"
+        :request="fetchTableData"
         :row-selection="rowSelection"
         @selection-change="handleSelectionChange"
       >
@@ -508,6 +540,13 @@ export const 批量操作表格 = {
       </jh-pro-table>
     `,
     methods: {
+      async fetchTableData(params) {
+        return {
+          success: true,
+          data: generateOrderData(20),
+          total: 20,
+        };
+      },
       handleSelectionChange({ selectedRowKeys, selectedRows }) {
         console.log('选中的订单:', selectedRows);
       },
@@ -522,13 +561,7 @@ export const 批量操作表格 = {
       },
     },
   }),
-  args: {
-    toolbar: {
-      search: true,
-      refresh: true,
-      setting: true,
-    },
-  },
+  args: {},
 };
 
 // 7. 服务端分页表格
@@ -537,7 +570,6 @@ export const 服务端分页 = {
     components: { JhProTable },
     data() {
       return {
-        args,
         columns: [
           { key: 'id', title: '员工ID', dataIndex: 'id', width: 100, sortable: true },
           { key: 'name', title: '姓名', dataIndex: 'name', width: 120 },
@@ -546,6 +578,11 @@ export const 服务端分页 = {
           { key: 'phone', title: '手机号', dataIndex: 'phone', width: 140 },
           { key: 'entryDate', title: '入职日期', dataIndex: 'entryDate', width: 120, sortable: true },
         ],
+        toolbar: {
+          search: true,
+          refresh: true,
+          setting: true,
+        },
         // 模拟所有数据
         allData: generateEmployeeData(200),
       };
@@ -556,7 +593,7 @@ export const 服务端分页 = {
           这是一个服务端分页示例，模拟了200条员工数据。尝试搜索、排序和翻页，数据将通过 request 函数动态加载。
         </v-alert>
         <jh-pro-table
-          v-bind="args"
+          :toolbar="toolbar"
           :columns="columns"
           :request="fetchTableData"
         />
@@ -609,13 +646,7 @@ export const 服务端分页 = {
       },
     },
   }),
-  args: {
-    toolbar: {
-      search: true,
-      refresh: true,
-      setting: true,
-    },
-  },
+  args: {},
 };
 
 // 8. 项目管理完整示例
@@ -624,7 +655,6 @@ export const 项目管理示例 = {
     components: { JhProTable },
     data() {
       return {
-        args,
         columns: [
           { key: 'id', title: '项目ID', dataIndex: 'id', width: 120 },
           { key: 'name', title: '项目名称', dataIndex: 'name', width: 220 },
@@ -689,6 +719,12 @@ export const 项目管理示例 = {
         rowSelection: {
           type: 'checkbox',
         },
+        toolbar: {
+          search: true,
+          refresh: true,
+          setting: true,
+          density: true,
+        },
         allData: generateProjectData(100),
       };
     },
@@ -699,7 +735,7 @@ export const 项目管理示例 = {
         </v-alert>
         <jh-pro-table
           ref="tableRef"
-          v-bind="args"
+          :toolbar="toolbar"
           :columns="columns"
           :search-config="searchConfig"
           :action-column="actionColumn"
@@ -841,12 +877,5 @@ export const 项目管理示例 = {
       },
     },
   }),
-  args: {
-    toolbar: {
-      search: true,
-      refresh: true,
-      setting: true,
-      density: true,
-    },
-  },
+  args: {},
 };

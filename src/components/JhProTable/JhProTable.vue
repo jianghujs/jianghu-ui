@@ -212,7 +212,7 @@
       v-model="selectedRows"
       :headers="visibleHeaders"
       :items="tableData"
-      :loading="loading"
+      :loading="internalLoading"
       :dense="currentSize === 'compact'"
       :show-select="!!rowSelection"
       :single-select="rowSelection && rowSelection.type === 'radio'"
