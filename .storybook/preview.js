@@ -7,6 +7,9 @@ import '@mdi/font/css/materialdesignicons.css';
 import '../src/style/globalCSSVuetifyV4.css';
 import '../src/style/globalCSSJHV4.css';
 
+// Import Tailwind CSS
+import '../src/tailwind.css';
+
 // 注册 Vuetify 插件
 Vue.use(Vuetify);
 
