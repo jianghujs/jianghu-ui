@@ -632,3 +632,6 @@
     }
     
  
+    .v-main .v-main {
+        padding: 0!important;
+    }

@@ -16,4 +16,37 @@
   .v-application {
     font-family: Roboto, sans-serif;
   }
+
+  /* 优化 Docs 预览区域的显示 */
+  .sbdocs-preview {
+    padding: 0 !important;
+  }
+
+  .sbdocs-preview > div {
+    padding: 0 !important;
+  }
+
+  /* 移除 Docs Canvas 的默认 padding */
+  .docs-story {
+    padding: 0 !important;
+  }
+
+  /* 确保预览容器占满宽度 */
+  .sbdocs .sbdocs-preview,
+  .sbdocs .docs-story > div {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* 移除内部容器的 padding */
+  #storybook-root .v-application--wrap {
+    min-height: auto !important;
+  }
+
+  /* 优化小屏幕显示 */
+  @media (max-width: 768px) {
+    .sbdocs-preview {
+      margin: 0 !important;
+    }
+  }
 </style>

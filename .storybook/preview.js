@@ -47,7 +47,7 @@ export const parameters = {
       component: 'JianghuJS UI 组件库文档',
     },
   },
-  layout: 'centered',
+  layout: 'fullscreen',
 };
 
 // 配置全局装饰器 - 为所有组件提供 Vuetify 上下文
@@ -55,6 +55,6 @@ export const decorators = [
   (story) => ({
     vuetify,
     components: { story },
-    template: '<v-app><v-main><v-container><story /></v-container></v-main></v-app>',
+    template: '<v-app><v-main class="pa-3"><v-container fluid class="pa-0"><story /></v-container></v-main></v-app>',
   }),
 ];

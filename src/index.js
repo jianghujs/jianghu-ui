@@ -9,6 +9,8 @@ import './style/globalCSSJHV4.css';
 import JhMenu from './components/JhMenu/JhMenu.vue';
 import JhScene from './components/JhScene/JhScene.vue';
 import JhDateRangePicker from './components/JhDateRangePicker/JhDateRangePicker.vue';
+import JhQueryFilter from './components/JhQueryFilter/JhQueryFilter.vue';
+import JhTable from './components/JhTable/JhTable.vue';
 
 // Layout Components
 import JhPageContainer from './components/JhPageContainer/JhPageContainer.vue';
@@ -23,11 +25,14 @@ import JhProForm from './components/JhProForm/JhProForm.vue';
 import JhProTable from './components/JhProTable/JhProTable.vue';
 import JhModalForm from './components/JhModalForm/JhModalForm.vue';
 import JhDrawerForm from './components/JhDrawerForm/JhDrawerForm.vue';
+import JhDrawerFormBasic from './components/JhDrawerForm/JhDrawerFormBasic.vue';
 
 const components = {
   JhMenu,
   JhScene,
   JhDateRangePicker,
+  JhQueryFilter,
+  JhTable,
   // Layout Components
   JhPageContainer,
   // Feedback Components
@@ -39,6 +44,7 @@ const components = {
   JhProTable,
   JhModalForm,
   JhDrawerForm,
+  JhDrawerFormBasic,
 };
 
 // Vue plugin install function
@@ -66,6 +72,8 @@ export {
   JhMenu,
   JhScene,
   JhDateRangePicker,
+  JhQueryFilter,
+  JhTable,
   // Layout Components
   JhPageContainer,
   // Feedback Components
@@ -77,4 +85,5 @@ export {
   JhProTable,
   JhModalForm,
   JhDrawerForm,
+  JhDrawerFormBasic,
 };

@@ -1,0 +1,269 @@
+<template>
+  <div class="rounded-lg elevation-0">
+    <!-- 表格工具栏 -->
+    <v-row class="ma-0 pb-3 pa-0 px-3 px-md-0" align="center">
+      <!-- 操作按钮插槽 -->
+      <slot name="toolbar-actions">
+        <v-btn
+          v-if="showCreateButton"
+          color="success"
+          class="mr-2"
+          @click.stop="$emit('create-click')"
+          small
+        >
+          新增
+        </v-btn>
+      </slot>
+
+      <v-spacer></v-spacer>
+
+      <!-- 筛选搜索框 -->
+      <v-col
+        v-if="showSearch"
+        cols="12"
+        sm="6"
+        md="3"
+        xs="8"
+        class="pa-0"
+      >
+        <v-text-field
+          prefix="筛选"
+          v-model="searchInputInternal"
+          class="jh-v-input"
+          dense
+          filled
+          single-line
+        ></v-text-field>
+      </v-col>
+
+      <!-- 额外工具栏操作插槽 -->
+      <slot name="toolbar-extra"></slot>
+    </v-row>
+
+    <!-- 表格 -->
+    <v-data-table
+      :headers="headers"
+      :items="items"
+      :search="searchInputInternal"
+      :footer-props="footerProps"
+      :items-per-page="itemsPerPage"
+      :mobile-breakpoint="mobileBreakpoint"
+      :loading="loading"
+      :checkbox-color="checkboxColor"
+      :class="tableClass"
+      :fixed-header="fixedHeader"
+      :dense="dense"
+      :show-select="showSelect"
+      :single-select="singleSelect"
+      class="jh-fixed-table-height elevation-0 mt-0 mb-xs-4"
+      @click:row="handleRowClick"
+    >
+      <!-- 自定义列插槽 -->
+      <template
+        v-for="header in customHeaders"
+        v-slot:[`item.${header.value}`]="{ item }"
+      >
+        <slot :name="`item.${header.value}`" :item="item"></slot>
+      </template>
+
+      <!-- 操作列 -->
+      <template v-slot:item.action="{ item }">
+        <slot name="item.action" :item="item">
+          <!-- PC端默认操作 -->
+          <template v-if="!isMobile">
+            <span
+              v-if="showUpdateAction"
+              role="button"
+              class="success--text font-weight-medium font-size-2 mr-2"
+              @click.stop="$emit('update-click', item)"
+            >
+              <v-icon size="16" class="success--text">mdi-note-edit-outline</v-icon>详情
+            </span>
+            <span
+              v-if="showDeleteAction"
+              role="button"
+              class="error--text font-weight-medium font-size-2 mr-2"
+              @click.stop="$emit('delete-click', item)"
+            >
+              <v-icon size="16" class="error--text">mdi-trash-can-outline</v-icon>删除
+            </span>
+          </template>
+
+          <!-- 手机端菜单 -->
+          <v-menu offset-y v-if="isMobile">
+            <template v-slot:activator="{ on, attrs }">
+              <span
+                role="button"
+                class="success--text font-weight-medium font-size-2"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon size="20" class="success--text">mdi-chevron-down</v-icon>操作
+              </span>
+            </template>
+            <v-list dense>
+              <v-list-item v-if="showUpdateAction" @click.stop="$emit('update-click', item)">
+                <v-list-item-title>详情</v-list-item-title>
+              </v-list-item>
+              <v-list-item v-if="showDeleteAction" @click.stop="$emit('delete-click', item)">
+                <v-list-item-title>删除</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </slot>
+      </template>
+
+      <!-- 加载中 -->
+      <template v-slot:loading>
+        <div class="jh-no-data">数据加载中</div>
+      </template>
+
+      <!-- 无数据 -->
+      <template v-slot:no-data>
+        <div class="jh-no-data">暂无数据</div>
+      </template>
+
+      <!-- 无结果 -->
+      <template v-slot:no-results>
+        <div class="jh-no-data">暂无数据</div>
+      </template>
+
+      <!-- 分页文本 -->
+      <template v-slot:footer.page-text="pagination">
+        <span>{{ pagination.pageStart }}-{{ pagination.pageStop }}</span>
+        <span class="ml-1">共{{ pagination.itemsLength }}条</span>
+        <span
+          class="ml-1"
+          v-if="items.length > 0 && !loading && items.length < (pagination.pageStop - pagination.pageStart + 1)"
+        >
+          筛选出{{ items.length }}条
+        </span>
+      </template>
+    </v-data-table>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'JhTable',
+  props: {
+    // 表格数据
+    headers: {
+      type: Array,
+      required: true,
+      default: () => []
+    },
+    items: {
+      type: Array,
+      required: true,
+      default: () => []
+    },
+
+    // 表格状态
+    loading: {
+      type: Boolean,
+      default: false
+    },
+
+    // 搜索
+    showSearch: {
+      type: Boolean,
+      default: true
+    },
+    searchInput: {
+      type: String,
+      default: null
+    },
+
+    // 工具栏按钮
+    showCreateButton: {
+      type: Boolean,
+      default: true
+    },
+    showUpdateAction: {
+      type: Boolean,
+      default: true
+    },
+    showDeleteAction: {
+      type: Boolean,
+      default: true
+    },
+
+    // 表格配置
+    itemsPerPage: {
+      type: Number,
+      default: -1
+    },
+    footerProps: {
+      type: Object,
+      default: () => ({
+        itemsPerPageOptions: [20, 50, 200, -1],
+        itemsPerPageText: '每页',
+        itemsPerPageAllText: '所有'
+      })
+    },
+    mobileBreakpoint: {
+      type: Number,
+      default: 0
+    },
+    checkboxColor: {
+      type: String,
+      default: 'success'
+    },
+    tableClass: {
+      type: [String, Object, Array],
+      default: () => ({ zebraLine: true })
+    },
+    fixedHeader: {
+      type: Boolean,
+      default: true
+    },
+    dense: {
+      type: Boolean,
+      default: false
+    },
+    showSelect: {
+      type: Boolean,
+      default: false
+    },
+    singleSelect: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      isMobile: window.innerWidth < 500,
+      searchInputInternal: this.searchInput
+    };
+  },
+  computed: {
+    customHeaders() {
+      // 返回需要自定义插槽的列（排除 action 列）
+      return this.headers.filter(h => h.value !== 'action' && this.$scopedSlots[`item.${h.value}`]);
+    }
+  },
+  watch: {
+    searchInput(val) {
+      this.searchInputInternal = val;
+    },
+    searchInputInternal(val) {
+      this.$emit('update:searchInput', val);
+    }
+  },
+  mounted() {
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+  methods: {
+    handleResize() {
+      this.isMobile = window.innerWidth < 500;
+    },
+    handleRowClick(item, event) {
+      this.$emit('row-click', item, event);
+    }
+  }
+};
+</script>
