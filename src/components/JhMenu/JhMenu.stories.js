@@ -101,7 +101,6 @@ export default {
     docs: {
       description: {
         component: `
-# JhMenu - 江湖菜单组件
 
 一个功能完整的导航菜单组件，支持：
 - 响应式设计（PC端和移动端不同布局）

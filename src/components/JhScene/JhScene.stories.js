@@ -49,7 +49,6 @@ export default {
     docs: {
       description: {
         component: `
-# JhScene - 江湖场景组件
 
 场景管理组件，用于快速切换不同的数据筛选场景。
 

@@ -37,7 +37,6 @@ export default {
     docs: {
       description: {
         component: `
-# JhPageContainer - 江湖页面容器组件（基础版）
 
 页面容器组件，提供统一的页面布局结构。这是与 test 目录中组件样式和功能保持一致的基础版本。
 
@@ -104,6 +103,7 @@ export const Default = {
         </template>
         <template v-slot:search-bar>
           <jh-query-filter
+            class="pa-0"
             :keyword.sync="keyword"
             :keywordFieldList.sync="keywordFieldList"
             :headers="headers"

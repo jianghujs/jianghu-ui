@@ -24,7 +24,7 @@
 
         <!-- 搜索栏插槽 -->
         <v-spacer></v-spacer>
-        <v-col cols="12" xs="12" sm="12" md="8" xl="9" class="pl-md-2 mb-2 mb-md-0">
+        <v-col cols="12" xs="12" sm="12" md="8" xl="9" class="pl-md-2 mb-2 mb-md-0 flex justify-end">
           <slot name="search-bar"></slot>
         </v-col>
       </v-row>

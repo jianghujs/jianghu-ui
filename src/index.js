@@ -21,11 +21,10 @@ import JhToast from './components/JhToast/JhToast.vue';
 import JhConfirmDialog from './components/JhConfirmDialog/JhConfirmDialog.vue';
 
 // Pro Components
-import JhProForm from './components/JhProForm/JhProForm.vue';
-import JhProTable from './components/JhProTable/JhProTable.vue';
+import JhForm from './components/JhForm/JhForm.vue';
 import JhModalForm from './components/JhModalForm/JhModalForm.vue';
 import JhDrawerForm from './components/JhDrawerForm/JhDrawerForm.vue';
-import JhDrawerFormBasic from './components/JhDrawerForm/JhDrawerFormBasic.vue';
+import JhStepsForm from './components/JhStepsForm/JhStepsForm.vue';
 
 const components = {
   JhMenu,
@@ -39,12 +38,10 @@ const components = {
   JhMask,
   JhToast,
   JhConfirmDialog,
-  // Pro Components
-  JhProForm,
-  JhProTable,
+  JhForm,
   JhModalForm,
   JhDrawerForm,
-  JhDrawerFormBasic,
+  JhStepsForm,
 };
 
 // Vue plugin install function
@@ -81,9 +78,8 @@ export {
   JhToast,
   JhConfirmDialog,
   // Pro Components
-  JhProForm,
-  JhProTable,
+  JhForm,
   JhModalForm,
   JhDrawerForm,
-  JhDrawerFormBasic,
+  JhStepsForm,
 };

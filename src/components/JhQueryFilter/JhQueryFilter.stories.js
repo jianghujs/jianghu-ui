@@ -1,243 +1,563 @@
 import JhQueryFilter from './JhQueryFilter.vue';
 
-// 示例表头数据
-const sampleHeaders = [
-  { text: '用户名', value: 'username' },
-  { text: '邮箱', value: 'email' },
-  { text: '手机号', value: 'phone' },
-  { text: '状态', value: 'status' },
-  { text: '创建时间', value: 'createdAt' },
-  { text: '操作', value: 'action' },
-];
-
 export default {
-  title: '基础组件/JhQueryFilter',
+  title: '数据录入/JhQueryFilter',
   component: JhQueryFilter,
   tags: ['autodocs'],
   argTypes: {
-    showKeywordSearch: {
+    fields: {
+      control: 'object',
+      description: '查询字段配置数组',
+    },
+    initialValues: {
+      control: 'object',
+      description: '初始查询数据',
+    },
+    collapsible: {
       control: 'boolean',
-      description: '是否显示关键字搜索',
+      description: '是否可折叠',
     },
-    keyword: {
-      control: 'text',
-      description: '关键字搜索内容',
+    defaultCollapsed: {
+      control: 'boolean',
+      description: '默认是否折叠',
     },
-    keywordFieldList: {
-      control: 'object',
-      description: '关键字搜索字段列表',
+    defaultVisibleCount: {
+      control: 'number',
+      description: '默认显示字段数量（折叠时）',
     },
-    keywordLabel: {
-      control: 'text',
-      description: '关键字字段标签',
-    },
-    headers: {
-      control: 'object',
-      description: '表头数据（用于关键字字段选择）',
-    },
-    searchButtonText: {
+    searchText: {
       control: 'text',
       description: '查询按钮文本',
+    },
+    resetText: {
+      control: 'text',
+      description: '重置按钮文本',
     },
   },
   parameters: {
     docs: {
       description: {
         component: `
-# JhQueryFilter - 江湖查询筛选组件
 
-查询筛选组件，支持关键字搜索和自定义筛选字段。
+高级查询筛选组件，参考 Ant Design Pro QueryFilter 设计，支持字段配置化查询表单。
 
 ## 功能特性
 
-- 关键字搜索（支持多字段选择）
-- 自定义筛选字段插槽
-- 额外操作按钮插槽
-- 响应式布局
+### 1. 字段类型支持
+- **text**: 文本输入框
+- **number**: 数字输入框
+- **select**: 下拉选择框（支持单选/多选）
+- **autocomplete**: 自动完成
+- **date**: 日期选择器
+- **daterange**: 日期范围选择器
+- **slot**: 自定义字段插槽
 
-## 使用场景
+### 2. 折叠/展开
+- 默认显示前 3 个字段
+- 超过设定数量自动显示展开按钮
+- 支持自定义默认显示数量
 
-适用于需要查询和筛选功能的列表页面，如：
-- 用户列表筛选
-- 订单查询
-- 商品搜索
+### 3. 查询操作
+- 查询按钮：提交查询，自动过滤空值
+- 重置按钮：清空所有字段并触发查询
+- 支持回车键快速查询
 
-## 事件
+### 4. 响应式布局
+- 自适应不同屏幕尺寸
+- 支持自定义列宽配置
 
-- \`search\`: 点击查询按钮时触发
-- \`update:keyword\`: 关键字变化时触发
-- \`update:keywordFieldList\`: 关键字字段列表变化时触发
+## API
 
-## 插槽
+### Props
 
-- \`filter-fields\`: 自定义筛选字段
-- \`extra-actions\`: 额外操作按钮
+| 参数 | 类型 | 默认值 | 说明 |
+|-----|------|--------|------|
+| fields | Array | [] | 字段配置数组 |
+| initialValues | Object | {} | 初始查询数据 |
+| collapsible | Boolean | true | 是否可折叠 |
+| defaultCollapsed | Boolean | true | 默认是否折叠 |
+| defaultVisibleCount | Number | 3 | 默认显示字段数量 |
+| colSpan | Object | {...} | 列宽配置 |
+| searchText | String | '查询' | 查询按钮文本 |
+| resetText | String | '重置' | 重置按钮文本 |
+| expandText | String | '展开' | 展开按钮文本 |
+| collapseText | String | '收起' | 收起按钮文本 |
+
+### 字段配置 (Field Config)
+
+\`\`\`javascript
+{
+  key: 'fieldName',        // 字段名称
+  label: '字段标签',        // 字段标签
+  type: 'text',            // 字段类型
+  placeholder: '请输入',    // 占位符
+  defaultValue: '',        // 默认值
+  options: [],             // 选项（select/autocomplete）
+  cols: 12,                // 列宽（xs）
+  sm: 12,                  // 列宽（sm）
+  md: 8,                   // 列宽（md）
+  lg: 6,                   // 列宽（lg）
+  disabled: false,         // 是否禁用
+  realtime: false,         // 是否实时查询
+}
+\`\`\`
+
+### Events
+
+| 事件名 | 参数 | 说明 |
+|-------|------|------|
+| search | queryData | 查询事件，返回过滤后的查询数据 |
+| reset | - | 重置事件 |
+| field-change | { key, value, formData } | 字段变化事件 |
+| collapse-change | collapsed | 折叠状态变化 |
+
+### Methods
+
+| 方法名 | 参数 | 说明 |
+|-------|------|------|
+| getFormData | - | 获取表单数据 |
+| setFieldsValue | values | 批量设置字段值 |
+| setFieldValue | key, value | 设置单个字段值 |
+
+## 使用示例
+
+\`\`\`vue
+<template>
+  <jh-query-filter
+    :fields="queryFields"
+    :initial-values="initialValues"
+    @search="handleSearch"
+    @reset="handleReset"
+  />
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      queryFields: [
+        {
+          key: 'keyword',
+          label: '关键词',
+          type: 'text',
+          placeholder: '请输入关键词',
+        },
+        {
+          key: 'status',
+          label: '状态',
+          type: 'select',
+          placeholder: '请选择状态',
+          options: [
+            { text: '全部', value: '' },
+            { text: '启用', value: 'active' },
+            { text: '禁用', value: 'inactive' },
+          ],
+        },
+        {
+          key: 'dateRange',
+          label: '日期范围',
+          type: 'daterange',
+          placeholder: '请选择日期',
+        },
+      ],
+      initialValues: {
+        status: '',
+      },
+    };
+  },
+  methods: {
+    handleSearch(queryData) {
+      console.log('查询参数:', queryData);
+      // 调用表格刷新等操作
+    },
+    handleReset() {
+      console.log('重置查询');
+    },
+  },
+};
+</script>
+\`\`\`
         `,
       },
     },
   },
 };
 
-// 默认故事
+// 默认故事 - 基础查询表单
 export const Default = {
   args: {
-    showKeywordSearch: true,
-    keyword: '',
-    keywordFieldList: ['username', 'email'],
-    keywordLabel: '标题',
-    headers: sampleHeaders,
-    searchButtonText: '查询',
+    fields: [
+      {
+        key: 'keyword',
+        label: '关键词',
+        type: 'text',
+        placeholder: '请输入关键词',
+      },
+      {
+        key: 'status',
+        label: '状态',
+        type: 'select',
+        placeholder: '请选择状态',
+        options: [
+          { text: '全部', value: '' },
+          { text: '启用', value: 'active' },
+          { text: '禁用', value: 'inactive' },
+        ],
+      },
+      {
+        key: 'category',
+        label: '分类',
+        type: 'select',
+        placeholder: '请选择分类',
+        options: [
+          { text: '全部', value: '' },
+          { text: '技术', value: 'tech' },
+          { text: '产品', value: 'product' },
+          { text: '设计', value: 'design' },
+        ],
+      },
+    ],
+    initialValues: {},
+    collapsible: true,
+    defaultCollapsed: true,
+    defaultVisibleCount: 3,
   },
   render: (args) => ({
     components: { JhQueryFilter },
     data() {
       return {
         args,
-        keywordSync: args.keyword,
-        keywordFieldListSync: [...args.keywordFieldList],
+        queryData: {},
       };
     },
     template: `
       <div>
         <jh-query-filter
           v-bind="args"
-          :keyword.sync="keywordSync"
-          :keywordFieldList.sync="keywordFieldListSync"
           @search="handleSearch"
+          @reset="handleReset"
         />
         <v-card class="mt-4" outlined>
           <v-card-text>
-            <h4>搜索参数：</h4>
-            <p><strong>关键字：</strong>{{ keywordSync }}</p>
-            <p><strong>搜索字段：</strong>{{ keywordFieldListSync.join(', ') }}</p>
+            <h4>查询参数：</h4>
+            <pre>{{ JSON.stringify(queryData, null, 2) }}</pre>
           </v-card-text>
         </v-card>
       </div>
     `,
     methods: {
-      handleSearch() {
-        console.log('Search triggered', {
-          keyword: this.keywordSync,
-          fields: this.keywordFieldListSync,
-        });
-        alert('查询触发！关键字：' + this.keywordSync);
+      handleSearch(queryData) {
+        this.queryData = queryData;
+        console.log('查询参数:', queryData);
+      },
+      handleReset() {
+        console.log('重置查询');
       },
     },
   }),
 };
 
-// 带自定义筛选字段的故事
-export const WithCustomFilters = {
+// 多字段折叠示例
+export const CollapsibleFields = {
   args: {
-    ...Default.args,
+    fields: [
+      {
+        key: 'keyword',
+        label: '关键词',
+        type: 'text',
+        placeholder: '请输入关键词',
+      },
+      {
+        key: 'status',
+        label: '状态',
+        type: 'select',
+        placeholder: '请选择状态',
+        options: [
+          { text: '全部', value: '' },
+          { text: '启用', value: 'active' },
+          { text: '禁用', value: 'inactive' },
+        ],
+      },
+      {
+        key: 'category',
+        label: '分类',
+        type: 'select',
+        placeholder: '请选择分类',
+        options: [
+          { text: '全部', value: '' },
+          { text: '技术', value: 'tech' },
+          { text: '产品', value: 'product' },
+        ],
+      },
+      {
+        key: 'author',
+        label: '作者',
+        type: 'text',
+        placeholder: '请输入作者',
+      },
+      {
+        key: 'priority',
+        label: '优先级',
+        type: 'select',
+        placeholder: '请选择优先级',
+        options: [
+          { text: '全部', value: '' },
+          { text: '高', value: 'high' },
+          { text: '中', value: 'medium' },
+          { text: '低', value: 'low' },
+        ],
+      },
+      {
+        key: 'tags',
+        label: '标签',
+        type: 'autocomplete',
+        placeholder: '请输入标签',
+        options: [
+          { text: 'Vue', value: 'vue' },
+          { text: 'React', value: 'react' },
+          { text: 'Angular', value: 'angular' },
+        ],
+      },
+    ],
+    initialValues: {},
+    collapsible: true,
+    defaultCollapsed: true,
+    defaultVisibleCount: 3,
+  },
+  render: Default.render,
+};
+
+// 日期范围查询
+export const WithDateRange = {
+  args: {
+    fields: [
+      {
+        key: 'keyword',
+        label: '关键词',
+        type: 'text',
+        placeholder: '请输入关键词',
+      },
+      {
+        key: 'status',
+        label: '状态',
+        type: 'select',
+        placeholder: '请选择状态',
+        options: [
+          { text: '全部', value: '' },
+          { text: '进行中', value: 'progress' },
+          { text: '已完成', value: 'completed' },
+        ],
+      },
+      {
+        key: 'date',
+        label: '日期',
+        type: 'date',
+        placeholder: '请选择日期',
+      },
+      {
+        key: 'dateRange',
+        label: '日期范围',
+        type: 'daterange',
+        placeholder: '请选择日期范围',
+      },
+    ],
+    initialValues: {},
+    collapsible: false,
+  },
+  render: Default.render,
+};
+
+// 自定义初始值
+export const WithInitialValues = {
+  args: {
+    fields: [
+      {
+        key: 'keyword',
+        label: '关键词',
+        type: 'text',
+        placeholder: '请输入关键词',
+      },
+      {
+        key: 'status',
+        label: '状态',
+        type: 'select',
+        placeholder: '请选择状态',
+        options: [
+          { text: '全部', value: '' },
+          { text: '启用', value: 'active' },
+          { text: '禁用', value: 'inactive' },
+        ],
+        defaultValue: 'active',
+      },
+      {
+        key: 'category',
+        label: '分类',
+        type: 'select',
+        placeholder: '请选择分类',
+        options: [
+          { text: '全部', value: '' },
+          { text: '技术', value: 'tech' },
+          { text: '产品', value: 'product' },
+        ],
+      },
+    ],
+    initialValues: {
+      keyword: '搜索关键词',
+      status: 'active',
+    },
+    collapsible: false,
+  },
+  render: Default.render,
+};
+
+// 自定义字段插槽
+export const CustomFieldSlot = {
+  args: {
+    fields: [
+      {
+        key: 'keyword',
+        label: '关键词',
+        type: 'text',
+        placeholder: '请输入关键词',
+      },
+      {
+        key: 'status',
+        label: '状态',
+        type: 'select',
+        placeholder: '请选择状态',
+        options: [
+          { text: '全部', value: '' },
+          { text: '启用', value: 'active' },
+          { text: '禁用', value: 'inactive' },
+        ],
+      },
+      {
+        key: 'customField',
+        label: '自定义字段',
+        type: 'slot',
+      },
+    ],
+    initialValues: {},
+    collapsible: false,
   },
   render: (args) => ({
     components: { JhQueryFilter },
     data() {
       return {
         args,
-        keywordSync: args.keyword,
-        keywordFieldListSync: [...args.keywordFieldList],
-        status: '',
-        dateRange: '',
+        customValue: '',
+        queryData: {},
       };
     },
     template: `
       <div>
         <jh-query-filter
           v-bind="args"
-          :keyword.sync="keywordSync"
-          :keywordFieldList.sync="keywordFieldListSync"
           @search="handleSearch"
+          @reset="handleReset"
         >
-          <template v-slot:filter-fields>
-            <v-col cols="12" sm="3" md="2" class="pl-md-2">
-              <v-select
-                v-model="status"
-                :items="statusOptions"
-                label="状态"
-                dense
-                filled
-                single-line
-                class="jh-v-input"
-              ></v-select>
-            </v-col>
-            <v-col cols="12" sm="3" md="2" class="pl-md-2">
-              <v-text-field
-                v-model="dateRange"
-                label="日期"
-                dense
-                filled
-                single-line
-                class="jh-v-input"
-              ></v-text-field>
-            </v-col>
+          <template #field-customField="{ updateField }">
+            <v-text-field
+              v-model="customValue"
+              placeholder="自定义字段插槽"
+              dense
+              filled
+              single-line
+              class="jh-v-input"
+              hide-details
+              @input="updateField('customField', $event)"
+            >
+              <template v-slot:append>
+                <v-icon small>mdi-magnify</v-icon>
+              </template>
+            </v-text-field>
           </template>
         </jh-query-filter>
         <v-card class="mt-4" outlined>
           <v-card-text>
-            <h4>搜索参数：</h4>
-            <p><strong>关键字：</strong>{{ keywordSync }}</p>
-            <p><strong>搜索字段：</strong>{{ keywordFieldListSync.join(', ') }}</p>
-            <p><strong>状态：</strong>{{ status }}</p>
-            <p><strong>日期：</strong>{{ dateRange }}</p>
+            <h4>查询参数：</h4>
+            <pre>{{ JSON.stringify(queryData, null, 2) }}</pre>
           </v-card-text>
         </v-card>
       </div>
     `,
-    computed: {
-      statusOptions() {
-        return [
-          { text: '全部', value: '' },
-          { text: '启用', value: 'active' },
-          { text: '禁用', value: 'inactive' },
-        ];
-      },
-    },
     methods: {
-      handleSearch() {
-        console.log('Search triggered', {
-          keyword: this.keywordSync,
-          fields: this.keywordFieldListSync,
-          status: this.status,
-          dateRange: this.dateRange,
-        });
-        alert('查询触发！');
+      handleSearch(queryData) {
+        this.queryData = queryData;
+        console.log('查询参数:', queryData);
+      },
+      handleReset() {
+        this.customValue = '';
+        console.log('重置查询');
       },
     },
   }),
 };
 
-// 带额外操作按钮
-export const WithExtraActions = {
+// 自定义按钮插槽
+export const CustomButtons = {
   args: {
-    ...Default.args,
+    fields: [
+      {
+        key: 'keyword',
+        label: '关键词',
+        type: 'text',
+        placeholder: '请输入关键词',
+      },
+      {
+        key: 'status',
+        label: '状态',
+        type: 'select',
+        placeholder: '请选择状态',
+        options: [
+          { text: '全部', value: '' },
+          { text: '启用', value: 'active' },
+          { text: '禁用', value: 'inactive' },
+        ],
+      },
+    ],
+    initialValues: {},
+    collapsible: false,
   },
   render: (args) => ({
     components: { JhQueryFilter },
     data() {
       return {
         args,
-        keywordSync: args.keyword,
-        keywordFieldListSync: [...args.keywordFieldList],
+        queryData: {},
       };
     },
     template: `
       <div>
         <jh-query-filter
           v-bind="args"
-          :keyword.sync="keywordSync"
-          :keywordFieldList.sync="keywordFieldListSync"
           @search="handleSearch"
         >
-          <template v-slot:extra-actions>
-            <div class="ml-2">
+          <template #buttons="{ formData, search, reset }">
+            <div class="d-flex align-center gap-2">
               <v-btn
-                class="elevation-0 mt-2 mt-sm-0"
                 color="primary"
+                small
+                @click="search"
+              >
+                <v-icon left small>mdi-magnify</v-icon>
+                搜索
+              </v-btn>
+              <v-btn
+                color="default"
+                small
+                text
+                @click="reset"
+              >
+                <v-icon left small>mdi-refresh</v-icon>
+                清空
+              </v-btn>
+              <v-btn
+                color="success"
                 small
                 @click="handleExport"
               >
+                <v-icon left small>mdi-download</v-icon>
                 导出
               </v-btn>
             </div>
@@ -245,81 +565,119 @@ export const WithExtraActions = {
         </jh-query-filter>
         <v-card class="mt-4" outlined>
           <v-card-text>
-            <h4>搜索参数：</h4>
-            <p><strong>关键字：</strong>{{ keywordSync }}</p>
-            <p><strong>搜索字段：</strong>{{ keywordFieldListSync.join(', ') }}</p>
+            <h4>查询参数：</h4>
+            <pre>{{ JSON.stringify(queryData, null, 2) }}</pre>
           </v-card-text>
         </v-card>
       </div>
     `,
     methods: {
-      handleSearch() {
-        console.log('Search triggered');
-        alert('查询触发！');
+      handleSearch(queryData) {
+        this.queryData = queryData;
+        console.log('查询参数:', queryData);
       },
       handleExport() {
-        console.log('Export triggered');
-        alert('导出触发！');
+        alert('导出数据');
       },
     },
   }),
 };
 
-// 不显示关键字搜索
-export const WithoutKeywordSearch = {
-  args: {
-    ...Default.args,
-    showKeywordSearch: false,
-  },
-  render: (args) => ({
+// 完整示例 - 配合 JhTable 使用
+export const CompleteExample = {
+  render: () => ({
     components: { JhQueryFilter },
     data() {
       return {
-        args,
-        status: '',
+        queryFields: [
+          {
+            key: 'keyword',
+            label: '关键词',
+            type: 'text',
+            placeholder: '请输入用户名/邮箱',
+          },
+          {
+            key: 'status',
+            label: '状态',
+            type: 'select',
+            placeholder: '请选择状态',
+            options: [
+              { text: '全部', value: '' },
+              { text: '在职', value: 'active' },
+              { text: '离职', value: 'inactive' },
+            ],
+          },
+          {
+            key: 'department',
+            label: '部门',
+            type: 'select',
+            placeholder: '请选择部门',
+            options: [
+              { text: '全部', value: '' },
+              { text: '技术部', value: 'tech' },
+              { text: '产品部', value: 'product' },
+              { text: '设计部', value: 'design' },
+            ],
+          },
+          {
+            key: 'dateRange',
+            label: '入职时间',
+            type: 'daterange',
+            placeholder: '请选择日期范围',
+          },
+        ],
+        initialValues: {},
+        queryData: {},
+        tableData: [],
+        loading: false,
       };
     },
     template: `
       <div>
-        <jh-query-filter
-          v-bind="args"
-          @search="handleSearch"
-        >
-          <template v-slot:filter-fields>
-            <v-col cols="12" sm="4" md="3" class="pl-md-2">
-              <v-select
-                v-model="status"
-                :items="statusOptions"
-                label="状态"
-                dense
-                filled
-                single-line
-                class="jh-v-input"
-              ></v-select>
-            </v-col>
-          </template>
-        </jh-query-filter>
+        <v-card outlined>
+          <v-card-text>
+            <jh-query-filter
+              :fields="queryFields"
+              :initial-values="initialValues"
+              :loading="loading"
+              @search="handleSearch"
+              @reset="handleReset"
+            />
+          </v-card-text>
+        </v-card>
+
         <v-card class="mt-4" outlined>
           <v-card-text>
-            <h4>搜索参数：</h4>
-            <p><strong>状态：</strong>{{ status }}</p>
+            <h3>查询结果</h3>
+            <div class="mt-2">
+              <p><strong>当前查询条件：</strong></p>
+              <pre class="pa-2 grey lighten-4 rounded">{{ JSON.stringify(queryData, null, 2) }}</pre>
+            </div>
+            <div class="mt-4">
+              <p class="grey--text">在实际使用中，这里会显示 JhTable 组件，并根据查询条件刷新表格数据。</p>
+              <v-alert type="info" text dense>
+                示例代码：&lt;jh-table :request="fetchData" /&gt;
+              </v-alert>
+            </div>
           </v-card-text>
         </v-card>
       </div>
     `,
-    computed: {
-      statusOptions() {
-        return [
-          { text: '全部', value: '' },
-          { text: '启用', value: 'active' },
-          { text: '禁用', value: 'inactive' },
-        ];
-      },
-    },
     methods: {
-      handleSearch() {
-        console.log('Search triggered', { status: this.status });
-        alert('查询触发！');
+      async handleSearch(queryData) {
+        this.loading = true;
+        this.queryData = queryData;
+        console.log('查询参数:', queryData);
+
+        // 模拟 API 请求
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        this.loading = false;
+        console.log('查询完成');
+      },
+      handleReset() {
+        this.queryData = {};
+        console.log('重置查询');
       },
     },
   }),

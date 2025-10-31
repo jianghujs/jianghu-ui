@@ -1,498 +1,297 @@
 <template>
   <v-navigation-drawer
-    v-if="value"
-    :value="value"
-    @input="handleDrawerInput"
-    :permanent="value"
+    v-model="isShownInternal"
     fixed
     temporary
-    :right="placement === 'right'"
-    :left="placement === 'left'"
-    :width="drawerWidth"
-    class="elevation-24 jh-drawer-form"
+    :right="position === 'right'"
+    :left="position === 'left'"
+    :width="width"
+    class="elevation-24"
   >
-    <v-form ref="formRef" lazy-validation>
-      <!-- 抽屉头部 -->
-      <v-row
-        class="jh-drawer-header px-4"
-        :class="{ 'pl-[30px] md:pl-4': true }"
-        no-gutters
-        align="center"
-      >
-        <!-- 移动端返回按钮 -->
-        <v-icon
-          v-if="isMobile"
-          @click="handleClose"
-          class="mr-2"
+    <!-- 抽屉标题 -->
+    <v-row class="jh-drawer-header px-4 bg-white" no-gutters align="center">
+      <span class="text-h7 font-weight-bold py-4">{{ title }}</span>
+      <v-spacer></v-spacer>
+
+      <!-- 操作按钮组 -->
+      <div class="jh-drawer-action-btn-group">
+        <!-- 取消按钮 -->
+        <v-btn
+          class="elevation-0 grey lighten-4"
+          @click="handleCancel"
+          small
         >
-          mdi-chevron-left
-        </v-icon>
+          {{ cancelText }}
+        </v-btn>
 
-        <div class="d-flex justify-center py-3 flex-grow-1 align-center">
-          <span class="text-h7 font-weight-bold">{{ title }}</span>
-          <v-spacer></v-spacer>
-        </div>
-
-        <!-- 头部操作按钮 -->
-        <div
-          v-if="headerActions && headerActions.length > 0"
-          class="jh-drawer-action-btn-group pa-3"
-        >
-          <div class="d-flex gap-2">
-            <v-btn
-              v-for="(action, index) in headerActions"
-              :key="index"
-              :color="action.color || 'success'"
-              :disabled="action.disabled || submitting"
-              :loading="action.loading"
-              small
-              @click="action.handler"
-            >
-              <v-icon v-if="action.icon" left small>{{ action.icon }}</v-icon>
-              {{ action.label }}
-            </v-btn>
-          </div>
-        </div>
-      </v-row>
-
-      <v-divider class="jh-divider"></v-divider>
-
-      <!-- 抽屉内容 -->
-      <div class="jh-drawer-content">
-        <!-- 如果使用默认插槽，完全自定义内容 -->
-        <slot v-if="$slots.default"></slot>
-
-        <!-- 否则使用 JhProForm -->
-        <div v-else class="pa-4">
-          <jh-pro-form
-            ref="proFormRef"
-            label-position="top"
-            :fields="fields"
-            :initial-data="initialValues"
-            :layout="layout"
-            :label-width="labelWidth"
-            :outlined="outlined"
-            :dense="dense"
-            :show-buttons="false"
-            :disabled="submitting"
-            @submit="handleSubmit"
-          >
-            <!-- 透传所有具名插槽 -->
-            <template
-              v-for="(_, slot) in $scopedSlots"
-              #[slot]="scope"
-            >
-              <slot :name="slot" v-bind="scope" />
-            </template>
-          </jh-pro-form>
-        </div>
-
-        <!-- 底部操作按钮 (仅在非插槽模式下显示) -->
-        <div
-          v-if="!$slots.default && showFooterButtons"
-          class="jh-drawer-footer pa-4 d-flex justify-end"
-        >
+        <!-- 自定义操作按钮插槽 -->
+        <slot name="actions">
+          <!-- 默认确认按钮 -->
           <v-btn
-            text
-            :disabled="submitting"
-            @click="handleCancel"
-          >
-            {{ cancelText }}
-          </v-btn>
-          <v-btn
-            color="primary"
+            v-if="showConfirmButton"
+            color="success"
             class="ml-2"
-            :loading="submitting"
-            :disabled="submitting"
+            small
             @click="handleConfirm"
           >
-            {{ submitText }}
+            {{ confirmText }}
           </v-btn>
-        </div>
+        </slot>
       </div>
-    </v-form>
+    </v-row>
 
-    <!-- PC端浮动关闭按钮 -->
-    <!-- <v-btn
-      v-if="!isMobile && showCloseButton"
+    <v-divider class="jh-divider"></v-divider>
+
+    <!-- 抽屉内容 -->
+    <div class="px-4 pb-4">
+      <!-- 支持完全自定义内容 -->
+      <slot name="content">
+        <!-- 使用 JhForm 组件渲染表单 -->
+        <jh-form
+          ref="jhForm"
+          :form-ref="formRef"
+          :fields="fields"
+          :initial-data="initialData"
+          :validation-rules="validationRules"
+          :default-cols-md="3"
+          :row-class="rowClass"
+          @field-change="handleFieldChange"
+        >
+          <!-- 传递自定义字段插槽 -->
+          <template v-for="field in slotFields" v-slot:[`field-${field.key}`]="slotProps">
+            <slot :name="`field-${field.key}`" v-bind="slotProps"></slot>
+          </template>
+        </jh-form>
+      </slot>
+    </div>
+
+    <!-- 抽屉关闭按钮 -->
+    <v-btn
       elevation="0"
       color="success"
       fab
       absolute
       top
-      :left="placement === 'right'"
-      :right="placement === 'left'"
+      left
       small
       tile
-      class="jh-drawer-close-float-btn"
-      @click="handleClose"
+      class="drawer-close-float-btn"
+      @click="handleCancel"
     >
       <v-icon>mdi-close</v-icon>
-    </v-btn> -->
+    </v-btn>
   </v-navigation-drawer>
 </template>
 
 <script>
-import JhProForm from '../JhProForm/JhProForm.vue';
+import JhForm from '../JhForm/JhForm.vue';
 
 export default {
   name: 'JhDrawerForm',
 
   components: {
-    JhProForm,
+    JhForm,
   },
 
   props: {
-    // v-model 控制显示/隐藏
+    // 抽屉显示状态
     value: {
       type: Boolean,
-      default: false,
+      default: false
     },
 
     // 抽屉标题
     title: {
       type: String,
-      default: '表单',
+      default: '表单'
     },
 
-    // 表单字段配置（仅在不使用插槽时有效）
-    fields: {
-      type: Array,
-      default: () => [],
-    },
-
-    // 初始值
-    initialValues: {
-      type: Object,
-      default: () => ({}),
+    // 抽屉位置
+    position: {
+      type: String,
+      default: 'right',
+      validator: (v) => ['left', 'right'].includes(v)
     },
 
     // 抽屉宽度
     width: {
-      type: [Number, String],
-      default: null,
-    },
-
-    // 抽屉位置
-    placement: {
       type: String,
-      default: 'right',
-      validator: (v) => ['left', 'right'].includes(v),
+      default: '90%'
     },
 
-    // 是否显示关闭按钮
-    showCloseButton: {
+    // 按钮配置
+    showConfirmButton: {
       type: Boolean,
-      default: true,
+      default: true
     },
-
-    // 是否显示底部按钮（仅在非插槽模式下有效）
-    showFooterButtons: {
-      type: Boolean,
-      default: true,
-    },
-
-    // 提交按钮文本
-    submitText: {
+    confirmText: {
       type: String,
-      default: '确定',
+      default: '确认'
     },
-
-    // 取消按钮文本
     cancelText: {
       type: String,
-      default: '取消',
+      default: '取消'
     },
 
-    // 头部操作按钮配置
-    // 格式: [{ label: '保存', color: 'success', icon: 'mdi-content-save', handler: () => {}, disabled: false, loading: false }]
-    headerActions: {
-      type: Array,
-      default: () => [],
-    },
-
-    // 表单布局
-    layout: {
+    // 表单引用名称
+    formRef: {
       type: String,
-      default: 'vertical',
+      default: 'drawerForm'
     },
 
-    // 标签宽度
-    labelWidth: {
-      type: [Number, String],
-      default: 100,
-    },
-
-    // 是否显示边框
-    outlined: {
+    // 是否在确认前验证表单
+    validateBeforeConfirm: {
       type: Boolean,
-      default: true,
+      default: true
     },
 
-    // 紧凑模式
-    dense: {
-      type: Boolean,
-      default: true,
+    // 表单字段配置（JSON 配置）
+    fields: {
+      type: Array,
+      default: () => []
     },
 
-    // 提交请求函数
-    request: {
-      type: Function,
-      default: null,
+    // 初始表单数据
+    initialData: {
+      type: Object,
+      default: () => ({})
     },
 
-    // 关闭前的确认回调
-    onBeforeClose: {
-      type: Function,
-      default: null,
+    // 自定义行样式类
+    rowClass: {
+      type: String,
+      default: 'mt-0'
     },
 
-    // 数据转换函数（提交前）
-    transformBeforeSubmit: {
-      type: Function,
-      default: null,
-    },
+    // 验证规则集合
+    validationRules: {
+      type: Object,
+      default: () => ({
+        require: [v => !!v || '必填'],
+        email: [v => !v || /.+@.+\..+/.test(v) || '邮箱格式不正确'],
+        phone: [v => !v || /^1[3-9]\d{9}$/.test(v) || '手机号格式不正确'],
+        number: [v => !v || !isNaN(v) || '请输入数字'],
+        integer: [v => !v || Number.isInteger(Number(v)) || '请输入整数']
+      })
+    }
   },
 
   data() {
     return {
-      submitting: false,
-      isMobile: false,
+      isShownInternal: this.value,
     };
   },
 
   computed: {
-    drawerWidth() {
-      if (this.width) {
-        return this.width;
-      }
-      return this.isMobile ? '90%' : 600;
+    // 获取所有 slot 类型的字段
+    slotFields() {
+      return this.fields.filter(field => field.type === 'slot');
     },
   },
 
-  mounted() {
-    this.checkMobile();
-    window.addEventListener('resize', this.checkMobile);
-  },
-
-  beforeDestroy() {
-    window.removeEventListener('resize', this.checkMobile);
+  watch: {
+    value(val) {
+      this.isShownInternal = val;
+      // 当抽屉打开时,重置表单数据和验证状态
+      if (val) {
+        this.$nextTick(() => {
+          this.resetForm();
+        });
+      }
+    },
+    isShownInternal(val) {
+      if (!val) {
+        this.$emit('input', false);
+        this.$emit('close');
+      }
+    }
   },
 
   methods: {
-    // 检测移动端
-    checkMobile() {
-      this.isMobile = window.innerWidth < 600;
-    },
-
-    // 处理抽屉输入事件
-    handleDrawerInput(value) {
-      if (!value) {
-        this.handleClose();
-      }
-    },
-
-    // 关闭抽屉
-    async handleClose() {
-      if (this.submitting) return;
-
-      // 如果有关闭前回调，先执行
-      if (this.onBeforeClose) {
-        const shouldClose = await this.onBeforeClose();
-        if (shouldClose === false) {
-          return;
-        }
-      }
-
-      this.$emit('input', false);
-      this.$emit('close');
-
-      // 延迟重置表单，避免关闭动画时看到表单重置
-      setTimeout(() => {
-        this.resetForm();
-      }, 300);
-    },
-
-    // 取消
+    // 处理取消
     handleCancel() {
-      this.handleClose();
       this.$emit('cancel');
+      this.isShownInternal = false;
     },
 
-    // 确认提交（仅在非插槽模式下调用）
+    // 处理确认
     async handleConfirm() {
-      // 如果使用插槽模式，不处理提交
-      if (this.$slots.default) {
-        this.$emit('confirm');
-        return;
-      }
-
-      try {
-        // 验证表单
-        const valid = await this.validate();
-        if (!valid) {
+      // 如果需要验证表单
+      if (this.validateBeforeConfirm) {
+        const isValid = await this.validate();
+        if (!isValid) {
           return;
         }
-
-        // 获取表单数据
-        let formData = this.getFormData();
-
-        // 数据转换
-        if (this.transformBeforeSubmit) {
-          formData = this.transformBeforeSubmit(formData);
-        }
-
-        // 如果提供了 request 函数，自动处理提交
-        if (this.request) {
-          this.submitting = true;
-          try {
-            const response = await this.request(formData);
-            this.$emit('success', response, formData);
-            this.$emit('input', false);
-
-            // 延迟重置表单
-            setTimeout(() => {
-              this.resetForm();
-            }, 300);
-          } catch (error) {
-            this.$emit('error', error, formData);
-          } finally {
-            this.submitting = false;
-          }
-        } else {
-          // 否则触发 submit 事件，由外部处理
-          this.$emit('submit', formData);
-        }
-      } catch (error) {
-        console.error('Form validation failed:', error);
       }
+
+      this.$emit('confirm', this.getFormData());
     },
 
-    // 处理提交（表单内部触发）
-    handleSubmit(formData) {
-      // 由 handleConfirm 统一处理
+    // 处理字段变化
+    handleFieldChange(event) {
+      this.$emit('field-change', event);
     },
 
-    // 重置表单
-    resetForm() {
-      if (this.$refs.proFormRef) {
-        this.$refs.proFormRef.resetForm();
-        this.$refs.proFormRef.resetValidation();
-      }
-      if (this.$refs.formRef) {
-        this.$refs.formRef.resetValidation();
-      }
+    // 获取 JhForm 实例
+    getJhForm() {
+      return this.$refs.jhForm;
+    },
+
+    // 获取表单引用（供父组件调用）
+    getForm() {
+      const jhForm = this.getJhForm();
+      return jhForm ? jhForm.getForm() : null;
     },
 
     // 获取表单数据
     getFormData() {
-      if (this.$refs.proFormRef) {
-        return this.$refs.proFormRef.getFormData() || {};
-      }
-      return {};
+      const jhForm = this.getJhForm();
+      return jhForm ? jhForm.getFormData() : {};
     },
 
     // 设置表单数据
     setFieldsValue(values) {
-      this.$refs.proFormRef?.setFieldsValue(values);
+      const jhForm = this.getJhForm();
+      if (jhForm) {
+        jhForm.setFieldsValue(values);
+      }
+    },
+
+    // 设置单个字段值
+    setFieldValue(key, value) {
+      const jhForm = this.getJhForm();
+      if (jhForm) {
+        jhForm.setFieldValue(key, value);
+      }
+    },
+
+    // 重置表单
+    resetForm() {
+      const jhForm = this.getJhForm();
+      if (jhForm) {
+        jhForm.resetForm();
+      }
+    },
+
+    // 重置表单验证
+    resetValidation() {
+      const jhForm = this.getJhForm();
+      if (jhForm) {
+        jhForm.resetValidation();
+      }
     },
 
     // 验证表单
     async validate() {
-      if (this.$refs.proFormRef) {
-        return await this.$refs.proFormRef.validate();
-      }
-      if (this.$refs.formRef) {
-        return await this.$refs.formRef.validate();
+      const jhForm = this.getJhForm();
+      if (jhForm) {
+        return await jhForm.validate();
       }
       return true;
-    },
-
-    // 重置验证
-    resetValidation() {
-      if (this.$refs.proFormRef) {
-        this.$refs.proFormRef.resetValidation();
-      }
-      if (this.$refs.formRef) {
-        this.$refs.formRef.resetValidation();
-      }
-    },
-
-    // 设置提交状态（外部控制提交时使用）
-    setSubmitting(loading) {
-      this.submitting = loading;
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style scoped>
-/* 抽屉样式 */
-.jh-drawer-form >>> .v-navigation-drawer__content {
-  overflow: hidden;
-}
-
-/* 头部样式 */
-.jh-drawer-header {
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #e0e0e0;
-  min-height: 64px;
-}
-
-.jh-drawer-action-btn-group {
-  display: flex;
-  align-items: center;
-}
-
-/* 内容区域 */
-.jh-drawer-content {
-  overflow-y: auto;
-  height: calc(100vh - 65px);
-  display: flex;
-  flex-direction: column;
-}
-
-/* 底部按钮区域 */
-.jh-drawer-footer {
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
-  background: white;
-  margin-top: auto;
-}
-
-/* 分割线 */
-.jh-divider {
-  margin: 0;
-}
-
-/* 浮动关闭按钮 */
-.jh-drawer-close-float-btn {
-  z-index: 10;
-  margin-top: 16px;
-}
-
-/* 左侧抽屉的关闭按钮 */
-.jh-drawer-form >>> .v-navigation-drawer--left .jh-drawer-close-float-btn {
-  margin-right: -28px;
-}
-
-/* 右侧抽屉的关闭按钮 */
-.jh-drawer-form >>> .v-navigation-drawer--right .jh-drawer-close-float-btn {
-  margin-left: -28px;
-}
-
-/* 移动端适配 */
-@media (max-width: 600px) {
-  .jh-drawer-header {
-    min-height: 56px;
-  }
-
-  .jh-drawer-close-float-btn {
-    display: none;
-  }
-}
-
-/* 间隙工具类 */
-.gap-2 > * + * {
-  margin-left: 8px;
-}
 </style>

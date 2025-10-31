@@ -60,7 +60,7 @@
 
 | 组件名称 | 优先级 | 对应 AntD Pro | 功能描述 |
 |---------|--------|--------------|----------|
-| ✅JhProForm | P0 | ProForm | 高级表单，集成多种表单场景 |
+| JhProForm | P0 | ProForm | 高级表单，集成多种表单场景 |
 | JhQueryForm | P0 | Query/LightFilter | 查询表单，折叠/轻量筛选 |
 | JhModalForm | P0 | ModalForm | 弹窗表单 |
 | JhDrawerForm | P0 | DrawerForm | 抽屉表单 |
@@ -75,7 +75,7 @@
 
 | 组件名称 | 优先级 | 对应 AntD Pro | 功能描述 |
 |---------|--------|--------------|----------|
-| ✅JhProTable | P0 | ProTable | 高级表格，集成查询、工具栏、操作列 |
+| JhProTable | P0 | ProTable | 高级表格，集成查询、工具栏、操作列 |
 | JhEditableTable | P1 | EditableProTable | 可编辑表格 |
 | JhDragSortTable | P2 | DragSortTable | 拖拽排序表格 |
 | JhProList | P2 | ProList | 高级列表 |

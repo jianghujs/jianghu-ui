@@ -1,15 +1,14 @@
 <template>
   <v-dialog
-    :value="value"
+    v-model="isShownInternal"
     :max-width="width"
     :persistent="persistent"
     :fullscreen="fullscreen"
-    @input="handleDialogInput"
     @keydown.esc="handleCancel"
   >
     <v-card>
       <!-- 标题栏 -->
-      <v-card-title class="d-flex align-center justify-space-between">
+      <v-card-title class="d-flex align-center justify-space-between pa-4">
         <span class="text-h6">{{ title }}</span>
         <v-btn
           v-if="closable"
@@ -25,27 +24,24 @@
 
       <!-- 表单内容 -->
       <v-card-text class="pa-6">
-        <jh-pro-form
-          ref="formRef"
-          :fields="fields"
-          :initial-data="initialValues"
-          label-position="top"
-          :layout="layout"
-          :label-width="labelWidth"
-          :outlined="outlined"
-          :dense="dense"
-          :show-buttons="false"
-          :disabled="submitting"
-          @submit="handleSubmit"
-        >
-          <!-- 透传所有插槽 -->
-          <template
-            v-for="(_, slot) in $scopedSlots"
-            #[slot]="scope"
+        <!-- 支持完全自定义内容 -->
+        <slot name="content">
+          <!-- 使用 JhForm 组件渲染表单 -->
+          <jh-form
+            ref="jhForm"
+            :form-ref="formRef"
+            :fields="fields"
+            :initial-data="initialData"
+            :validation-rules="validationRules"
+            :default-cols-md="6"
+            @field-change="handleFieldChange"
           >
-            <slot :name="slot" v-bind="scope" />
-          </template>
-        </jh-pro-form>
+            <!-- 传递自定义字段插槽 -->
+            <template v-for="field in slotFields" v-slot:[`field-${field.key}`]="slotProps">
+              <slot :name="`field-${field.key}`" v-bind="slotProps"></slot>
+            </template>
+          </jh-form>
+        </slot>
       </v-card-text>
 
       <v-divider />
@@ -55,18 +51,16 @@
         <v-spacer />
         <v-btn
           text
-          :disabled="submitting"
           @click="handleCancel"
         >
           {{ cancelText }}
         </v-btn>
         <v-btn
-          color="primary"
-          :loading="submitting"
-          :disabled="submitting"
+          v-if="showConfirmButton"
+          color="success"
           @click="handleConfirm"
         >
-          {{ submitText }}
+          {{ confirmText }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -74,13 +68,13 @@
 </template>
 
 <script>
-import JhProForm from '../JhProForm/JhProForm.vue';
+import JhForm from '../JhForm/JhForm.vue';
 
 export default {
   name: 'JhModalForm',
 
   components: {
-    JhProForm,
+    JhForm,
   },
 
   props: {
@@ -99,14 +93,13 @@ export default {
     // 表单字段配置
     fields: {
       type: Array,
-      required: true,
       default: () => [],
     },
 
-    // 初始值
-    initialValues: {
+    // 初始表单数据
+    initialData: {
       type: Object,
-      default: () => ({}),
+      default: () => ({})
     },
 
     // 弹窗宽度
@@ -133,161 +126,173 @@ export default {
       default: true,
     },
 
-    // 提交按钮文本
-    submitText: {
-      type: String,
-      default: '确定',
+    // 按钮配置
+    showConfirmButton: {
+      type: Boolean,
+      default: true
     },
-
-    // 取消按钮文本
+    confirmText: {
+      type: String,
+      default: '确认'
+    },
     cancelText: {
       type: String,
-      default: '取消',
+      default: '取消'
     },
 
-    // 表单布局
-    layout: {
+    // 表单引用名称
+    formRef: {
       type: String,
-      default: 'vertical',
+      default: 'modalForm'
     },
 
-    // 标签宽度
-    labelWidth: {
-      type: [Number, String],
-      default: 100,
-    },
-
-    // 是否显示边框
-    outlined: {
+    // 是否在确认前验证表单
+    validateBeforeConfirm: {
       type: Boolean,
-      default: true,
+      default: true
     },
 
-    // 紧凑模式
-    dense: {
-      type: Boolean,
-      default: true,
-    },
-
-    // 提交请求函数
-    request: {
-      type: Function,
-      default: null,
-    },
-
-    // 数据转换函数（提交前）
-    transformBeforeSubmit: {
-      type: Function,
-      default: null,
-    },
+    // 验证规则集合
+    validationRules: {
+      type: Object,
+      default: () => ({
+        require: [v => !!v || '必填'],
+        email: [v => !v || /.+@.+\..+/.test(v) || '邮箱格式不正确'],
+        phone: [v => !v || /^1[3-9]\d{9}$/.test(v) || '手机号格式不正确'],
+        number: [v => !v || !isNaN(v) || '请输入数字'],
+        integer: [v => !v || Number.isInteger(Number(v)) || '请输入整数']
+      })
+    }
   },
 
   data() {
     return {
-      submitting: false,
+      isShownInternal: this.value,
     };
   },
 
-  methods: {
-    // 处理弹窗输入事件
-    handleDialogInput(value) {
-      if (!value) {
-        this.handleCancel();
+  computed: {
+    // 获取所有 slot 类型的字段
+    slotFields() {
+      return this.fields.filter(field => field.type === 'slot');
+    },
+  },
+
+  watch: {
+    value(val) {
+      this.isShownInternal = val;
+      // 当弹窗打开时,重置表单数据和验证状态
+      if (val) {
+        this.$nextTick(() => {
+          this.resetForm();
+        });
       }
     },
+    isShownInternal(val) {
+      if (!val) {
+        this.$emit('input', false);
+        this.$emit('close');
+      }
+    }
+  },
 
-    // 取消
+  methods: {
+    // 处理取消
     handleCancel() {
-      if (this.submitting) return;
-
-      this.$emit('input', false);
       this.$emit('cancel');
-
-      // 延迟重置表单，避免关闭动画时看到表单重置
-      setTimeout(() => {
-        this.resetForm();
-      }, 300);
+      this.isShownInternal = false;
     },
 
-    // 确认提交
+    // 处理确认
     async handleConfirm() {
-      try {
-        // 验证表单
-        const valid = await this.$refs.formRef.validate();
-        if (!valid) {
+      // 如果需要验证表单
+      if (this.validateBeforeConfirm) {
+        const isValid = await this.validate();
+        if (!isValid) {
           return;
         }
-
-        // 获取表单数据
-        let formData = this.$refs.formRef.getFormData();
-
-        // 数据转换
-        if (this.transformBeforeSubmit) {
-          formData = this.transformBeforeSubmit(formData);
-        }
-
-        // 如果提供了 request 函数，自动处理提交
-        if (this.request) {
-          this.submitting = true;
-          try {
-            const response = await this.request(formData);
-            this.$emit('success', response, formData);
-            this.$emit('input', false);
-
-            // 延迟重置表单
-            setTimeout(() => {
-              this.resetForm();
-            }, 300);
-          } catch (error) {
-            this.$emit('error', error, formData);
-          } finally {
-            this.submitting = false;
-          }
-        } else {
-          // 否则触发 submit 事件，由外部处理
-          this.$emit('submit', formData);
-        }
-      } catch (error) {
-        console.error('Form validation failed:', error);
       }
+
+      this.$emit('confirm', this.getFormData());
     },
 
-    // 处理提交（表单内部触发）
-    handleSubmit(formData) {
-      // 由 handleConfirm 统一处理
+    // 处理字段变化
+    handleFieldChange(event) {
+      this.$emit('field-change', event);
     },
 
-    // 重置表单
-    resetForm() {
-      if (this.$refs.formRef) {
-        this.$refs.formRef.resetForm();
-        this.$refs.formRef.resetValidation();
-      }
+    // 获取 JhForm 实例
+    getJhForm() {
+      return this.$refs.jhForm;
+    },
+
+    // 获取表单引用（供父组件调用）
+    getForm() {
+      const jhForm = this.getJhForm();
+      return jhForm ? jhForm.getForm() : null;
     },
 
     // 获取表单数据
     getFormData() {
-      return this.$refs.formRef?.getFormData() || {};
+      const jhForm = this.getJhForm();
+      return jhForm ? jhForm.getFormData() : {};
     },
 
     // 设置表单数据
     setFieldsValue(values) {
-      this.$refs.formRef?.setFieldsValue(values);
+      const jhForm = this.getJhForm();
+      if (jhForm) {
+        jhForm.setFieldsValue(values);
+      }
+    },
+
+    // 设置单个字段值
+    setFieldValue(key, value) {
+      const jhForm = this.getJhForm();
+      if (jhForm) {
+        jhForm.setFieldValue(key, value);
+      }
+    },
+
+    // 重置表单
+    resetForm() {
+      const jhForm = this.getJhForm();
+      if (jhForm) {
+        jhForm.resetForm();
+      }
+    },
+
+    // 重置表单验证
+    resetValidation() {
+      const jhForm = this.getJhForm();
+      if (jhForm) {
+        jhForm.resetValidation();
+      }
     },
 
     // 验证表单
     async validate() {
-      return await this.$refs.formRef?.validate();
-    },
-
-    // 设置提交状态（外部控制提交时使用）
-    setSubmitting(loading) {
-      this.submitting = loading;
-    },
+      const jhForm = this.getJhForm();
+      if (jhForm) {
+        return await jhForm.validate();
+      }
+      return true;
+    }
   },
 };
 </script>
 
 <style scoped>
-/* 样式由 Vuetify 提供，无需额外样式 */
+/* 输入标签 */
+.jh-input-label {
+  display: block;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 4px;
+}
+
+/* 输入框样式 */
+.jh-v-input {
+  margin-top: 0;
+}
 </style>

@@ -31,6 +31,9 @@
   text-align: center;
   max-width: calc(100vw - 64px);
 }
+.jh-v-input {
+  border: 1px solid #e5e7eb;
+}
 .jh-v-input .v-input__slot {
   margin: 0 !important;
 }
