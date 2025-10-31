@@ -1,0 +1,93 @@
+{% block htmlHead %}
+{% include 'component/jhDrawerForm.html' %}
+{% endblock %}
+
+{% extends 'template/jhTemplateV4.html'%}
+{% block vueTemplate %}
+<script type="text/html" id="app-template">
+<div>
+<v-app>
+  <v-main>
+    <v-container>
+      <v-btn color="primary" @click="isDrawerShown = true">
+        打开抽屉
+      </v-btn>
+
+      <div class="mt-4">
+        <h3>表单数据：</h3>
+        <pre>{{ JSON.stringify(formData, null, 2) }}</pre>
+      </div>
+
+      <jh-drawer-form
+        :is-shown.sync="isDrawerShown"
+        title="测试表单"
+        :fields="fields"
+        v-model="formData"
+        @confirm="handleConfirm"
+        @cancel="handleCancel"
+      >
+      </jh-drawer-form>
+    </v-container>
+  </v-main>
+</v-app>
+</div>
+</script>
+<div id="app"></div>
+{% endblock %}
+
+{% block vueScript %}
+<script type="module">
+new Vue({
+  el: '#app',
+  template: '#app-template',
+  vuetify: new Vuetify(),
+  data: () => ({
+    isDrawerShown: false,
+    formData: {
+      name: '',
+      gender: '',
+      age: ''
+    },
+    fields: [
+      {
+        label: '姓名',
+        key: 'name',
+        type: 'text',
+        cols: { xs: 12, md: 6 },
+        rules: 'require'
+      },
+      {
+        label: '性别',
+        key: 'gender',
+        type: 'select',
+        cols: { xs: 12, md: 6 },
+        options: [
+          { text: '男', value: '男' },
+          { text: '女', value: '女' }
+        ]
+      },
+      {
+        label: '年龄',
+        key: 'age',
+        type: 'number',
+        cols: { xs: 12, md: 6 }
+      }
+    ],
+    validationRules: {
+      require: [v => !!v || '必填']
+    }
+  }),
+  methods: {
+    handleConfirm(data) {
+      console.log('确认', data);
+      alert('表单数据：' + JSON.stringify(data));
+      this.isDrawerShown = false;
+    },
+    handleCancel() {
+      console.log('取消');
+      this.isDrawerShown = false;
+    }
+  }
+});
+</script>
+{% endblock %}

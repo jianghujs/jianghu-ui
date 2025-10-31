@@ -327,7 +327,7 @@
 
     <=%- if actionItem.tag == 'jh-drawer' or actionItem.tag == 'jh-create-drawer' or actionItem.tag == 'jh-update-drawer' %=>
     <!-- <=$ actionItem.title $=> >>>>>>>>>>>>> -->
-    <v-navigation-drawer v-if="is<=$ actionItem.key | ucfirst $=>DrawerShown" v-model="is<=$ actionItem.key | ucfirst $=>DrawerShown" :permanent="is<=$ actionItem.key | ucfirst $=>DrawerShown" fixed temporary right width="90%" class="elevation-24" <=% for attr, value in actionItem.attrs %=><=$ attr | tagAttr(value) $=> <=% endfor %=>>
+    <v-navigation-drawer v-if="is<=$ actionItem.key | ucfirst $=>DrawerShown" v-model="is<=$ actionItem.key | ucfirst $=>DrawerShown" fixed temporary right width="90%" class="elevation-24" <=% for attr, value in actionItem.attrs %=><=$ attr | tagAttr(value) $=> <=% endfor %=>>
       <v-form ref="<=$ actionItem.key $=>Form" lazy-validation>
         <=% if actionItem.title %=>
         <!-- 抽屉标题 -->
@@ -467,7 +467,7 @@
 
     <=%- if hasHelpDrawer %=>
     <!-- 帮助页抽屉 >>>>>>>>>>>>> -->
-    <v-navigation-drawer v-if="isHelpPageDrawerLoaded" v-model="isHelpPageDrawerShown" :permanent="isHelpPageDrawerShown" fixed temporary right width="80%" class="elevation-24">
+    <v-navigation-drawer v-if="isHelpPageDrawerLoaded" v-model="isHelpPageDrawerShown" fixed temporary right width="80%" class="elevation-24">
       <iframe style="border: 0" :src="`/${appInfo.appId}/pageDoc#<=$ pageId $=>.md`" width="100%" height="100%"></iframe>
       <v-btn elevation="0" color="success" fab absolute top left small tile class="drawer-close-float-btn" @click="isHelpPageDrawerShown = false">
           <v-icon>mdi-close</v-icon>
