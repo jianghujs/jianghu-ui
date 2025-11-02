@@ -88,6 +88,11 @@ export const 基础示例 = {
         headers: sampleHeaders,
         items: sampleItems,
         loading: false,
+        menuItems: [
+          { text: '用户管理', value: 'user', icon: 'mdi-account' },
+          { text: '角色管理', value: 'role', icon: 'mdi-shield-account' },
+          { text: '权限管理', value: 'permission', icon: 'mdi-key' },
+        ],
       };
     },
     template: `
@@ -127,8 +132,10 @@ export const 基础示例 = {
       handleHelpClick() {
         alert('帮助按钮被点击');
       },
+      handleMenuSelect(item) {
+        alert('切换菜单：' + item.text);
+      },
       handleSearch() {
-        console.log('Search:', this.keyword);
         this.loading = true;
         setTimeout(() => {
           this.loading = false;
