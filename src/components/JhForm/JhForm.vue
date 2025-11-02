@@ -780,7 +780,7 @@ export default {
 
 /* 水平布局 */
 .jh-form--horizontal .jh-field-label--horizontal {
-  padding-top: 8px;
+  padding-top: 0;
   line-height: 1.5;
 }
 

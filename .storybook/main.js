@@ -6,6 +6,7 @@ module.exports = {
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-docs',
+    '@storybook/addon-storysource',
   ],
   framework: {
     name: '@storybook/vue-webpack5',

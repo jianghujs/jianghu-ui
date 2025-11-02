@@ -25,6 +25,7 @@ import JhForm from './components/JhForm/JhForm.vue';
 import JhModalForm from './components/JhModalForm/JhModalForm.vue';
 import JhDrawerForm from './components/JhDrawerForm/JhDrawerForm.vue';
 import JhStepsForm from './components/JhStepsForm/JhStepsForm.vue';
+import JhFormList from './components/JhFormList/JhFormList.vue';
 
 // Advanced Components
 import JhFileInput from './components/JhFileInput/JhFileInput.vue';
@@ -32,6 +33,7 @@ import JhJsonEditor from './components/JhJsonEditor/JhJsonEditor.vue';
 import JhMarkdownEditor from './components/JhMarkdownEditor/JhMarkdownEditor.vue';
 import JhDraggable from './components/JhDraggable/JhDraggable.vue';
 import JhTableAttachment from './components/JhTableAttachment/JhTableAttachment.vue';
+import JhEditableTable from './components/JhEditableTable/JhEditableTable.vue';
 
 const components = {
   JhMenu,
@@ -41,18 +43,20 @@ const components = {
   JhTable,
   // Layout Components
   JhPageContainer,
- 
+
   // Pro Components
   JhForm,
   JhModalForm,
   JhDrawerForm,
   JhStepsForm,
+  JhFormList,
   // Advanced Components
   JhFileInput,
   JhJsonEditor,
   JhMarkdownEditor,
   JhDraggable,
   JhTableAttachment,
+  JhEditableTable,
 
   // Feedback Components
   JhMask,
@@ -95,12 +99,14 @@ export {
   JhModalForm,
   JhDrawerForm,
   JhStepsForm,
+  JhFormList,
   // Advanced Components
   JhFileInput,
   JhJsonEditor,
   JhMarkdownEditor,
   JhDraggable,
   JhTableAttachment,
+  JhEditableTable,
 
   // Feedback Components
   JhMask,

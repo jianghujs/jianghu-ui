@@ -80,7 +80,6 @@ export default {
     docs: {
       description: {
         component: `
-# JhTable - 江湖高级表格组件
 
 增强版数据表格组件，参考 Ant Design Pro 的 ProTable 设计，提供丰富的功能。
 

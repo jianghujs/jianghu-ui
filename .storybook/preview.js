@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify';
+
 import 'vuetify/dist/vuetify.min.css';
 import '@mdi/font/css/materialdesignicons.css';
 
@@ -39,28 +40,33 @@ const vuetify = new Vuetify({
   },
 });
 
-// 预览页面的配置
-export const parameters = {
-  actions: { argTypesRegex: '^on[A-Z].*' },
-  controls: {
-    matchers: {
-      color: /(background|color)$/i,
-      date: /Date$/,
+export default {
+  parameters: {
+    actions: { argTypesRegex: '^on[A-Z].*' },
+    controls: {
+      matchers: {
+        color: /(background|color)$/i,
+        date: /Date$/,
+      },
     },
-  },
-  docs: {
-    description: {
-      component: 'JianghuJS UI 组件库文档',
+    docs: {
+      codePanel: true,
+      description: {
+        component: 'JianghuJS UI 组件库文档',
+      },
     },
-  },
-  layout: 'fullscreen',
-};
+    layout: 'fullscreen',
 
-// 配置全局装饰器 - 为所有组件提供 Vuetify 上下文
-export const decorators = [
-  (story) => ({
-    vuetify,
-    components: { story },
-    template: '<v-app class="preview-page"><v-main class="pa-3 pb-6"><v-container fluid class="pa-0"><story /></v-container></v-main></v-app>',
-  }),
-];
+   
+  },
+   initialGlobals: {
+    viewport: { value: 'ipad', isRotated: false },
+  },
+  decorators: [
+    (story) => ({
+      vuetify,
+      components: { story },
+      template: '<v-app class="preview-page"><v-main class="pa-3 pb-6"><v-container fluid class="pa-0"><story /></v-container></v-main></v-app>',
+    }),
+  ]
+}

@@ -34,7 +34,6 @@ export default {
     docs: {
       description: {
         component: `
-# JhDateRangePicker - 江湖日期范围选择器
 
 一个功能丰富的日期范围选择器组件，支持快捷日期选择和自定义日期范围。
 
