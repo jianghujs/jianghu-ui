@@ -347,7 +347,7 @@ export default {
     // 标签宽度 (horizontal 布局时生效)
     labelWidth: {
       type: [Number, String],
-      default: 100,
+      default: 'auto',
     },
 
     // 标签对齐方式 (horizontal 布局时生效)
@@ -551,7 +551,7 @@ export default {
     // 获取字段包装器样式类
     getFieldWrapperClass(field) {
       const fieldLayout = field.layout || this.layout;
-      const layoutClass = fieldLayout === 'horizontal' ? 'd-flex align-start' : '';
+      const layoutClass = fieldLayout === 'horizontal' ? 'd-flex align-center' : '';
       return `jh-field-wrapper ${layoutClass}`;
     },
 

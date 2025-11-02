@@ -340,3 +340,7 @@ body .v-navigation-drawer.jh-drawer-level-2 {
   ) !important; /* Tailwind pb-6 */
 }
 /* <<<<< 状态样式 */
+
+.jh-form .v-input--selection-controls {
+  margin-top: 0;
+}

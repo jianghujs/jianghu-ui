@@ -487,7 +487,7 @@ export const DateTimeFields = {
 export const HorizontalLayout = {
   args: {
     layout: 'horizontal',
-    labelWidth: 120,
+    labelWidth: 'auto',
     labelAlign: 'right',
     fields: [
       {
@@ -783,83 +783,6 @@ export const FieldDependency = {
     },
   },
 };
-
-// 只读模式
-export const ReadonlyMode = {
-  args: {
-    readonly: true,
-    layout: 'horizontal',
-    labelWidth: 120,
-    fields: [
-      {
-        key: 'username',
-        label: '用户名',
-        type: 'text',
-        cols: { md: 12 },
-      },
-      {
-        key: 'email',
-        label: '邮箱',
-        type: 'text',
-        cols: { md: 12 },
-      },
-      {
-        key: 'role',
-        label: '角色',
-        type: 'select',
-        options: [
-          { text: '管理员', value: 'admin' },
-          { text: '普通用户', value: 'user' },
-        ],
-        cols: { md: 12 },
-      },
-      {
-        key: 'status',
-        label: '状态',
-        type: 'radio',
-        options: [
-          { text: '激活', value: 'active' },
-          { text: '禁用', value: 'inactive' },
-        ],
-        cols: { md: 12 },
-      },
-      {
-        key: 'receiveNotification',
-        label: '接收通知',
-        type: 'switch',
-        cols: { md: 12 },
-      },
-      {
-        key: 'tags',
-        label: '标签',
-        type: 'select',
-        multiple: true,
-        options: [
-          { text: 'VIP', value: 'vip' },
-          { text: '活跃', value: 'active' },
-          { text: '新用户', value: 'new' },
-        ],
-        cols: { md: 12 },
-      },
-      {
-        key: 'bio',
-        label: '个人简介',
-        type: 'textarea',
-        cols: { md: 12 },
-      },
-    ],
-    initialData: {
-      username: '张三',
-      email: 'zhangsan@example.com',
-      role: 'admin',
-      status: 'active',
-      receiveNotification: true,
-      tags: ['vip', 'active'],
-      bio: '这是一段个人简介文本,用于测试只读模式的显示效果。',
-    },
-  },
-};
-
 // 混合布局 (字段级别控制)
 export const MixedLayout = {
   args: {
@@ -879,7 +802,7 @@ export const MixedLayout = {
         type: 'select',
         placeholder: '请选择分类',
         layout: 'horizontal',
-        labelWidth: 100,
+        labelWidth: 'auto',
         options: [
           { text: '技术', value: 'tech' },
           { text: '生活', value: 'life' },
@@ -892,7 +815,7 @@ export const MixedLayout = {
         type: 'select',
         placeholder: '请选择优先级',
         layout: 'horizontal',
-        labelWidth: 100,
+        labelWidth: 'auto',
         options: [
           { text: '高', value: 'high' },
           { text: '中', value: 'medium' },

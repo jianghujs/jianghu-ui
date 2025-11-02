@@ -6,6 +6,7 @@ import '@mdi/font/css/materialdesignicons.css';
 // Import global custom styles
 import '../src/style/globalCSSVuetifyV4.css';
 import '../src/style/globalCSSJHV4.css';
+import '../src/style/storybook.css';
 
 // Import Tailwind CSS
 import '../src/tailwind.css';
@@ -55,6 +56,6 @@ export const decorators = [
   (story) => ({
     vuetify,
     components: { story },
-    template: '<v-app><v-main class="pa-3"><v-container fluid class="pa-0"><story /></v-container></v-main></v-app>',
+    template: '<v-app class="preview-page"><v-main class="pa-3 pb-6"><v-container fluid class="pa-0"><story /></v-container></v-main></v-app>',
   }),
 ];
