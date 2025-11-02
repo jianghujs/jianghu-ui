@@ -38,7 +38,7 @@ const generateMockData = (count = 100) => {
 const allMockData = generateMockData(100);
 
 export default {
-  title: '数据展示/JhTable',
+  title: '数据展示/JhTable - 高级表格',
   component: JhTable,
   tags: ['autodocs'],
   argTypes: {
@@ -179,8 +179,8 @@ async fetchData(params) {
   },
 };
 
-// 默认故事
-export const Default = {
+// 基础示例
+export const 基础示例 = {
   args: {
     headers: sampleHeaders,
     items: sampleItems,
@@ -228,9 +228,9 @@ export const Default = {
 };
 
 // 完整工具栏
-export const WithFullToolbar = {
+export const 完整工具栏 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     toolbar: {
       search: true,
       refresh: true,
@@ -239,13 +239,13 @@ export const WithFullToolbar = {
       fullscreen: true,
     },
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
-// 列增强功能（复制、省略号）
-export const ColumnEnhancements = {
+// 列增强功能
+export const 列增强功能 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     headers: [
       { text: 'ID', value: 'id', width: 80 },
       { text: '用户名', value: 'username', copyable: true },
@@ -295,9 +295,9 @@ export const ColumnEnhancements = {
 };
 
 // 配置化操作列
-export const ConfigurableActions = {
+export const 配置化操作列 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     actionColumn: {
       title: '操作',
       width: 200,
@@ -339,11 +339,11 @@ export const ConfigurableActions = {
       ],
     },
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
 // 服务端分页
-export const ServerSidePagination = {
+export const 服务端分页 = {
   args: {
     headers: sampleHeaders,
     items: [], // 由 request 函数加载
@@ -414,9 +414,9 @@ export const ServerSidePagination = {
 };
 
 // 行选择
-export const WithRowSelection = {
+export const 行选择 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     showSelect: true,
   },
   render: (args) => ({
@@ -470,7 +470,7 @@ export const WithRowSelection = {
 };
 
 // 密度切换
-export const DensityVariants = {
+export const 密度切换 = {
   render: () => ({
     components: { JhTable },
     data() {
@@ -512,9 +512,9 @@ export const DensityVariants = {
 };
 
 // 自定义列渲染
-export const CustomColumnRender = {
+export const 自定义列渲染 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
   },
   render: (args) => ({
     components: { JhTable },
@@ -544,36 +544,36 @@ export const CustomColumnRender = {
 };
 
 // 加载状态
-export const Loading = {
+export const 加载状态 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     loading: true,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
 // 空数据
-export const Empty = {
+export const 空数据 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     items: [],
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
 // 隐藏工具栏
-export const WithoutToolbar = {
+export const 隐藏工具栏 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     toolbar: false,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
 // 简化工具栏
-export const MinimalToolbar = {
+export const 简化工具栏 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     toolbar: {
       search: true,
       refresh: true,
@@ -582,11 +582,11 @@ export const MinimalToolbar = {
       fullscreen: false,
     },
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
-// 集成高级筛选栏
-export const WithAdvancedFilter = {
+// 集成高级筛选
+export const 集成高级筛选 = {
   args: {
     headers: sampleHeaders,
     items: [],
@@ -736,10 +736,10 @@ export const WithAdvancedFilter = {
   }),
 };
 
-// 自定义工具栏按钮
-export const CustomToolbarButtons = {
+// 自定义工具栏
+export const 自定义工具栏 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     showCreateButton: false,
   },
   render: (args) => ({
@@ -774,8 +774,8 @@ export const CustomToolbarButtons = {
   }),
 };
 
-// 完整示例：带高级筛选的 CRUD 页面
-export const CompleteCRUDWithFilter = {
+// 完整CRUD示例
+export const 完整CRUD示例 = {
   render: () => ({
     components: { JhTable },
     data() {
@@ -1027,8 +1027,8 @@ export const CompleteCRUDWithFilter = {
   }),
 };
 
-// 完整示例：CRUD 页面
-export const CompleteCRUDExample = {
+// CRUD页面
+export const CRUD页面 = {
   render: () => ({
     components: { JhTable },
     data() {

@@ -1,7 +1,7 @@
 import JhToast from './JhToast.vue';
 
 export default {
-  title: '反馈/JhToast',
+  title: '反馈/JhToast - 消息提示',
   component: JhToast,
   tags: ['autodocs'],
   argTypes: {
@@ -52,8 +52,8 @@ export default {
   },
 };
 
-// 基础用法
-export const Default = {
+// 基础示例
+export const 基础示例 = {
   render: () => ({
     components: { JhToast },
     data() {
@@ -75,7 +75,7 @@ export const Default = {
 };
 
 // 不同类型
-export const DifferentTypes = {
+export const 不同类型 = {
   render: () => ({
     components: { JhToast },
     data() {
@@ -126,7 +126,7 @@ export const DifferentTypes = {
 };
 
 // 不同位置
-export const DifferentPositions = {
+export const 不同位置 = {
   render: () => ({
     components: { JhToast },
     data() {
@@ -164,7 +164,7 @@ export const DifferentPositions = {
 };
 
 // 带操作按钮
-export const WithAction = {
+export const 带操作按钮 = {
   render: () => ({
     components: { JhToast },
     data() {
@@ -189,8 +189,8 @@ export const WithAction = {
   }),
 };
 
-// 自定义图标和颜色
-export const CustomIconAndColor = {
+// 自定义图标
+export const 自定义图标 = {
   render: () => ({
     components: { JhToast },
     data() {
@@ -228,7 +228,7 @@ export const CustomIconAndColor = {
 };
 
 // 长文本消息
-export const LongMessage = {
+export const 长文本消息 = {
   render: () => ({
     components: { JhToast },
     data() {
@@ -259,7 +259,7 @@ export const LongMessage = {
 };
 
 // 不自动关闭
-export const NoAutoClose = {
+export const 不自动关闭 = {
   render: () => ({
     components: { JhToast },
     data() {
@@ -283,7 +283,7 @@ export const NoAutoClose = {
 };
 
 // 垂直布局
-export const VerticalLayout = {
+export const 垂直布局 = {
   render: () => ({
     components: { JhToast },
     data() {
@@ -306,8 +306,8 @@ export const VerticalLayout = {
   }),
 };
 
-// 不显示关闭按钮
-export const NoCloseButton = {
+// 无关闭按钮
+export const 无关闭按钮 = {
   render: () => ({
     components: { JhToast },
     data() {
@@ -330,8 +330,8 @@ export const NoCloseButton = {
   }),
 };
 
-// 模拟实际场景
-export const RealWorldExample = {
+// 实际应用
+export const 实际应用 = {
   render: () => ({
     components: { JhToast },
     data() {

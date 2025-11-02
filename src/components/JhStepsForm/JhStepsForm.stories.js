@@ -1,7 +1,7 @@
 import JhStepsForm from './JhStepsForm.vue';
 
 export default {
-  title: '数据录入/JhStepsForm',
+  title: '数据录入/JhStepsForm - 分步表单',
   component: JhStepsForm,
   tags: ['autodocs'],
   argTypes: {
@@ -41,7 +41,7 @@ export default {
 };
 
 // 基础示例
-export const Basic = {
+export const 基础示例 = {
   render: (args) => ({
     components: { JhStepsForm },
     data() {
@@ -195,7 +195,7 @@ export const Basic = {
 };
 
 // 垂直布局
-export const Vertical = {
+export const 垂直布局 = {
   render: (args) => ({
     components: { JhStepsForm },
     data() {
@@ -274,7 +274,7 @@ export const Vertical = {
 };
 
 // 可编辑步骤
-export const Editable = {
+export const 可编辑步骤 = {
   render: (args) => ({
     components: { JhStepsForm },
     data() {
@@ -361,8 +361,8 @@ export const Editable = {
   args: {},
 };
 
-// 自定义步骤内容
-export const CustomContent = {
+// 自定义内容
+export const 自定义内容 = {
   render: (args) => ({
     components: { JhStepsForm },
     data() {
@@ -483,8 +483,8 @@ export const CustomContent = {
   args: {},
 };
 
-// 员工入职流程
-export const EmployeeOnboarding = {
+// 员工入职
+export const 员工入职 = {
   render: (args) => ({
     components: { JhStepsForm },
     data() {
@@ -725,8 +725,8 @@ export const EmployeeOnboarding = {
   args: {},
 };
 
-// 带验证的分步表单
-export const WithValidation = {
+// 带验证
+export const 带验证 = {
   render: (args) => ({
     components: { JhStepsForm },
     data() {

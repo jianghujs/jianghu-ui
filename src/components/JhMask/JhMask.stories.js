@@ -1,7 +1,7 @@
 import JhMask from './JhMask.vue';
 
 export default {
-  title: '反馈/JhMask',
+  title: '反馈/JhMask - 遮罩层',
   component: JhMask,
   tags: ['autodocs'],
   argTypes: {
@@ -79,8 +79,8 @@ export default {
   },
 };
 
-// 基础用法
-export const Default = {
+// 基础示例
+export const 基础示例 = {
   args: {
     value: true,
   },
@@ -104,8 +104,8 @@ export const Default = {
   }),
 };
 
-// 带 Loading 动画
-export const WithLoading = {
+// 加载动画
+export const 加载动画 = {
   args: {
     value: true,
     showLoading: true,
@@ -131,7 +131,7 @@ export const WithLoading = {
 };
 
 // 点击关闭
-export const ClickToClose = {
+export const 点击关闭 = {
   args: {
     value: true,
     closeOnClick: true,
@@ -159,7 +159,7 @@ export const ClickToClose = {
 };
 
 // 自动关闭
-export const AutoClose = {
+export const 自动关闭 = {
   args: {
     value: true,
     showLoading: true,
@@ -192,7 +192,7 @@ export const AutoClose = {
 };
 
 // 自定义内容
-export const CustomContent = {
+export const 自定义内容 = {
   args: {
     value: true,
   },
@@ -226,7 +226,7 @@ export const CustomContent = {
 };
 
 // 不同颜色
-export const DifferentColors = {
+export const 不同颜色 = {
   render: () => ({
     components: { JhMask },
     data() {

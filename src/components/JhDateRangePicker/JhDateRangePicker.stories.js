@@ -1,7 +1,7 @@
 import JhDateRangePicker from './JhDateRangePicker.vue';
 
 export default {
-  title: '基础组件/JhDateRangePicker',
+  title: '基础组件/JhDateRangePicker - 日期范围',
   component: JhDateRangePicker,
   tags: ['autodocs'],
   argTypes: {
@@ -92,8 +92,8 @@ const getDaysAgo = (days) => {
   return `${year}-${month}-${day}`;
 };
 
-// 默认故事
-export const Default = {
+// 基础示例
+export const 基础示例 = {
   args: {
     value: [getDaysAgo(7), getToday()],
     prefix: '',
@@ -143,44 +143,44 @@ export const Default = {
 };
 
 // 带前缀
-export const WithPrefix = {
+export const 带前缀 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     prefix: '日期范围：',
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
 // 轮廓样式
-export const Outlined = {
+export const 轮廓样式 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     filled: false,
     outlined: true,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
 // 正常尺寸
-export const NormalSize = {
+export const 正常尺寸 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     dense: false,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
 // 不可清除
-export const NotClearable = {
+export const 不可清除 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     clearable: false,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
 // 初始为空
-export const Empty = {
+export const 初始为空 = {
   args: {
     value: [],
     prefix: '选择日期：',
@@ -190,12 +190,12 @@ export const Empty = {
     hideDetails: true,
     clearable: true,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
 // 表单中使用
-export const InForm = {
-  args: Default.args,
+export const 表单中使用 = {
+  args: 基础示例.args,
   render: (args) => ({
     components: { JhDateRangePicker },
     data() {
@@ -276,8 +276,8 @@ export const InForm = {
 };
 
 // 多个选择器
-export const Multiple = {
-  args: Default.args,
+export const 多个选择器 = {
+  args: 基础示例.args,
   render: () => ({
     components: { JhDateRangePicker },
     data() {

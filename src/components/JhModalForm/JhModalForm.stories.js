@@ -41,7 +41,7 @@ const sampleFields = [
 ];
 
 export default {
-  title: '数据录入/JhModalForm',
+  title: '数据录入/JhModalForm - 弹窗表单',
   component: JhModalForm,
   tags: ['autodocs'],
   argTypes: {
@@ -142,8 +142,8 @@ export default {
   },
 };
 
-// 基础用法
-export const Default = {
+// 基础示例
+export const 基础示例 = {
   render: () => ({
     components: { JhModalForm },
     data() {
@@ -179,8 +179,8 @@ export const Default = {
   }),
 };
 
-// 编辑模式 - 预填充数据
-export const EditMode = {
+// 编辑模式
+export const 编辑模式 = {
   render: () => ({
     components: { JhModalForm },
     data() {
@@ -225,8 +225,8 @@ export const EditMode = {
   }),
 };
 
-// 复杂表单 - 多字段类型
-export const ComplexForm = {
+// 复杂表单
+export const 复杂表单 = {
   render: () => ({
     components: { JhModalForm },
     data() {
@@ -329,7 +329,7 @@ export const ComplexForm = {
 };
 
 // 全屏模式
-export const Fullscreen = {
+export const 全屏模式 = {
   render: () => ({
     components: { JhModalForm },
     data() {
@@ -380,8 +380,8 @@ export const Fullscreen = {
   }),
 };
 
-// 自定义内容插槽
-export const CustomContent = {
+// 自定义内容
+export const 自定义内容 = {
   render: () => ({
     components: { JhModalForm },
     data() {
@@ -437,8 +437,8 @@ export const CustomContent = {
   }),
 };
 
-// 自定义验证规则
-export const CustomValidation = {
+// 自定义验证
+export const 自定义验证 = {
   render: () => ({
     components: { JhModalForm },
     data() {
@@ -504,8 +504,8 @@ export const CustomValidation = {
   }),
 };
 
-// 小尺寸弹窗
-export const SmallSize = {
+// 小尺寸
+export const 小尺寸 = {
   render: () => ({
     components: { JhModalForm },
     data() {
@@ -547,8 +547,8 @@ export const SmallSize = {
   }),
 };
 
-// 不可关闭（必须操作）
-export const NonPersistent = {
+// 可点击外部关闭
+export const 可点击外部关闭 = {
   render: () => ({
     components: { JhModalForm },
     data() {

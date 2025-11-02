@@ -14,6 +14,11 @@ import '../src/tailwind.css';
 // 注册 Vuetify 插件
 Vue.use(Vuetify);
 
+// 全局注册 vuedraggable 组件
+if (window.vuedraggable) {
+  Vue.component('draggable', window.vuedraggable);
+}
+
 // 创建 Vuetify 实例
 const vuetify = new Vuetify({
   theme: {

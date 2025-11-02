@@ -28,7 +28,7 @@ const sampleScenes = [
 ];
 
 export default {
-  title: '基础组件/JhScene',
+  title: '基础组件/JhScene - 场景管理',
   component: JhScene,
   tags: ['autodocs'],
   argTypes: {
@@ -83,8 +83,8 @@ export default {
   },
 };
 
-// 默认故事
-export const Default = {
+// 基础示例
+export const 基础示例 = {
   args: {
     scenes: sampleScenes,
     showActionBtn: true,
@@ -138,10 +138,10 @@ export const Default = {
   }),
 };
 
-// 带表单插槽的场景
-export const WithFormSlot = {
+// 带表单插槽
+export const 带表单插槽 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     initFormData: {
       status: '',
       keyword: '',
@@ -224,18 +224,18 @@ export const WithFormSlot = {
 };
 
 // 无操作按钮
-export const WithoutActionBtn = {
+export const 无操作按钮 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     showActionBtn: false,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
-// 使用 localStorage
-export const WithLocalStorage = {
+// 本地存储
+export const 本地存储 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     useLocalStorage: true,
     storageKey: 'demo-scene-list',
   },
@@ -288,8 +288,8 @@ export const WithLocalStorage = {
   }),
 };
 
-// 多场景示例
-export const ManyScenes = {
+// 多场景
+export const 多场景 = {
   args: {
     scenes: [
       { id: 'all', name: '全部', default: true, system: true, form: {} },
@@ -303,15 +303,15 @@ export const ManyScenes = {
     showActionBtn: true,
     useLocalStorage: false,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
 // 单个场景
-export const SingleScene = {
+export const 单个场景 = {
   args: {
     scenes: [{ id: 'all', name: '全部数据', default: true, system: true, form: {} }],
     showActionBtn: true,
     useLocalStorage: false,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };

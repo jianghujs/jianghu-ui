@@ -1,7 +1,7 @@
 import JhConfirmDialog from './JhConfirmDialog.vue';
 
 export default {
-  title: '反馈/JhConfirmDialog',
+  title: '反馈/JhConfirmDialog - 确认对话框',
   component: JhConfirmDialog,
   tags: ['autodocs'],
   argTypes: {
@@ -64,8 +64,8 @@ export default {
   },
 };
 
-// 基础用法
-export const Default = {
+// 基础示例
+export const 基础示例 = {
   render: () => ({
     components: { JhConfirmDialog },
     data() {
@@ -90,8 +90,8 @@ export const Default = {
   }),
 };
 
-// 仅显示确定按钮
-export const OnlyConfirm = {
+// 仅确定按钮
+export const 仅确定按钮 = {
   render: () => ({
     components: { JhConfirmDialog },
     data() {
@@ -113,8 +113,8 @@ export const OnlyConfirm = {
   }),
 };
 
-// 自定义按钮文本和颜色
-export const CustomButtons = {
+// 自定义按钮
+export const 自定义按钮 = {
   render: () => ({
     components: { JhConfirmDialog },
     data() {
@@ -160,8 +160,8 @@ export const CustomButtons = {
   }),
 };
 
-// HTML 内容
-export const HtmlContent = {
+// HTML内容
+export const HTML内容 = {
   render: () => ({
     components: { JhConfirmDialog },
     data() {
@@ -182,8 +182,8 @@ export const HtmlContent = {
   }),
 };
 
-// 自定义内容插槽
-export const CustomContent = {
+// 自定义内容
+export const 自定义内容 = {
   render: () => ({
     components: { JhConfirmDialog },
     data() {
@@ -227,8 +227,8 @@ export const CustomContent = {
   }),
 };
 
-// 自定义标题插槽
-export const CustomTitle = {
+// 自定义标题
+export const 自定义标题 = {
   render: () => ({
     components: { JhConfirmDialog },
     data() {
@@ -253,8 +253,8 @@ export const CustomTitle = {
   }),
 };
 
-// 异步确认(带加载状态)
-export const AsyncConfirm = {
+// 异步确认
+export const 异步确认 = {
   render: () => ({
     components: { JhConfirmDialog },
     data() {
@@ -295,7 +295,7 @@ export const AsyncConfirm = {
 };
 
 // 确认前钩子
-export const BeforeConfirmHook = {
+export const 确认前钩子 = {
   render: () => ({
     components: { JhConfirmDialog },
     data() {
@@ -344,7 +344,7 @@ export const BeforeConfirmHook = {
 };
 
 // 持久化对话框
-export const PersistentDialog = {
+export const 持久化对话框 = {
   render: () => ({
     components: { JhConfirmDialog },
     data() {
@@ -368,7 +368,7 @@ export const PersistentDialog = {
 };
 
 // 不同宽度
-export const DifferentWidths = {
+export const 不同宽度 = {
   render: () => ({
     components: { JhConfirmDialog },
     data() {
@@ -409,8 +409,8 @@ export const DifferentWidths = {
   }),
 };
 
-// 实际场景: 删除确认
-export const DeleteConfirmation = {
+// 删除确认
+export const 删除确认 = {
   render: () => ({
     components: { JhConfirmDialog },
     data() {
@@ -468,8 +468,8 @@ export const DeleteConfirmation = {
   }),
 };
 
-// 实际场景: 表单提交确认
-export const FormSubmitConfirmation = {
+// 表单提交确认
+export const 表单提交确认 = {
   render: () => ({
     components: { JhConfirmDialog },
     data() {

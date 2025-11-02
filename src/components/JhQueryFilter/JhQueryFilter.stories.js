@@ -1,7 +1,7 @@
 import JhQueryFilter from './JhQueryFilter.vue';
 
 export default {
-  title: '数据录入/JhQueryFilter',
+  title: '数据录入/JhQueryFilter - 筛选表单',
   component: JhQueryFilter,
   tags: ['autodocs'],
   argTypes: {
@@ -183,8 +183,8 @@ export default {
   },
 };
 
-// 默认故事 - 基础查询表单
-export const Default = {
+// 基础示例
+export const 基础示例 = {
   args: {
     fields: [
       {
@@ -257,8 +257,8 @@ export const Default = {
   }),
 };
 
-// 多字段折叠示例
-export const CollapsibleFields = {
+// 多字段折叠
+export const 多字段折叠 = {
   args: {
     fields: [
       {
@@ -324,11 +324,11 @@ export const CollapsibleFields = {
     defaultCollapsed: true,
     defaultVisibleCount: 3,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
 // 日期范围查询
-export const WithDateRange = {
+export const 日期范围查询 = {
   args: {
     fields: [
       {
@@ -364,11 +364,11 @@ export const WithDateRange = {
     initialValues: {},
     collapsible: false,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
-// 自定义初始值
-export const WithInitialValues = {
+// 预设初始值
+export const 预设初始值 = {
   args: {
     fields: [
       {
@@ -407,11 +407,11 @@ export const WithInitialValues = {
     },
     collapsible: false,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
-// 自定义字段插槽
-export const CustomFieldSlot = {
+// 自定义字段
+export const 自定义字段 = {
   args: {
     fields: [
       {
@@ -494,8 +494,8 @@ export const CustomFieldSlot = {
   }),
 };
 
-// 自定义按钮插槽
-export const CustomButtons = {
+// 自定义按钮
+export const 自定义按钮 = {
   args: {
     fields: [
       {
@@ -583,8 +583,8 @@ export const CustomButtons = {
   }),
 };
 
-// 完整示例 - 配合 JhTable 使用
-export const CompleteExample = {
+// 完整示例
+export const 完整示例 = {
   render: () => ({
     components: { JhQueryFilter },
     data() {

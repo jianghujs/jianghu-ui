@@ -20,7 +20,7 @@ const sampleItems = [
 ];
 
 export default {
-  title: '布局/JhPageContainer',
+  title: '布局/JhPageContainer - 页容器',
   component: JhPageContainer,
   tags: ['autodocs'],
   argTypes: {
@@ -72,8 +72,8 @@ export default {
 };
 
 
-// 完整列表页面示例
-export const Default = {
+// 基础示例
+export const 基础示例 = {
   args: {
     pageName: '用户管理',
     showHelpButton: true,
@@ -147,28 +147,28 @@ export const Default = {
   }),
 };
 
-// 不显示帮助按钮
-export const WithoutHelpButton = {
+// 无帮助按钮
+export const 无帮助按钮 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     showHelpButton: false,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
-// 自定义页面标题
-export const CustomPageName = {
+// 自定义标题
+export const 自定义标题 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     pageName: '订单管理系统',
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
 // 空内容
-export const EmptyContent = {
+export const 空内容 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
   },
   render: (args) => ({
     components: { JhPageContainer },

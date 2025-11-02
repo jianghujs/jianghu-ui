@@ -237,7 +237,7 @@ export default {
 import JhNewComponent from './JhNewComponent.vue';
 
 export default {
-  title: 'Components/JhNewComponent',
+  title: '基础组件/JhNewComponent',
   component: JhNewComponent,
   tags: ['autodocs'],
 };

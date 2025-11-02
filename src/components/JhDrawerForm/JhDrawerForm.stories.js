@@ -49,7 +49,7 @@ const sampleFields = [
 ];
 
 export default {
-  title: '数据录入/JhDrawerForm',
+  title: '数据录入/JhDrawerForm - 抽屉表单',
   component: JhDrawerForm,
   tags: ['autodocs'],
   argTypes: {
@@ -144,8 +144,8 @@ export default {
   },
 };
 
-// 基础用法
-export const Default = {
+// 基础示例
+export const 基础示例 = {
   render: () => ({
     components: { JhDrawerForm },
     data() {
@@ -182,7 +182,7 @@ export const Default = {
 };
 
 // 左侧抽屉
-export const LeftPosition = {
+export const 左侧抽屉 = {
   render: () => ({
     components: { JhDrawerForm },
     data() {
@@ -236,8 +236,8 @@ export const LeftPosition = {
   }),
 };
 
-// 自定义内容插槽
-export const CustomContent = {
+// 自定义内容
+export const 自定义内容 = {
   render: () => ({
     components: { JhDrawerForm },
     data() {
@@ -298,8 +298,8 @@ export const CustomContent = {
   }),
 };
 
-// 复杂表单 - 多字段类型
-export const ComplexForm = {
+// 复杂表单
+export const 复杂表单 = {
   render: () => ({
     components: { JhDrawerForm },
     data() {
@@ -388,8 +388,8 @@ export const ComplexForm = {
   }),
 };
 
-// 编辑模式 - 预填充数据
-export const EditMode = {
+// 编辑模式
+export const 编辑模式 = {
   render: () => ({
     components: { JhDrawerForm },
     data() {
@@ -435,8 +435,8 @@ export const EditMode = {
   }),
 };
 
-// 自定义验证规则
-export const CustomValidation = {
+// 自定义验证
+export const 自定义验证 = {
   render: () => ({
     components: { JhDrawerForm },
     data() {

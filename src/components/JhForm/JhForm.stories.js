@@ -1,7 +1,7 @@
 import JhForm from './JhForm.vue';
 
 export default {
-  title: '数据录入/JhForm',
+  title: '数据录入/JhForm - 高级表单',
   component: JhForm,
   tags: ['autodocs'],
   argTypes: {
@@ -34,8 +34,8 @@ export default {
   },
 };
 
-// 基础表单
-export const Basic = {
+// 基础示例
+export const 基础示例 = {
   args: {
     fields: [
       {
@@ -94,8 +94,8 @@ export const Basic = {
   }),
 };
 
-// 完整表单示例
-export const Complete = {
+// 完整示例
+export const 完整示例 = {
   args: {
     fields: [
       {
@@ -238,8 +238,8 @@ export const Complete = {
   }),
 };
 
-// 紧凑模式（3列布局）
-export const CompactThreeColumns = {
+// 三列布局
+export const 三列布局 = {
   args: {
     fields: [
       {
@@ -294,7 +294,7 @@ export const CompactThreeColumns = {
 };
 
 // 无标签模式
-export const WithoutLabels = {
+export const 无标签模式 = {
   args: {
     showLabels: false,
     fields: [
@@ -325,7 +325,7 @@ export const WithoutLabels = {
 };
 
 // 轮廓样式
-export const OutlinedStyle = {
+export const 轮廓样式 = {
   args: {
     defaultFilled: false,
     defaultOutlined: true,
@@ -359,8 +359,8 @@ export const OutlinedStyle = {
   },
 };
 
-// 自定义初始数据
-export const WithInitialData = {
+// 预填充数据
+export const 预填充数据 = {
   args: {
     fields: [
       {
@@ -403,7 +403,7 @@ export const WithInitialData = {
 };
 
 // 单列布局
-export const SingleColumn = {
+export const 单列布局 = {
   args: {
     defaultColsMd: 12,
     fields: [
@@ -449,8 +449,8 @@ export const SingleColumn = {
   },
 };
 
-// 时间相关字段
-export const DateTimeFields = {
+// 时间字段
+export const 时间字段 = {
   args: {
     fields: [
       {
@@ -483,8 +483,8 @@ export const DateTimeFields = {
   },
 };
 
-// 水平布局 (标签并排)
-export const HorizontalLayout = {
+// 水平布局
+export const 水平布局 = {
   args: {
     layout: 'horizontal',
     labelWidth: 'auto',
@@ -545,7 +545,7 @@ export const HorizontalLayout = {
 };
 
 // 行内布局
-export const InlineLayout = {
+export const 行内布局 = {
   args: {
     layout: 'inline',
     defaultColsMd: 'auto',
@@ -594,8 +594,8 @@ export const InlineLayout = {
   }),
 };
 
-// 表单分组
-export const WithGroups = {
+// 字段分组
+export const 字段分组 = {
   args: {
     fields: [
       { type: 'group', title: '基本信息', divider: false },
@@ -678,7 +678,7 @@ export const WithGroups = {
 };
 
 // 字段联动
-export const FieldDependency = {
+export const 字段联动 = {
   args: {
     fields: [
       {
@@ -783,8 +783,8 @@ export const FieldDependency = {
     },
   },
 };
-// 混合布局 (字段级别控制)
-export const MixedLayout = {
+// 混合布局
+export const 混合布局 = {
   args: {
     layout: 'vertical',
     fields: [

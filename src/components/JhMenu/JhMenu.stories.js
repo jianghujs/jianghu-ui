@@ -72,7 +72,7 @@ const sampleUserInfo = {
 };
 
 export default {
-  title: '基础组件/JhMenu',
+  title: '基础组件/JhMenu - 导航菜单',
   component: JhMenu,
   tags: ['autodocs'],
   argTypes: {
@@ -140,8 +140,8 @@ export default {
   },
 };
 
-// 默认故事
-export const Default = {
+// 基础示例
+export const 基础示例 = {
   args: {
     appTitle: 'JianghuJS Admin',
     menuList: sampleMenuList,
@@ -197,27 +197,27 @@ export const Default = {
   }),
 };
 
-// 带有活动菜单的故事
-export const WithActiveMenu = {
+// 活动菜单
+export const 活动菜单 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     activeMenuIndex: 1,
     activeSecondMenuId: 'user-list',
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
-// 简单菜单（无用户头像）
-export const WithoutAvatar = {
+// 无用户头像
+export const 无用户头像 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     showAvatar: false,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
-// 最小化菜单（无右侧菜单和用户头像）
-export const MinimalMenu = {
+// 最小化菜单
+export const 最小化菜单 = {
   args: {
     appTitle: 'Simple App',
     menuList: [
@@ -231,13 +231,13 @@ export const MinimalMenu = {
     showAvatar: false,
     hideDrawers: false,
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
-// 仅一级菜单
-export const OnlyFirstLevelMenus = {
+// 一级菜单
+export const 一级菜单 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     menuList: [
       { id: 'dashboard', title: '仪表盘', path: '/dashboard' },
       { id: 'analytics', title: '数据分析', path: '/analytics' },
@@ -245,13 +245,13 @@ export const OnlyFirstLevelMenus = {
       { id: 'settings', title: '设置', path: '/settings' },
     ],
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
-// 仅二级菜单
-export const OnlySecondLevelMenus = {
+// 二级菜单
+export const 二级菜单 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     menuList: [
       {
         id: 'system',
@@ -273,13 +273,13 @@ export const OnlySecondLevelMenus = {
       },
     ],
   },
-  render: Default.render,
+  render: 基础示例.render,
 };
 
-// 自定义标题插槽
-export const WithCustomTitle = {
+// 自定义标题
+export const 自定义标题 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
   },
   render: (args) => ({
     components: { JhMenu },
@@ -322,9 +322,9 @@ export const WithCustomTitle = {
 };
 
 // 长菜单列表
-export const LongMenuList = {
+export const 长菜单列表 = {
   args: {
-    ...Default.args,
+    ...基础示例.args,
     menuList: [
       { id: 'menu1', title: '菜单1', path: '/menu1' },
       { id: 'menu2', title: '菜单2', path: '/menu2' },
@@ -345,5 +345,5 @@ export const LongMenuList = {
       { id: 'menu10', title: '菜单10', path: '/menu10' },
     ],
   },
-  render: Default.render,
+  render: 基础示例.render,
 };

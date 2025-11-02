@@ -26,6 +26,13 @@ import JhModalForm from './components/JhModalForm/JhModalForm.vue';
 import JhDrawerForm from './components/JhDrawerForm/JhDrawerForm.vue';
 import JhStepsForm from './components/JhStepsForm/JhStepsForm.vue';
 
+// Advanced Components
+import JhFileInput from './components/JhFileInput/JhFileInput.vue';
+import JhJsonEditor from './components/JhJsonEditor/JhJsonEditor.vue';
+import JhMarkdownEditor from './components/JhMarkdownEditor/JhMarkdownEditor.vue';
+import JhDraggable from './components/JhDraggable/JhDraggable.vue';
+import JhTableAttachment from './components/JhTableAttachment/JhTableAttachment.vue';
+
 const components = {
   JhMenu,
   JhScene,
@@ -34,14 +41,23 @@ const components = {
   JhTable,
   // Layout Components
   JhPageContainer,
-  // Feedback Components
-  JhMask,
-  JhToast,
-  JhConfirmDialog,
+ 
+  // Pro Components
   JhForm,
   JhModalForm,
   JhDrawerForm,
   JhStepsForm,
+  // Advanced Components
+  JhFileInput,
+  JhJsonEditor,
+  JhMarkdownEditor,
+  JhDraggable,
+  JhTableAttachment,
+
+  // Feedback Components
+  JhMask,
+  JhToast,
+  JhConfirmDialog,
 };
 
 // Vue plugin install function
@@ -73,13 +89,21 @@ export {
   JhTable,
   // Layout Components
   JhPageContainer,
-  // Feedback Components
-  JhMask,
-  JhToast,
-  JhConfirmDialog,
+
   // Pro Components
   JhForm,
   JhModalForm,
   JhDrawerForm,
   JhStepsForm,
+  // Advanced Components
+  JhFileInput,
+  JhJsonEditor,
+  JhMarkdownEditor,
+  JhDraggable,
+  JhTableAttachment,
+
+  // Feedback Components
+  JhMask,
+  JhToast,
+  JhConfirmDialog,
 };
