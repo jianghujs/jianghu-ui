@@ -15,7 +15,7 @@
       :show-labels="true"
       :search-text="filterSearchText"
       :reset-text="filterResetText"
-      class="mb-4 px-3 px-md-0"
+      class="px-md-0"
       @search="handleFilterSearch"
       @reset="handleFilterReset"
     >

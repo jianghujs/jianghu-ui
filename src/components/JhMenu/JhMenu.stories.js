@@ -168,7 +168,7 @@ export const 基础示例 = {
         >
           <template v-slot:title>{{ args.appTitle }}</template>
         </jh-menu>
-        <v-main>
+        <v-main class="mt-15">
           <v-container>
             <h3>菜单组件演示</h3>
             <p>点击菜单项查看效果</p>
@@ -301,7 +301,7 @@ export const 自定义标题 = {
             欢迎使用
           </template>
         </jh-menu>
-        <v-main>
+        <v-main class="mt-15">
           <v-container>
             <h3>自定义标题插槽演示</h3>
             <p>标题区域可以通过插槽自定义内容</p>
@@ -344,6 +344,41 @@ export const 长菜单列表 = {
       },
       { id: 'menu10', title: '菜单10', path: '/menu10' },
     ],
+  },
+  render: 基础示例.render,
+};
+
+// 三级菜单
+export const 三级菜单 = {
+  args: {
+    ...基础示例.args,
+    menuList: [
+      {
+        id: 'system',
+        title: '系统管理',
+        children: [
+          {
+            id: 'users',
+            title: '用户管理',
+            children: [
+              { id: 'user-list', title: '用户列表', path: '/system/users/list' },
+              { id: 'user-add', title: '新增用户', path: '/system/users/add' },
+            ],
+          },
+          { id: 'roles', title: '角色管理', path: '/system/roles' },
+        ],
+      },
+      {
+        id: 'content',
+        title: '内容管理',
+        children: [
+          { id: 'posts', title: '文章', path: '/content/posts' },
+          { id: 'pages', title: '页面', path: '/content/pages' },
+        ],
+      },
+    ],
+    activeMenuIndex: 0,
+    activeSecondMenuId: 'user-list',
   },
   render: 基础示例.render,
 };

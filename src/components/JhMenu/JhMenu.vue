@@ -32,16 +32,44 @@
                 <template v-slot:appendIcon>
                   <v-icon size="18">mdi-chevron-down</v-icon>
                 </template>
-                <v-list-item
-                  v-for="(child, childIndex) in item.children"
-                  :key="childIndex"
-                  @click="handleMenuClick(child, index)"
-                  :class="{ 'second-active': currentSecondMenuId === child.id && currentMenuIndex === index }"
-                >
-                  <v-list-item-content>
-                    <v-list-item-title class="pl-6 pl-sm-4">{{ child.title }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
+                <template v-for="(child, childIndex) in item.children">
+                  <!-- 三级菜单 -->
+                  <template v-if="child.children && child.children.length > 0">
+                    <v-list-group :key="childIndex" :value="child.active" class="px-0">
+                      <template v-slot:activator>
+                        <v-list-item class="pl-0" :ripple="false">
+                          <v-list-item-content>
+                            <v-list-item-title class="pl-6 pl-sm-4">{{ child.title }}</v-list-item-title>
+                          </v-list-item-content>
+                        </v-list-item>
+                      </template>
+                      <template v-slot:appendIcon>
+                        <v-icon size="16">mdi-chevron-down</v-icon>
+                      </template>
+                      <v-list-item
+                        v-for="(grandchild, grandchildIndex) in child.children"
+                        :key="grandchildIndex"
+                        @click="handleMenuClick(grandchild, index)"
+                        :class="{ 'second-active': currentSecondMenuId === grandchild.id && currentMenuIndex === index }"
+                      >
+                        <v-list-item-content>
+                          <v-list-item-title class="pl-10 pl-sm-8">{{ grandchild.title }}</v-list-item-title>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-list-group>
+                  </template>
+                  <!-- 二级菜单（无三级） -->
+                  <v-list-item
+                    v-else
+                    :key="childIndex"
+                    @click="handleMenuClick(child, index)"
+                    :class="{ 'second-active': currentSecondMenuId === child.id && currentMenuIndex === index }"
+                  >
+                    <v-list-item-content>
+                      <v-list-item-title class="pl-6 pl-sm-4">{{ child.title }}</v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
               </v-list-group>
             </template>
             <!-- 无子菜单 -->
@@ -204,16 +232,46 @@
                 </v-tab>
               </template>
               <v-list nav dense>
-                <v-list-item
-                  v-for="(child, childIndex) in item.children"
-                  :key="childIndex"
-                  @click="handleMenuClick(child, index)"
-                  :class="{ 'second-active': currentSecondMenuId === child.id && currentMenuIndex === index }"
-                >
-                  <v-list-item-content>
-                    <v-list-item-title style="color: #41434f">{{ child.title }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
+                <template v-for="(child, childIndex) in item.children">
+                  <!-- 三级菜单 -->
+                  <template v-if="child.children && child.children.length > 0">
+                    <v-menu :key="childIndex" offset-x right>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-list-item v-bind="attrs" v-on="on">
+                          <v-list-item-content>
+                            <v-list-item-title style="color: #41434f">{{ child.title }}</v-list-item-title>
+                          </v-list-item-content>
+                          <v-list-item-action>
+                            <v-icon>mdi-chevron-right</v-icon>
+                          </v-list-item-action>
+                        </v-list-item>
+                      </template>
+                      <v-list nav dense>
+                        <v-list-item
+                          v-for="(grandchild, grandchildIndex) in child.children"
+                          :key="grandchildIndex"
+                          @click="handleMenuClick(grandchild, index)"
+                          :class="{ 'second-active': currentSecondMenuId === grandchild.id && currentMenuIndex === index }"
+                        >
+                          <v-list-item-content>
+                            <v-list-item-title style="color: #41434f">{{ grandchild.title }}</v-list-item-title>
+                          </v-list-item-content>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </template>
+                  <!-- 二级菜单（无三级） -->
+                  <v-list-item
+                    v-else
+                    :key="childIndex"
+                    @click="handleMenuClick(child, index)"
+                    :class="{ 'second-active': currentSecondMenuId === child.id && currentMenuIndex === index }"
+                  >
+                    <v-list-item-content>
+                      <v-list-item-title style="color: #41434f">{{ child.title }}</v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
               </v-list>
             </v-menu>
           </template>
