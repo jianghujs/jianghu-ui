@@ -12,10 +12,10 @@
       :col-span="filterColSpan"
       :dense="true"
       :outlined="true"
-      :show-labels="true"
+      :show-labels="false"
       :search-text="filterSearchText"
       :reset-text="filterResetText"
-      class="px-md-0"
+      class="pa-0 -mx-3"
       @search="handleFilterSearch"
       @reset="handleFilterReset"
     >

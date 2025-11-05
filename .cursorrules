@@ -1,0 +1,238 @@
+# JianghuJS UI 组件库开发规则
+
+## 项目概述
+
+本项目是一个基于 Vue 2 + Vuetify 2 的企业级 UI 组件库，提供表格、表单、布局等常用组件。
+
+## 知识库文件
+
+- `AI_KNOWLEDGE_BASE.md`: 完整的组件库 API 文档和使用指南
+- `QUICK_REFERENCE.md`: 快速参考手册，包含常见场景代码模板
+- `AI_USAGE_GUIDE.md`: AI 工具使用指南
+
+## 技术栈
+
+- **Vue**: 2.7.x
+- **Vuetify**: 2.x
+- **Storybook**: 7.x
+- **设计规范**: Material Design
+
+## 编码规范
+
+### 组件命名
+
+- 所有组件以 `Jh` 开头（JiangHu 缩写）
+- 使用 PascalCase 命名法，如：`JhTable`、`JhForm`、`JhFormList`
+
+### Props 命名
+
+- 使用 camelCase 命名法
+- 布尔类型使用 `is`、`has`、`show` 等前缀或直接描述状态
+- 示例：`showFilter`、`isEdit`、`disabled`
+
+### 事件命名
+
+- 使用 kebab-case 命名法
+- 不使用 `on-` 前缀
+- 示例：`@click`、`@change`、`@submit`、`@field-change`
+
+### 插槽命名
+
+- 使用 kebab-case 命名法
+- 示例：`header`、`footer`、`item-action`
+
+## 核心组件使用指南
+
+### JhTable - 数据表格
+
+**基础用法**:
+```vue
+<jh-table :headers="headers" :items="items" />
+```
+
+**服务端分页**:
+```vue
+<jh-table :headers="headers" :request="loadData" />
+```
+
+**完整功能**:
+```vue
+<jh-table
+  :headers="headers"
+  :request="loadData"
+  :show-filter="true"
+  :filter-fields="filterFields"
+  @create-click="handleCreate"
+  @update-click="handleUpdate"
+  @delete-click="handleDelete"
+/>
+```
+
+### JhForm - 通用表单
+
+**基础用法**:
+```vue
+<jh-form
+  :fields="formFields"
+  :initial-data="formData"
+  @submit="handleSubmit"
+/>
+```
+
+**字段类型**: text | number | textarea | select | autocomplete | date | time | switch | checkbox | radio | slot | group
+
+**字段联动**:
+```javascript
+{
+  key: 'companyName',
+  label: '公司名称',
+  type: 'text',
+  visible: (formData) => formData.userType === 'company',
+}
+```
+
+### JhFormList - 动态表单列表
+
+**基础用法**:
+```vue
+<jh-form-list
+  v-model="list"
+  :fields="fields"
+  :min="1"
+  :max="5"
+/>
+```
+
+**渲染模式**: card | table | inline
+
+### JhModalForm - 弹窗表单
+
+**基础用法**:
+```vue
+<jh-modal-form
+  v-model="showModal"
+  title="新增用户"
+  :fields="formFields"
+  @confirm="handleConfirm"
+/>
+```
+
+## 常见开发模式
+
+### 标准 CRUD 页面
+
+参考 `QUICK_REFERENCE.md` 中的场景1代码模板，包含：
+- JhTable 数据表格
+- JhModalForm 新增/编辑弹窗
+- 服务端分页
+- 高级搜索筛选
+
+### 复杂表单
+
+- 使用 JhForm 的字段配置
+- 通过 `visible` 和 `disabled` 函数实现字段联动
+- 使用表单分组 `{ type: 'group' }` 组织字段
+- 自定义验证规则通过 `rules` 属性
+
+### 动态表单列表
+
+- 订单明细、联系人列表等重复性数据使用 JhFormList
+- Card 模式适合字段较多的场景
+- Table 模式适合字段较少的场景
+- Inline 模式适合单字段或标签列表
+
+## 代码生成建议
+
+当用户请求生成代码时：
+
+1. **优先使用组件库组件**：不要从头编写表格或表单，使用 JhTable、JhForm 等组件
+2. **参考知识库**：根据 `AI_KNOWLEDGE_BASE.md` 和 `QUICK_REFERENCE.md` 中的示例生成代码
+3. **遵循规范**：确保组件名、Props、事件命名符合规范
+4. **完整的错误处理**：包含 try-catch 和用户友好的错误提示
+5. **响应式设计**：使用 Vuetify 的栅格系统，考虑移动端适配
+
+## 验证规则
+
+内置验证规则（通过字符串引用）：
+- `require`: 必填
+- `email`: 邮箱格式
+- `phone`: 手机号格式
+- `number`: 数字
+- `integer`: 整数
+
+自定义验证规则（使用数组）：
+```javascript
+rules: [
+  v => !!v || '不能为空',
+  v => (v && v.length >= 6) || '至少6位',
+]
+```
+
+## 响应式布局
+
+使用 Vuetify 的栅格系统：
+
+```javascript
+// 简单配置
+{ cols: 6 }
+
+// 响应式配置
+{ cols: { xs: 12, sm: 6, md: 4, lg: 3 } }
+```
+
+断点：
+- xs: 0-600px (手机竖屏)
+- sm: 600-960px (手机横屏/平板竖屏)
+- md: 960-1264px (平板横屏/小屏电脑)
+- lg: 1264-1904px (桌面)
+- xl: 1904px+ (大屏)
+
+## 颜色系统
+
+主题色（使用 Vuetify 的颜色名称）：
+- primary: #1976D2 (主要操作)
+- secondary: #424242 (次要操作)
+- success: #4CAF50 (成功状态)
+- error: #FF5252 (错误状态)
+- warning: #FB8C00 (警告状态)
+- info: #2196F3 (提示信息)
+
+## 最佳实践
+
+1. **字段配置抽离**：将表单字段配置、表头配置抽离到 data 或独立文件
+2. **API 请求封装**：不在组件中直接写请求，封装到 API 文件
+3. **组件 ref 命名**：使用有意义的 ref 名称，如 `ref="table"` 而不是 `ref="t"`
+4. **事件处理**：使用明确的事件处理函数名，如 `handleCreate`、`handleUpdate`
+5. **代码注释**：为复杂的业务逻辑添加注释
+
+## 常见问题解决
+
+### 表单验证不生效
+- 检查是否设置了 `required` 或 `rules` 属性
+- 确保调用了 `validate()` 方法
+
+### 表格数据不刷新
+- 在 CRUD 操作后调用 `this.$refs.table.reload()`
+
+### 字段联动不生效
+- 使用函数而不是布尔值：`visible: (formData) => condition`
+
+### 服务端分页
+- 使用 `request` prop 而不是 `items` prop
+- 返回格式：`{ data: [], total: 0 }`
+
+## 开发流程
+
+1. **明确需求**：了解要实现的功能
+2. **查阅知识库**：参考 `AI_KNOWLEDGE_BASE.md` 或 `QUICK_REFERENCE.md`
+3. **选择组件**：确定使用哪些 JianghuJS UI 组件
+4. **编写代码**：基于模板和最佳实践编写
+5. **测试验证**：确保功能正常、响应式布局正确
+
+## 注意事项
+
+- ⚠️ 使用 Vue 2 语法，不要使用 Vue 3 的 Composition API
+- ⚠️ 使用 Vuetify 2.x 的 API，不要使用 Vuetify 3 的语法
+- ⚠️ 所有组件必须包裹在 `<v-app>` 标签内
+- ⚠️ 确保引入了必要的 CSS 和字体资源
+

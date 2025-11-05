@@ -300,6 +300,37 @@ MIT License
 - [Storybook 官方文档](https://storybook.js.org/)
 - [Material Design Icons](https://materialdesignicons.com/)
 
+## AI 代码助手支持
+
+本项目为 AI 代码助手（如 Cursor、GitHub Copilot）提供了专门的知识库文档：
+
+### 📚 AI 知识库文件
+
+| 文件 | 说明 | 使用场景 |
+|------|------|----------|
+| [AI_KNOWLEDGE_BASE.md](./AI_KNOWLEDGE_BASE.md) | 完整的组件库知识库 | 详细了解组件 API 和使用方法 |
+| [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) | 快速参考手册 | 快速查找组件用法和代码模板 |
+| [AI_USAGE_GUIDE.md](./AI_USAGE_GUIDE.md) | AI 工具使用指南 | 了解如何在 AI 工具中使用知识库 |
+
+### 🚀 快速开始使用
+
+#### 在 Cursor 中使用
+
+1. 打开项目根目录，Cursor 会自动读取 `.cursorrules` 文件
+2. 在对话中直接引用知识库文件：
+   ```
+   @AI_KNOWLEDGE_BASE.md 如何使用 JhTable 实现服务端分页？
+   ```
+
+#### 在 GitHub Copilot 中使用
+
+1. 打开 `AI_KNOWLEDGE_BASE.md` 或 `QUICK_REFERENCE.md` 文件
+2. 开始编写代码，Copilot 会根据知识库提供更准确的建议
+
+详细使用方法请查看 [AI_USAGE_GUIDE.md](./AI_USAGE_GUIDE.md)
+
+---
+
 ## 常见问题
 
 ### Vuetify 样式不生效？

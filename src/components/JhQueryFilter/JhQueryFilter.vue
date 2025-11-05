@@ -178,13 +178,12 @@
 
         <!-- 操作按钮列 -->
         <v-col
-          :cols="colSpan.xs || 12"
-          :sm="colSpan.sm || 12"
-          :md="colSpan.md || 8"
-          :lg="colSpan.lg || 6"
-          class="d-flex align-end pb-2"
-          :class="buttonColumnClass"
+          class="d-flex align-end flex-column"
         >
+          <span class="opacity-0"  v-if="showLabels" :class="labelClass">
+              工具栏
+          </span>
+
           <slot name="buttons" :formData="formData" :search="handleSearch" :reset="handleReset">
             <div class="jh-query-filter-buttons" :class="buttonClass">
               <!-- 查询按钮 -->
