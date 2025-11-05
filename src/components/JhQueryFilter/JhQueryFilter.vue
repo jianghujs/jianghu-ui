@@ -178,7 +178,7 @@
 
         <!-- 操作按钮列 -->
         <v-col
-          class="d-flex align-end flex-column"
+          class="d-flex align-end flex-column justify-center"
         >
           <span class="opacity-0"  v-if="showLabels" :class="labelClass">
               工具栏
