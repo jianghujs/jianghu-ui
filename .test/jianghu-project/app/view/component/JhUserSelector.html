@@ -1,0 +1,1171 @@
+<!-- 
+  JhUserSelector - 人员选择组件
+  
+  Props:
+  - value: v-model 绑定的已选用户列表 Array<User>
+  - visible: 是否显示对话框 Boolean
+  - mode: 'multiple' | 'single' - 多选或单选模式
+  - title: 对话框标题 String
+  - placeholder: 搜索框占位符 String
+  - maxWidth: 对话框最大宽度 String
+  - showRecent: 是否显示最近选择 Boolean
+  - showPaste: 是否显示粘贴选择 Boolean
+  - recentStorageKey: localStorage key for recent selections
+  - allowSelectGroup: 是否允许选择部门本身 Boolean
+  
+  Events:
+  - input: v-model 更新事件
+  - update:visible: 显示状态更新事件
+  - confirm: 确认选择事件
+  - cancel: 取消选择事件
+  
+  Usage:
+  <jh-user-selector
+    v-model="selectedUsers"
+    :visible.sync="isDialogShown"
+    mode="multiple"
+    title="选择人员"
+    @confirm="handleConfirm"
+  ></jh-user-selector>
+-->
+
+<script type="text/x-template" id="jh-user-selector-template">
+<v-dialog 
+  :value="visible" 
+  @input="handleDialogInput"
+  :max-width="maxWidth" 
+  persistent
+  :fullscreen="isMobile"
+>
+  <v-card>
+    <!-- 标题栏 -->
+    <v-card-title class="d-flex align-center pa-4">
+      <span>{{ title }}</span>
+      <v-spacer></v-spacer>
+      <v-icon @click="handleClose">mdi-close</v-icon>
+    </v-card-title>
+    
+    <v-card-text class="pa-0">
+      <v-row no-gutters :style="contentStyle">
+        <!-- 左侧：选择区 -->
+        <v-col :cols="isMobile ? 12 : 7" class="border-right">
+          <!-- Tab切换 -->
+          <v-tabs v-model="currentTab" class="px-3" v-if="showRecent">
+            <v-tab>
+              <v-icon small left>mdi-office-building</v-icon>
+              部门人员
+            </v-tab>
+            <v-tab>
+              <v-icon small left>mdi-history</v-icon>
+              最近选择
+            </v-tab>
+          </v-tabs>
+          
+          <!-- 搜索和工具栏 -->
+          <div class="px-3 pt-3">
+            <v-text-field
+              v-model="searchKeyword"
+              :placeholder="placeholder"
+              prepend-inner-icon="mdi-magnify"
+              outlined
+              dense
+              hide-details
+              clearable
+              class="mb-3"
+            ></v-text-field>
+            
+            <!-- 工具按钮 -->
+            <div class="mb-3 d-flex flex-wrap">
+              <v-btn 
+                small 
+                outlined 
+                @click="showPasteDialog" 
+                v-if="showPaste && mode === 'multiple'"
+                class="mr-2 mb-2"
+              >
+                <v-icon small left>mdi-content-paste</v-icon>
+                粘贴选择
+              </v-btn>
+              <v-btn 
+                small 
+                outlined 
+                v-if="mode === 'multiple'"
+                :disabled="filteredAllUsers.length === 0"
+                @click="handleBatchSelect"
+                class="mr-2 mb-2"
+              >
+                <v-icon small left>mdi-checkbox-multiple-marked</v-icon>
+                {{ isAllSelected ? '取消全选' : '全选当前' }}
+              </v-btn>
+            </div>
+          </div>
+          
+          <v-divider></v-divider>
+          
+          <!-- 内容区域 -->
+          <div :style="listStyle">
+            <!-- Tab内容 -->
+            <v-tabs-items v-model="currentTab" v-if="showRecent" style="height: 100%;">
+              <!-- Tab1: 部门人员 -->
+              <v-tab-item style="height: calc(100% - 300px); overflow-y: auto;">
+                <div class="px-3 py-2">
+                  <div v-if="loading" class="text-center py-8">
+                    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                  </div>
+                  
+                  <div v-else-if="filteredGroupList.length === 0" class="text-center grey--text py-8">
+                    <v-icon size="48" color="grey lighten-1">mdi-account-search</v-icon>
+                    <div class="mt-2">未找到匹配的部门或人员</div>
+                  </div>
+                  
+                  <div v-else>
+                    <!-- 部门树形结构 - 递归渲染 -->
+                    <group-tree-node
+                      v-for="node in filteredGroupList"
+                      :key="node.groupId"
+                      :node="node"
+                      :level="0"
+                      :mode="mode"
+                      :allow-select-group="allowSelectGroup"
+                      :expanded-groups="expandedGroups"
+                      :temp-selected-users="tempSelectedUsers"
+                      :temp-selected-groups="tempSelectedGroups"
+                      :get-group-users="getGroupUsers"
+                      :get-group-user-count="getGroupUserCount"
+                      :is-group-selected="isGroupSelected"
+                      :is-group-item-selected="isGroupItemSelected"
+                      :is-user-selected="isUserSelected"
+                      :get-user-avatar-color="getUserAvatarColor"
+                      @toggle-expand="toggleGroupExpand"
+                      @toggle-group="toggleGroup"
+                      @toggle-group-selection="toggleGroupSelection"
+                      @select-single-group="selectSingleGroup"
+                      @toggle-user="toggleUser"
+                      @select-single-user="selectSingleUser"
+                      @user-click="handleUserClick"
+                    ></group-tree-node>
+                  </div>
+                </div>
+              </v-tab-item>
+              
+              <!-- Tab2: 最近选择 -->
+              <v-tab-item style="height: calc(100% - 300px); overflow-y: auto;">
+                <div class="px-3 py-2">
+                  <div v-if="recentUsers.length === 0" class="text-center grey--text py-8">
+                    <v-icon size="48" color="grey lighten-1">mdi-history</v-icon>
+                    <div class="mt-2">暂无最近选择记录</div>
+                  </div>
+                  <div v-else>
+                    <div 
+                      v-for="user in recentUsers" 
+                      :key="user.userId"
+                      class="d-flex align-center py-2 user-item"
+                      @click="handleUserClick(user)"
+                    >
+                      <v-checkbox
+                        v-if="mode === 'multiple'"
+                        :input-value="isUserSelected(user.userId)"
+                        @change="toggleUser(user)"
+                        @click.stop
+                        hide-details
+                        dense
+                        class="mr-2 mt-0"
+                      ></v-checkbox>
+                      <v-radio
+                        v-else
+                        :value="user.userId"
+                        :input-value="tempSelectedUsers.length > 0 ? tempSelectedUsers[0].userId : null"
+                        @click.stop="selectSingleUser(user)"
+                        hide-details
+                        dense
+                        class="mr-2 mt-0"
+                      ></v-radio>
+                      <v-avatar size="32" :color="getUserAvatarColor(user)" class="mr-2">
+                        <span class="white--text text-caption">{{ user.username ? (user.username || user.groupName).charAt(0) : '?' }}</span>
+                      </v-avatar>
+                      <div class="flex-grow-1">
+                        <div>{{ user.username || '未知用户' }}</div>
+                        <div class="text-caption grey--text">{{ user.groupName || '未分配部门' }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </v-tab-item>
+            </v-tabs-items>
+            
+            <!-- 无Tab时直接显示部门列表 -->
+            <div v-else class="px-3 py-2" style="height: 100%; overflow-y: auto;">
+              <div v-if="loading" class="text-center py-8">
+                <v-progress-circular indeterminate color="primary"></v-progress-circular>
+              </div>
+              
+              <div v-else-if="filteredGroupList.length === 0" class="text-center grey--text py-8">
+                <v-icon size="48" color="grey lighten-1">mdi-account-search</v-icon>
+                <div class="mt-2">未找到匹配的部门或人员</div>
+              </div>
+              
+              <div v-else>
+                <!-- 部门树形结构 - 递归渲染 -->
+                <group-tree-node
+                  v-for="node in filteredGroupList"
+                  :key="node.groupId"
+                  :node="node"
+                  :level="0"
+                  :mode="mode"
+                  :allow-select-group="allowSelectGroup"
+                  :expanded-groups="expandedGroups"
+                  :temp-selected-users="tempSelectedUsers"
+                  :temp-selected-groups="tempSelectedGroups"
+                  :get-group-users="getGroupUsers"
+                  :get-group-user-count="getGroupUserCount"
+                  :is-group-selected="isGroupSelected"
+                  :is-group-item-selected="isGroupItemSelected"
+                  :is-user-selected="isUserSelected"
+                  :get-user-avatar-color="getUserAvatarColor"
+                  @toggle-expand="toggleGroupExpand"
+                  @toggle-group="toggleGroup"
+                  @toggle-group-selection="toggleGroupSelection"
+                  @select-single-group="selectSingleGroup"
+                  @toggle-user="toggleUser"
+                  @select-single-user="selectSingleUser"
+                  @user-click="handleUserClick"
+                ></group-tree-node>
+              </div>
+            </div>
+          </div>
+        </v-col>
+        
+        <!-- 右侧：已选区 -->
+        <v-col :cols="isMobile ? 12 : 5" v-if="mode === 'multiple' && !isMobile">
+          <div class="pa-3" style="height: 100%; display: flex; flex-direction: column;">
+            <div class="d-flex align-center mb-3">
+              <span class="text-subtitle-2">
+                已选: {{ totalSelectedCount }}
+                <span v-if="allowSelectGroup && tempSelectedGroups.length > 0" class="text-caption">
+                  ({{ tempSelectedGroups.length }}个部门, {{ tempSelectedUsers.length }}人)
+                </span>
+              </span>
+              <v-spacer></v-spacer>
+              <v-btn text small color="primary" @click="clearSelection" :disabled="totalSelectedCount === 0">
+                清除
+              </v-btn>
+            </div>
+            
+            <v-divider class="mb-3"></v-divider>
+            
+            <div class="flex-grow-1" style="overflow-y: auto;">
+              <div v-if="totalSelectedCount === 0" class="text-center py-8">
+                <v-icon size="64" color="grey lighten-2">mdi-account-multiple-outline</v-icon>
+                <div class="grey--text mt-2">暂无选中内容</div>
+              </div>
+              
+              <div v-else>
+                <!-- 显示选中的部门 -->
+                <v-chip
+                  v-for="group in tempSelectedGroups"
+                  :key="'group-' + group.groupId"
+                  class="ma-1"
+                  close
+                  small
+                  color="primary"
+                  @click:close="removeGroupFromTemp(group.groupId)"
+                >
+                  <v-avatar left small color="primary">
+                    <v-icon dark small>mdi-office-building</v-icon>
+                  </v-avatar>
+                  {{ group.groupName }}
+                </v-chip>
+                <!-- 显示选中的用户（确保只显示真正的用户对象） -->
+                <v-chip
+                  v-for="user in tempSelectedUsers"
+                  :key="user.userId"
+                  class="ma-1"
+                  close
+                  small
+                  @click:close="removeUserFromTemp(user.userId)"
+                  v-if="user.username"
+                >
+                  <v-avatar left small :color="getUserAvatarColor(user)">
+                    <span class="white--text caption">{{ user.username ? (user.username || user.groupName).charAt(0) : '?' }}</span>
+                  </v-avatar>
+                  {{ user.username }}
+                </v-chip>
+              </div>
+            </div>
+          </div>
+        </v-col>
+      </v-row>
+    </v-card-text>
+    
+    <v-divider></v-divider>
+    
+    <!-- 底部操作栏 -->
+    <v-card-actions class="pa-4">
+      <div v-if="mode === 'multiple' && isMobile" class="text-caption">
+        已选 {{ totalSelectedCount }}
+        <span v-if="allowSelectGroup && tempSelectedGroups.length > 0">
+          ({{ tempSelectedGroups.length }}个部门, {{ tempSelectedUsers.length }}人)
+        </span>
+      </div>
+      <v-spacer></v-spacer>
+      <v-btn text @click="handleCancel">取消</v-btn>
+      <v-btn 
+        color="success" 
+        @click="handleConfirm"
+        :disabled="mode === 'single' && totalSelectedCount === 0"
+      >
+        确定
+      </v-btn>
+    </v-card-actions>
+  </v-card>
+  
+  <!-- 粘贴选择对话框 -->
+  <v-dialog v-model="isPasteDialogShown" max-width="500px">
+    <v-card>
+      <v-card-title>粘贴选择</v-card-title>
+      <v-card-text>
+        <v-textarea
+          v-model="pasteContent"
+          outlined
+          placeholder="请粘贴人员姓名，每行一个"
+          rows="8"
+          auto-grow
+        ></v-textarea>
+        <div class="text-caption grey--text">
+          提示：每行输入一个姓名，系统将自动匹配对应人员
+        </div>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text @click="isPasteDialogShown = false">取消</v-btn>
+        <v-btn color="primary" @click="handlePasteSelect">确定</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</v-dialog>
+</script>
+
+<script>
+// 递归树节点组件
+Vue.component('group-tree-node', {
+  template: `
+    <div class="mb-1">
+      <!-- 部门节点 -->
+      <div class="d-flex align-center py-2 group-item" :style="{ paddingLeft: (level * 16) + 'px' }">
+        <v-checkbox
+          v-if="mode === 'multiple' && !allowSelectGroup"
+          :input-value="isGroupSelected(node.groupId)"
+          @change="$emit('toggle-group', node)"
+          @click.stop
+          hide-details
+          dense
+          class="mr-2 mt-0"
+        ></v-checkbox>
+        <v-icon 
+          class="mr-2" 
+          small
+          @click="$emit('toggle-expand', node.groupId)"
+          style="cursor: pointer;"
+          v-if="node.children.length > 0 || node.hasUsers"
+        >
+          {{ expandedGroups.includes(node.groupId) ? 'mdi-chevron-down' : 'mdi-chevron-right' }}
+        </v-icon>
+        <span v-else class="mr-2" style="width: 20px;"></span>
+        <v-avatar size="32" color="primary" class="mr-2">
+          <v-icon dark small>mdi-office-building</v-icon>
+        </v-avatar>
+        <div class="flex-grow-1" @click="$emit('toggle-expand', node.groupId)" style="cursor: pointer;">
+          <div class="font-weight-medium">{{ node.groupName }}</div>
+          <div class="text-caption grey--text">
+            {{ getGroupUserCount(node.groupId) }}人
+            <span v-if="node.children.length > 0" class="ml-1">({{ node.children.length }}个子部门)</span>
+          </div>
+        </div>
+        <!-- 选择部门按钮 -->
+        <v-btn
+          v-if="allowSelectGroup && mode === 'multiple'"
+          x-small
+          outlined
+          color="primary"
+          @click.stop="$emit('toggle-group-selection', node)"
+          class="ml-2"
+        >
+          <v-icon x-small left>mdi-check</v-icon>
+          {{ isGroupItemSelected(node.groupId) ? '已选' : '选择' }}
+        </v-btn>
+        <v-radio
+          v-else-if="allowSelectGroup && mode === 'single'"
+          :value="node.groupId"
+          :input-value="selectedGroupId"
+          @click.stop="handleGroupRadioClick(node)"
+          hide-details
+          dense
+          class="ml-2 mt-0"
+        ></v-radio>
+      </div>
+      
+      <!-- 展开内容：子部门和用户 -->
+      <v-expand-transition>
+        <div v-show="expandedGroups.includes(node.groupId)">
+          <!-- 子部门（递归） -->
+          <group-tree-node
+            v-for="child in node.children"
+            :key="child.groupId"
+            :node="child"
+            :level="level + 1"
+            :mode="mode"
+            :allow-select-group="allowSelectGroup"
+            :expanded-groups="expandedGroups"
+            :temp-selected-users="tempSelectedUsers"
+            :temp-selected-groups="tempSelectedGroups"
+            :get-group-users="getGroupUsers"
+            :get-group-user-count="getGroupUserCount"
+            :is-group-selected="isGroupSelected"
+            :is-group-item-selected="isGroupItemSelected"
+            :is-user-selected="isUserSelected"
+            :get-user-avatar-color="getUserAvatarColor"
+            @toggle-expand="$emit('toggle-expand', $event)"
+            @toggle-group="$emit('toggle-group', $event)"
+            @toggle-group-selection="$emit('toggle-group-selection', $event)"
+            @select-single-group="$emit('select-single-group', $event)"
+            @toggle-user="$emit('toggle-user', $event)"
+            @select-single-user="$emit('select-single-user', $event)"
+            @user-click="$emit('user-click', $event)"
+          ></group-tree-node>
+          
+          <!-- 该部门下的用户列表 -->
+          <div 
+            v-for="user in getGroupUsers(node.groupId)" 
+            :key="user.userId"
+            class="d-flex align-center py-2 user-item"
+            :style="{ paddingLeft: ((level + 1) * 16) + 'px' }"
+            @click="$emit('user-click', user)"
+          >
+            <v-checkbox
+              v-if="mode === 'multiple'"
+              :input-value="isUserSelected(user.userId)"
+              @change="$emit('toggle-user', user)"
+              @click.stop
+              hide-details
+              dense
+              class="mr-2 mt-0"
+            ></v-checkbox>
+            <v-radio
+              v-else
+              :value="user.userId"
+              :input-value="selectedUserId"
+              @click.stop="handleRadioClick(user)"
+              hide-details
+              dense
+              class="mr-2 mt-0"
+            ></v-radio>
+            <v-avatar size="28" :color="getUserAvatarColor(user)" class="mr-2">
+              <span class="white--text text-caption">{{ user.username ? (user.username || user.groupName).charAt(0) : '?' }}</span>
+            </v-avatar>
+            <div class="flex-grow-1">
+              <span>{{ user.username || '未知用户' }}</span>
+              <span v-if="user.roleName" class="ml-2 text-caption grey--text">({{ user.roleName }})</span>
+            </div>
+          </div>
+        </div>
+      </v-expand-transition>
+    </div>
+  `,
+  props: {
+    node: {
+      type: Object,
+      required: true
+    },
+    level: {
+      type: Number,
+      default: 0
+    },
+    mode: String,
+    allowSelectGroup: Boolean,
+    expandedGroups: Array,
+    tempSelectedUsers: Array,
+    tempSelectedGroups: Array,
+    getGroupUsers: Function,
+    getGroupUserCount: Function,
+    isGroupSelected: Function,
+    isGroupItemSelected: Function,
+    isUserSelected: Function,
+    getUserAvatarColor: Function
+  },
+  computed: {
+    selectedUserId() {
+      return this.tempSelectedUsers.length > 0 ? this.tempSelectedUsers[0].userId : null;
+    },
+    selectedGroupId() {
+      return this.tempSelectedGroups.length > 0 ? this.tempSelectedGroups[0].groupId : null;
+    }
+  },
+  methods: {
+    handleRadioClick(user) {
+      this.$emit('select-single-user', user);
+    },
+    handleGroupRadioClick(group) {
+      this.$emit('select-single-group', group);
+    }
+  }
+});
+
+Vue.component('jh-user-selector', {
+  template: '#jh-user-selector-template',
+  props: {
+    value: {
+      type: Array,
+      default: () => []
+    },
+    visible: {
+      type: Boolean,
+      default: false
+    },
+    mode: {
+      type: String,
+      default: 'multiple', // 'multiple' | 'single'
+      validator: value => ['multiple', 'single'].includes(value)
+    },
+    title: {
+      type: String,
+      default: '选择人员'
+    },
+    placeholder: {
+      type: String,
+      default: '搜索部门或人员'
+    },
+    maxWidth: {
+      type: String,
+      default: '1000px'
+    },
+    showRecent: {
+      type: Boolean,
+      default: true
+    },
+    showPaste: {
+      type: Boolean,
+      default: true
+    },
+    recentStorageKey: {
+      type: String,
+      default: 'jh_recent_selected_users'
+    },
+    allowSelectGroup: {
+      type: Boolean,
+      default: false
+    },
+    apiConfig: {
+      type: Object,
+      default: () => ({
+        pageId: 'allPage',
+        actionId: 'getUserListBySingleGroup'
+      })
+    }
+  },
+  data() {
+    return {
+      isMobile: window.innerWidth < 600,
+      loading: false,
+      currentTab: 0,
+      searchKeyword: '',
+      allUserList: [],
+      groupList: [],
+      groupTree: [], // 树形结构的部门列表
+      tempSelectedUsers: [],
+      tempSelectedGroups: [], // 临时选中的部门
+      recentUsers: [],
+      expandedGroups: [], // 展开的部门
+      isPasteDialogShown: false,
+      pasteContent: ''
+    };
+  },
+  computed: {
+    contentStyle() {
+      return this.isMobile ? 'height: calc(100vh - 120px);' : 'height: 600px;';
+    },
+    listStyle() {
+      const baseHeight = this.showRecent ? 'calc(100% - 140px)' : 'calc(100% - 100px)';
+      return `height: ${baseHeight};`;
+    },
+    filteredGroupList() {
+      if (!this.searchKeyword) {
+        return this.groupTree;
+      }
+      // 搜索时，过滤树形结构
+      const keyword = this.searchKeyword.toLowerCase();
+      return this.filterTreeRecursive(this.groupTree, keyword);
+    },
+    filteredAllUsers() {
+      if (!this.searchKeyword) {
+        return this.allUserList;
+      }
+      const keyword = this.searchKeyword.toLowerCase();
+      return this.allUserList.filter(u => u.username.toLowerCase().includes(keyword));
+    },
+    isAllSelected() {
+      if (this.filteredAllUsers.length === 0) return false;
+      return this.filteredAllUsers.every(user => this.isUserSelected(user.userId));
+    },
+    totalSelectedCount() {
+      return this.tempSelectedUsers.length + this.tempSelectedGroups.length;
+    }
+  },
+  watch: {
+    visible: {
+      immediate: true,
+      handler(val) {
+        if (val) {
+          this.initDialog();
+        }
+      }
+    }
+  },
+  mounted() {
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+  methods: {
+    handleResize() {
+      this.isMobile = window.innerWidth < 600;
+    },
+    
+    async initDialog() {
+      // 初始化临时选择列表
+      const value = this.value || [];
+      // 分离部门和用户（兼容旧数据格式）
+      this.tempSelectedUsers = value.filter(item => !item.isGroup && item.userId);
+      this.tempSelectedGroups = value.filter(item => item.isGroup || (!item.userId && item.groupId));
+      this.searchKeyword = '';
+      this.currentTab = 0;
+      this.expandedGroups = [];
+      
+      // 加载数据
+      if (this.allUserList.length === 0) {
+        await this.loadUserData();
+      }
+      
+      // 加载最近选择
+      if (this.showRecent) {
+        this.loadRecentUsers();
+      }
+      
+      // 自动展开有选中用户的部门
+      this.autoExpandSelectedGroups();
+    },
+    
+    async loadUserData() {
+      this.loading = true;
+      try {
+        const result = await window.jianghuAxios({
+          data: {
+            appData: {
+              pageId: this.apiConfig.pageId,
+              actionId: this.apiConfig.actionId,
+              actionData: {},
+              where: {},
+              orderBy: [
+                { column: 'groupId', order: 'asc' }, 
+                { column: 'username', order: 'asc' }
+              ]
+            }
+          }
+        });
+        
+        const users = result.data.appData.resultData.rows || [];
+        this.allUserList = users;
+        
+        // 提取唯一的部门列表
+        const groupMap = new Map();
+        users.forEach(user => {
+          if (user.groupId && !groupMap.has(user.groupId)) {
+            groupMap.set(user.groupId, {
+              groupId: user.groupId,
+              groupName: user.groupName || '未命名部门',
+              groupAllName: user.groupAllName || user.groupName,
+              groupPath: user.groupPath
+            });
+          }
+        });
+        this.groupList = Array.from(groupMap.values());
+        
+        // 构建树形结构
+        this.buildGroupTree();
+        
+        // 默认展开第一层部门
+        if (this.groupTree.length > 0) {
+          this.expandedGroups = this.groupTree.slice(0, 3).map(node => node.groupId);
+        }
+      } catch (error) {
+        console.error('加载用户数据失败:', error);
+        window.vtoast && window.vtoast.fail('加载用户数据失败');
+      } finally {
+        this.loading = false;
+      }
+    },
+    
+    loadRecentUsers() {
+      try {
+        const recent = localStorage.getItem(this.recentStorageKey);
+        if (recent) {
+          this.recentUsers = JSON.parse(recent);
+        }
+      } catch (error) {
+        console.error('加载最近选择失败:', error);
+      }
+    },
+    
+    saveRecentUsers() {
+      try {
+        if (this.tempSelectedUsers.length === 0) return;
+        
+        // 合并到最近选择，去重
+        const merged = [...this.tempSelectedUsers];
+        this.recentUsers.forEach(user => {
+          if (!merged.some(u => u.userId === user.userId)) {
+            merged.push(user);
+          }
+        });
+        
+        // 只保留最近20个
+        const recentList = merged.slice(0, 20);
+        localStorage.setItem(this.recentStorageKey, JSON.stringify(recentList));
+        this.recentUsers = recentList;
+      } catch (error) {
+        console.error('保存最近选择失败:', error);
+      }
+    },
+    
+    autoExpandSelectedGroups() {
+      // 自动展开有选中用户的部门及其父级
+      const selectedGroupIds = new Set();
+      this.tempSelectedUsers.forEach(user => {
+        if (user.groupId) {
+          selectedGroupIds.add(user.groupId);
+          // 添加所有父级部门
+          const parts = user.groupId.split('-');
+          for (let i = 1; i < parts.length; i++) {
+            selectedGroupIds.add(parts.slice(0, i).join('-'));
+          }
+        }
+      });
+      this.tempSelectedGroups.forEach(group => {
+        selectedGroupIds.add(group.groupId);
+        // 添加所有父级部门
+        const parts = group.groupId.split('-');
+        for (let i = 1; i < parts.length; i++) {
+          selectedGroupIds.add(parts.slice(0, i).join('-'));
+        }
+      });
+      this.expandedGroups = Array.from(selectedGroupIds);
+    },
+    
+    /**
+     * 构建树形结构
+     * 根据 groupId 中的 - 来分层
+     */
+    buildGroupTree() {
+      // 创建所有节点的映射
+      const nodeMap = new Map();
+      
+      // 为每个部门创建节点
+      this.groupList.forEach(group => {
+        const parts = group.groupId.split('-');
+        const level = parts.length;
+        
+        // 确保所有父级节点都存在
+        for (let i = 1; i < parts.length; i++) {
+          const parentId = parts.slice(0, i).join('-');
+          if (!nodeMap.has(parentId)) {
+            // 查找父级部门信息
+            const parentGroup = this.groupList.find(g => g.groupId === parentId);
+            nodeMap.set(parentId, {
+              groupId: parentId,
+              groupName: parentGroup ? parentGroup.groupName : parentId,
+              groupAllName: parentGroup ? parentGroup.groupAllName : parentId,
+              level: i,
+              children: [],
+              hasUsers: false
+            });
+          }
+        }
+        
+        // 创建或更新当前节点
+        if (!nodeMap.has(group.groupId)) {
+          nodeMap.set(group.groupId, {
+            groupId: group.groupId,
+            groupName: group.groupName,
+            groupAllName: group.groupAllName,
+            level: level,
+            children: [],
+            hasUsers: true
+          });
+        } else {
+          nodeMap.get(group.groupId).hasUsers = true;
+        }
+      });
+      
+      // 构建父子关系
+      const rootNodes = [];
+      nodeMap.forEach((node, groupId) => {
+        const parts = groupId.split('-');
+        if (parts.length === 1) {
+          // 根节点
+          rootNodes.push(node);
+        } else {
+          // 找到父节点
+          const parentId = parts.slice(0, parts.length - 1).join('-');
+          const parent = nodeMap.get(parentId);
+          if (parent) {
+            parent.children.push(node);
+          } else {
+            // 如果找不到父节点，作为根节点
+            rootNodes.push(node);
+          }
+        }
+      });
+      
+      // 排序：按 groupId 排序
+      const sortNodes = (nodes) => {
+        nodes.sort((a, b) => a.groupId.localeCompare(b.groupId));
+        nodes.forEach(node => {
+          if (node.children.length > 0) {
+            sortNodes(node.children);
+          }
+        });
+      };
+      
+      sortNodes(rootNodes);
+      this.groupTree = rootNodes;
+    },
+    
+    /**
+     * 递归过滤树形结构
+     */
+    filterTreeRecursive(tree, keyword) {
+      const result = [];
+      tree.forEach(node => {
+        const matches = node.groupName.toLowerCase().includes(keyword) ||
+                       (node.groupAllName && node.groupAllName.toLowerCase().includes(keyword)) ||
+                       node.groupId.toLowerCase().includes(keyword) ||
+                       this.getGroupUsers(node.groupId).length > 0;
+        
+        const filteredChildren = node.children.length > 0 ? this.filterTreeRecursive(node.children, keyword) : [];
+        const hasMatchingChildren = filteredChildren.length > 0;
+        
+        if (matches || hasMatchingChildren) {
+          result.push({
+            ...node,
+            children: filteredChildren
+          });
+        }
+      });
+      return result;
+    },
+    
+    getGroupUserCount(groupId) {
+      return this.allUserList.filter(u => u.groupId === groupId).length;
+    },
+    
+    getGroupUsers(groupId) {
+      const users = this.allUserList.filter(u => u.groupId === groupId);
+      if (!this.searchKeyword) {
+        return users;
+      }
+      const keyword = this.searchKeyword.toLowerCase();
+      return users.filter(u => u.username.toLowerCase().includes(keyword));
+    },
+    
+    isUserSelected(userId) {
+      return this.tempSelectedUsers.some(u => u.userId === userId);
+    },
+    
+    isGroupSelected(groupId) {
+      const groupUsers = this.getGroupUsers(groupId);
+      if (groupUsers.length === 0) return false;
+      return groupUsers.every(user => this.isUserSelected(user.userId));
+    },
+    
+    toggleGroupExpand(groupId) {
+      const index = this.expandedGroups.indexOf(groupId);
+      if (index > -1) {
+        this.expandedGroups.splice(index, 1);
+      } else {
+        this.expandedGroups.push(groupId);
+      }
+    },
+    
+    toggleUser(user) {
+      if (this.mode === 'single') {
+        this.selectSingleUser(user);
+        return;
+      }
+      
+      const index = this.tempSelectedUsers.findIndex(u => u.userId === user.userId);
+      if (index > -1) {
+        this.tempSelectedUsers.splice(index, 1);
+      } else {
+        this.tempSelectedUsers.push(user);
+      }
+    },
+    
+    selectSingleUser(user) {
+      // 直接赋值，Vue 会自动处理响应式更新
+      this.tempSelectedUsers = [user];
+      // 单选模式下，选择用户时清空部门选择
+      if (this.allowSelectGroup) {
+        this.tempSelectedGroups = [];
+      }
+    },
+    
+    handleUserClick(user) {
+      this.toggleUser(user);
+    },
+    
+    toggleGroup(group) {
+      const groupUsers = this.getGroupUsers(group.groupId);
+      const isSelected = this.isGroupSelected(group.groupId);
+      
+      if (isSelected) {
+        // 取消选择该部门所有用户
+        groupUsers.forEach(user => {
+          const index = this.tempSelectedUsers.findIndex(u => u.userId === user.userId);
+          if (index > -1) {
+            this.tempSelectedUsers.splice(index, 1);
+          }
+        });
+      } else {
+        // 选择该部门所有用户
+        groupUsers.forEach(user => {
+          if (!this.isUserSelected(user.userId)) {
+            this.tempSelectedUsers.push(user);
+          }
+        });
+      }
+    },
+    
+    handleBatchSelect() {
+      if (this.isAllSelected) {
+        // 取消全选
+        this.filteredAllUsers.forEach(user => {
+          const index = this.tempSelectedUsers.findIndex(u => u.userId === user.userId);
+          if (index > -1) {
+            this.tempSelectedUsers.splice(index, 1);
+          }
+        });
+      } else {
+        // 全选
+        this.filteredAllUsers.forEach(user => {
+          if (!this.isUserSelected(user.userId)) {
+            this.tempSelectedUsers.push(user);
+          }
+        });
+      }
+    },
+    
+    removeUserFromTemp(userId) {
+      const index = this.tempSelectedUsers.findIndex(u => u.userId === userId);
+      if (index > -1) {
+        this.tempSelectedUsers.splice(index, 1);
+      }
+    },
+    
+    clearSelection() {
+      this.tempSelectedUsers = [];
+      this.tempSelectedGroups = [];
+    },
+    
+    // ================================ 部门选择相关方法 ================================
+    /**
+     * 判断部门是否被选中（作为部门项）
+     */
+    isGroupItemSelected(groupId) {
+      return this.tempSelectedGroups.some(g => g.groupId === groupId);
+    },
+    
+    /**
+     * 切换部门选择（选择部门本身，并自动选中部门下的所有人员）
+     */
+    toggleGroupSelection(group) {
+      const index = this.tempSelectedGroups.findIndex(g => g.groupId === group.groupId);
+      if (index > -1) {
+        // 取消选择部门，同时取消该部门下所有用户的选择
+        this.tempSelectedGroups.splice(index, 1);
+        const groupUsers = this.getGroupUsers(group.groupId);
+        groupUsers.forEach(user => {
+          const userIndex = this.tempSelectedUsers.findIndex(u => u.userId === user.userId);
+          if (userIndex > -1) {
+            this.tempSelectedUsers.splice(userIndex, 1);
+          }
+        });
+      } else {
+        // 添加部门，标记为isGroup
+        this.tempSelectedGroups.push({
+          groupId: group.groupId,
+          groupName: group.groupName,
+          groupAllName: group.groupAllName,
+          isGroup: true
+        });
+        // 自动选中该部门下的所有用户
+        const groupUsers = this.getGroupUsers(group.groupId);
+        groupUsers.forEach(user => {
+          if (!this.isUserSelected(user.userId)) {
+            this.tempSelectedUsers.push(user);
+          }
+        });
+      }
+    },
+    
+    /**
+     * 单选模式下选择部门
+     */
+    selectSingleGroup(group) {
+      this.tempSelectedGroups = [{
+        groupId: group.groupId,
+        groupName: group.groupName,
+        groupAllName: group.groupAllName,
+        isGroup: true
+      }];
+      // 自动选中该部门下的所有用户
+      const groupUsers = this.getGroupUsers(group.groupId);
+      this.tempSelectedUsers = [...groupUsers];
+    },
+    
+    /**
+     * 从临时列表中移除部门
+     */
+    removeGroupFromTemp(groupId) {
+      const index = this.tempSelectedGroups.findIndex(g => g.groupId === groupId);
+      if (index > -1) {
+        this.tempSelectedGroups.splice(index, 1);
+        // 同时移除该部门下的所有用户
+        const groupUsers = this.getGroupUsers(groupId);
+        groupUsers.forEach(user => {
+          const userIndex = this.tempSelectedUsers.findIndex(u => u.userId === user.userId);
+          if (userIndex > -1) {
+            this.tempSelectedUsers.splice(userIndex, 1);
+          }
+        });
+      }
+    },
+    
+    showPasteDialog() {
+      this.pasteContent = '';
+      this.isPasteDialogShown = true;
+    },
+    
+    handlePasteSelect() {
+      if (!this.pasteContent) {
+        return;
+      }
+      
+      // 按行分割
+      const names = this.pasteContent.split('\n')
+        .map(n => n.trim())
+        .filter(n => n);
+      
+      let matchCount = 0;
+      // 查找匹配的用户
+      names.forEach(name => {
+        const user = this.allUserList.find(u => u.username === name);
+        if (user && !this.isUserSelected(user.userId)) {
+          this.tempSelectedUsers.push(user);
+          matchCount++;
+        }
+      });
+      
+      this.isPasteDialogShown = false;
+      window.vtoast && window.vtoast.success(`成功匹配 ${matchCount} 个用户`);
+    },
+    
+    getUserAvatarColor(user) {
+      // 根据用户名生成颜色
+      if (!user || !user.username) {
+        return '#9E9E9E'; // 默认灰色
+      }
+      const colors = [
+        '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
+        '#98D8C8', '#6C5CE7', '#A29BFE', '#FD79A8',
+        '#FDCB6E', '#E17055', '#00B894', '#00CEC9'
+      ];
+      const index = user.username.charCodeAt(0) % colors.length;
+      return colors[index];
+    },
+    
+    handleDialogInput(value) {
+      this.$emit('update:visible', value);
+    },
+    
+    handleClose() {
+      this.handleCancel();
+    },
+    
+    handleCancel() {
+      this.$emit('update:visible', false);
+      this.$emit('cancel');
+    },
+    
+    handleConfirm() {
+      // 保存最近选择
+      if (this.showRecent && this.tempSelectedUsers.length > 0) {
+        this.saveRecentUsers();
+      }
+      
+      // 合并部门和用户
+      const result = [...this.tempSelectedGroups, ...this.tempSelectedUsers];
+      
+      // 触发事件
+      this.$emit('input', result);
+      this.$emit('update:visible', false);
+      this.$emit('confirm', result);
+    }
+  }
+});
+</script>
+
+<style scoped>
+.border-right {
+  border-right: 1px solid #e0e0e0;
+}
+
+.group-item {
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.group-item:hover {
+  background-color: #f5f5f5;
+}
+
+.user-item {
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.user-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+</style>
+
