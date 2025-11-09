@@ -451,11 +451,58 @@ JhLayout 组件会自动适配不同屏幕尺寸：
 
 JhLayout 可以与其他 JianghuJS 组件完美配合：
 
+- **JhPageContainer**: 推荐在 JhLayout 的内容区域使用 JhPageContainer 作为页面容器，提供统一的页面头部和内容布局
 - **JhTable**: 在内容区域展示数据表格
 - **JhForm**: 在内容区域展示表单
 - **JhQueryFilter**: 在页面头部额外操作区添加搜索过滤
 - **JhDrawer**: 作为侧边抽屉使用
 - **JhModal**: 作为弹窗使用
+
+### 推荐的组件组合
+
+**JhLayout + JhPageContainer + JhTable**
+
+这是最常用的页面结构组合，适用于大多数列表页面：
+
+```vue
+<template>
+  <jh-layout
+    title="管理系统"
+    :menu-data="menuData"
+    :current-path="currentPath"
+    show-breadcrumb
+    :content-padding="false"
+  >
+    <jh-page-container
+      page-name="用户管理"
+      :show-help-button="true"
+    >
+      <template v-slot:search-bar>
+        <jh-query-filter
+          :keyword.sync="keyword"
+          :keywordFieldList.sync="keywordFieldList"
+          :headers="headers"
+          @search="handleSearch"
+        />
+      </template>
+
+      <template v-slot:content>
+        <jh-table
+          :headers="headers"
+          :items="items"
+          :loading="loading"
+        />
+      </template>
+    </jh-page-container>
+  </jh-layout>
+</template>
+```
+
+**说明**：
+- `JhLayout` 提供应用级布局（导航、头部、侧边栏）
+- `JhPageContainer` 提供页面级容器（页面标题、搜索栏）
+- `JhTable` 提供数据表格展示
+- 当使用 `JhPageContainer` 时，建议设置 `JhLayout` 的 `content-padding="false"` 和 `show-page-header="false"`，避免重复的内边距和头部
 
 ## 常见问题
 

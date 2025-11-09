@@ -4,7 +4,7 @@ import { create } from '@storybook/theming';
 const theme = create({
   base: 'light',
   brandTitle: 'JianghuJS UI',
-  brandUrl: 'https://jianghujs.org',
+  brandUrl: 'https://jianghujs.github.io/jianghu-ui',
   brandImage: null,
   brandTarget: '_self',
 });

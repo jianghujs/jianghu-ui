@@ -1,4 +1,7 @@
 import JhLayout from './JhLayout.vue';
+import JhPageContainer from '../JhPageContainer/JhPageContainer.vue';
+import JhTable from '../JhTable/JhTable.vue';
+import JhQueryFilter from '../JhQueryFilter/JhQueryFilter.vue';
 
 // 示例菜单数据
 const sampleMenuData = [
@@ -195,181 +198,178 @@ export default {
 - 内容管理系统
 - 电商后台
 - 任何需要统一布局的 Web 应用
+
+## 与 JhPageContainer 配合
+
+推荐在 JhLayout 的内容区域使用 JhPageContainer 组件：
+- JhLayout 提供应用级布局（导航、头部、侧边栏）
+- JhPageContainer 提供页面级容器（页面标题、搜索栏）
+- 配合使用时，建议设置 \`content-padding="false"\` 和 \`show-page-header="false"\`
         `
       }
     }
   }
 };
 
-// 侧边布局（默认）
-export const 侧边布局 = {
+// 基础示例（默认）
+export const 基础示例 = {
   args: {
     title: 'JianghuJS Admin',
     logo: 'mdi-view-dashboard',
-    layout: 'side',
     menuData: sampleMenuData,
     currentPath: '/users/list',
-    headerTheme: 'light',
-    sidebarTheme: 'dark',
-    showBreadcrumb: true,
-    showPageHeader: true,
-    pageTitle: '用户列表',
-    pageDescription: '管理系统中的所有用户信息',
-    showFooter: true,
-    footerText: 'Copyright © 2024 JianghuJS. All Rights Reserved.',
+    contentBackground: '#f5f5f5',
     userInfo: {
       username: '管理员',
-      email: 'admin@jianghujs.com'
+      userId: 'admin',
+      roles: ['超级管理员', '系统管理员']
     },
     avatarMenuList: avatarMenuData,
     showSettings: true,
-    contentPadding: true
+    showAvatar: true
   },
   render: (args) => ({
-    components: { JhLayout },
+    components: { JhLayout, JhPageContainer, JhTable, JhQueryFilter },
     data() {
       return {
-        args
+        args,
+        keyword: '',
+        keywordFieldList: ['username', 'email'],
+        headers: [
+          { text: 'ID', value: 'id', dataIndex: 'id', width: '80px' },
+          { text: '用户名', value: 'username', dataIndex: 'username' },
+          { text: '邮箱', value: 'email', dataIndex: 'email' },
+          { text: '角色', value: 'role', dataIndex: 'role' },
+          { text: '状态', value: 'status', dataIndex: 'status', width: '100px' },
+          { text: '创建时间', value: 'createdAt', dataIndex: 'createdAt', width: '150px' }
+        ],
+        tableData: [
+          { id: 1, username: '张三', email: 'zhangsan@example.com', role: '管理员', status: '启用', createdAt: '2024-01-01' },
+          { id: 2, username: '李四', email: 'lisi@example.com', role: '编辑', status: '启用', createdAt: '2024-01-02' },
+          { id: 3, username: '王五', email: 'wangwu@example.com', role: '用户', status: '禁用', createdAt: '2024-01-03' },
+          { id: 4, username: '赵六', email: 'zhaoliu@example.com', role: '用户', status: '启用', createdAt: '2024-01-04' },
+          { id: 5, username: '孙七', email: 'sunqi@example.com', role: '编辑', status: '启用', createdAt: '2024-01-05' },
+          { id: 6, username: '周八', email: 'zhouba@example.com', role: '用户', status: '启用', createdAt: '2024-01-06' },
+          { id: 7, username: '吴九', email: 'wujiu@example.com', role: '编辑', status: '禁用', createdAt: '2024-01-07' },
+          { id: 8, username: '郑十', email: 'zhengshi@example.com', role: '用户', status: '启用', createdAt: '2024-01-08' }
+        ],
+        loading: false
       };
     },
     template: `
       <jh-layout
         v-bind="args"
         @menu-click="handleMenuClick"
-        @breadcrumb-click="handleBreadcrumbClick"
-        @avatar-menu-click="handleAvatarMenuClick"
         @logout="handleLogout"
       >
-        <v-container>
-          <v-row>
-            <v-col v-for="i in 6" :key="i" cols="12" md="6" lg="4">
-              <v-card>
-                <v-card-title>卡片标题 {{ i }}</v-card-title>
-                <v-card-text>
-                  这是一个示例卡片内容，展示 JhLayout 组件的内容区域。
-                  您可以在这里放置任何内容，如表格、表单、图表等。
-                </v-card-text>
-                <v-card-actions>
-                  <v-btn text color="primary">操作</v-btn>
-                  <v-btn text>取消</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-container>
+        <jh-page-container
+          page-name="用户管理"
+          :show-help-button="true"
+          @help-click="handleHelpClick"
+        >
+          <template v-slot:search-bar>
+            <jh-query-filter
+              class="pa-0"
+              :keyword.sync="keyword"
+              :keywordFieldList.sync="keywordFieldList"
+              :headers="headers"
+              @search="handleSearch"
+            />
+          </template>
 
-        <template v-slot:pageHeaderExtra>
-          <v-btn color="primary" elevation="0">
-            <v-icon left>mdi-plus</v-icon>
-            新增用户
-          </v-btn>
-        </template>
+          <template v-slot:content>
+            <jh-table
+              :headers="headers"
+              :items="tableData"
+              :loading="loading"
+              show-index
+              header-title="用户列表"
+              tooltip="管理系统中的所有用户信息"
+              @create-click="handleCreate"
+              @update-click="handleUpdate"
+              @delete-click="handleDelete"
+            >
+              <template v-slot:item.status="{ item }">
+                <v-chip
+                  small
+                  :color="item.status === '启用' ? 'success' : 'error'"
+                  text-color="white"
+                >
+                  {{ item.status }}
+                </v-chip>
+              </template>
+            </jh-table>
+          </template>
+        </jh-page-container>
       </jh-layout>
     `,
     methods: {
       handleMenuClick(item) {
         console.log('菜单点击:', item);
-      },
-      handleBreadcrumbClick(item) {
-        console.log('面包屑点击:', item);
-      },
-      handleAvatarMenuClick(item) {
-        console.log('用户菜单点击:', item);
+        this.args.currentPath = item.path || item.id;
       },
       handleLogout() {
-        console.log('退出登录');
+        alert('退出登录');
+      },
+      handleHelpClick() {
+        alert('帮助按钮被点击');
+      },
+      handleSearch() {
+        this.loading = true;
+        setTimeout(() => {
+          this.loading = false;
+          console.log('搜索:', this.keyword);
+        }, 1000);
+      },
+      handleCreate() {
+        alert('新增用户');
+      },
+      handleUpdate(item) {
+        alert('编辑用户: ' + item.username);
+      },
+      handleDelete(item) {
+        if (confirm('确定删除用户 ' + item.username + ' 吗？')) {
+          console.log('删除用户:', item);
+        }
       }
     }
   })
 };
 
-// 顶部布局
-export const 顶部布局 = {
-  args: {
-    ...侧边布局.args,
-    layout: 'top',
-    headerTheme: 'dark'
-  },
-  render: 侧边布局.render
-};
-
-// 混合布局
-export const 混合布局 = {
-  args: {
-    ...侧边布局.args,
-    layout: 'mix',
-    headerTheme: 'light',
-    sidebarTheme: 'light'
-  },
-  render: 侧边布局.render
-};
-
 // 暗色主题
 export const 暗色主题 = {
   args: {
-    ...侧边布局.args,
-    headerTheme: 'dark',
-    sidebarTheme: 'dark',
-    footerTheme: 'dark'
+    ...基础示例.args,
+    contentBackground: '#1e1e1e'
   },
-  render: 侧边布局.render
+  render: 基础示例.render
 };
 
-// 无面包屑
-export const 无面包屑 = {
+// 无用户头像
+export const 无用户头像 = {
   args: {
-    ...侧边布局.args,
-    showBreadcrumb: false
+    ...基础示例.args,
+    showAvatar: false
   },
-  render: 侧边布局.render
+  render: 基础示例.render
 };
 
-// 无页面头部
-export const 无页面头部 = {
+// 无设置按钮
+export const 无设置按钮 = {
   args: {
-    ...侧边布局.args,
-    showPageHeader: false
-  },
-  render: 侧边布局.render
-};
-
-// 无底部
-export const 无底部 = {
-  args: {
-    ...侧边布局.args,
-    showFooter: false
-  },
-  render: 侧边布局.render
-};
-
-// 无内边距
-export const 无内边距 = {
-  args: {
-    ...侧边布局.args,
-    contentPadding: false
-  },
-  render: 侧边布局.render
-};
-
-// 简洁模式
-export const 简洁模式 = {
-  args: {
-    ...侧边布局.args,
-    showBreadcrumb: false,
-    showPageHeader: false,
-    showFooter: false,
+    ...基础示例.args,
     showSettings: false
   },
-  render: 侧边布局.render
+  render: 基础示例.render
 };
 
 // 自定义 Logo
 export const 自定义Logo = {
   args: {
-    ...侧边布局.args
+    ...基础示例.args
   },
   render: (args) => ({
-    components: { JhLayout },
+    components: { JhLayout, JhPageContainer },
     data() {
       return {
         args
@@ -386,295 +386,29 @@ export const 自定义Logo = {
           </div>
         </template>
 
-        <v-container>
-          <v-card>
-            <v-card-title>自定义 Logo 示例</v-card-title>
-            <v-card-text>
-              通过 logo 插槽可以完全自定义 Logo 区域的内容。
-            </v-card-text>
-          </v-card>
-        </v-container>
+        <jh-page-container page-name="自定义Logo示例">
+          <template v-slot:content>
+            <v-card>
+              <v-card-title>自定义 Logo 示例</v-card-title>
+              <v-card-text>
+                通过 logo 插槽可以完全自定义 Logo 区域的内容。
+              </v-card-text>
+            </v-card>
+          </template>
+        </jh-page-container>
       </jh-layout>
     `
   })
 };
 
-// 自定义头部右侧
-export const 自定义头部右侧 = {
+// 右侧菜单示例
+export const 右侧菜单 = {
   args: {
-    ...侧边布局.args,
-    showAvatar: false
+    ...基础示例.args,
+    rightMenuList: [
+      { title: '帮助中心', icon: 'mdi-help-circle', id: 'help' },
+      { title: '消息通知', icon: 'mdi-bell', id: 'notification' }
+    ]
   },
-  render: (args) => ({
-    components: { JhLayout },
-    data() {
-      return {
-        args,
-        notifications: 5
-      };
-    },
-    template: `
-      <jh-layout v-bind="args">
-        <template v-slot:headerRight>
-          <v-btn icon class="mr-2">
-            <v-badge :content="notifications" color="error" overlap>
-              <v-icon>mdi-bell</v-icon>
-            </v-badge>
-          </v-btn>
-          <v-btn icon class="mr-2">
-            <v-icon>mdi-email</v-icon>
-          </v-btn>
-          <v-menu offset-y>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn icon v-bind="attrs" v-on="on">
-                <v-avatar size="32" color="primary">
-                  <span class="white--text">A</span>
-                </v-avatar>
-              </v-btn>
-            </template>
-            <v-list>
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title>管理员</v-list-item-title>
-                  <v-list-item-subtitle>admin@example.com</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item>
-                <v-list-item-title>个人中心</v-list-item-title>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title>退出登录</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </template>
-
-        <v-container>
-          <v-card>
-            <v-card-title>自定义头部右侧内容</v-card-title>
-            <v-card-text>
-              通过 headerRight 插槽可以自定义头部右侧的内容，如通知、消息等。
-            </v-card-text>
-          </v-card>
-        </v-container>
-      </jh-layout>
-    `
-  })
-};
-
-// 自定义页面头部
-export const 自定义页面头部 = {
-  args: {
-    ...侧边布局.args,
-    showPageHeader: true
-  },
-  render: (args) => ({
-    components: { JhLayout },
-    data() {
-      return {
-        args,
-        stats: [
-          { label: '总用户数', value: '1,234', icon: 'mdi-account-group', color: 'primary' },
-          { label: '活跃用户', value: '856', icon: 'mdi-account-check', color: 'success' },
-          { label: '新增用户', value: '42', icon: 'mdi-account-plus', color: 'info' },
-          { label: '待审核', value: '8', icon: 'mdi-account-clock', color: 'warning' }
-        ]
-      };
-    },
-    template: `
-      <jh-layout v-bind="args">
-        <template v-slot:pageHeader>
-          <div>
-            <h2 class="text-h5 font-weight-bold mb-3">用户管理</h2>
-            <v-row>
-              <v-col v-for="stat in stats" :key="stat.label" cols="6" md="3">
-                <v-card outlined>
-                  <v-card-text class="d-flex align-center">
-                    <v-avatar :color="stat.color" size="48" class="mr-3">
-                      <v-icon dark>{{ stat.icon }}</v-icon>
-                    </v-avatar>
-                    <div>
-                      <div class="text-caption grey--text">{{ stat.label }}</div>
-                      <div class="text-h6 font-weight-bold">{{ stat.value }}</div>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-          </div>
-        </template>
-
-        <template v-slot:pageHeaderExtra>
-          <v-btn-toggle mandatory>
-            <v-btn small>日</v-btn>
-            <v-btn small>周</v-btn>
-            <v-btn small>月</v-btn>
-          </v-btn-toggle>
-        </template>
-
-        <v-container>
-          <v-card>
-            <v-card-title>用户列表</v-card-title>
-            <v-card-text>
-              通过 pageHeader 插槽可以完全自定义页面头部内容，如统计数据、操作按钮等。
-            </v-card-text>
-          </v-card>
-        </v-container>
-      </jh-layout>
-    `
-  })
-};
-
-// 自定义底部
-export const 自定义底部 = {
-  args: {
-    ...侧边布局.args,
-    showFooter: true
-  },
-  render: (args) => ({
-    components: { JhLayout },
-    data() {
-      return {
-        args
-      };
-    },
-    template: `
-      <jh-layout v-bind="args">
-        <template v-slot:footer>
-          <v-container class="mt-5">
-            <v-row>
-              <v-col cols="12" md="4">
-                <div class="text-body-2 font-weight-bold mb-2">关于我们</div>
-                <div class="text-caption grey--text">
-                  JianghuJS 是一个企业级的中后台前端解决方案。
-                </div>
-              </v-col>
-              <v-col cols="12" md="4">
-                <div class="text-body-2 font-weight-bold mb-2">快速链接</div>
-                <div class="text-caption">
-                  <a href="#" class="grey--text text-decoration-none d-block mb-1">文档</a>
-                  <a href="#" class="grey--text text-decoration-none d-block mb-1">GitHub</a>
-                  <a href="#" class="grey--text text-decoration-none d-block">更新日志</a>
-                </div>
-              </v-col>
-              <v-col cols="12" md="4">
-                <div class="text-body-2 font-weight-bold mb-2">联系我们</div>
-                <div class="text-caption grey--text">
-                  Email: contact@jianghujs.com<br>
-                  GitHub: github.com/jianghujs
-                </div>
-              </v-col>
-            </v-row>
-            <v-divider class="my-3"></v-divider>
-            <div class="text-center text-caption grey--text">
-              Copyright © 2024 JianghuJS. All Rights Reserved.
-            </div>
-          </v-container>
-        </template>
-
-        <v-container>
-          <v-card>
-            <v-card-title>自定义底部示例</v-card-title>
-            <v-card-text>
-              通过 footer 插槽可以自定义底部内容，如版权信息、友情链接等。
-            </v-card-text>
-          </v-card>
-        </v-container>
-      </jh-layout>
-    `
-  })
-};
-
-// 完整示例（包含表格）
-export const 完整示例 = {
-  args: {
-    ...侧边布局.args
-  },
-  render: (args) => ({
-    components: { JhLayout },
-    data() {
-      return {
-        args,
-        search: '',
-        headers: [
-          { text: 'ID', value: 'id' },
-          { text: '用户名', value: 'username' },
-          { text: '邮箱', value: 'email' },
-          { text: '角色', value: 'role' },
-          { text: '状态', value: 'status' },
-          { text: '创建时间', value: 'createdAt' },
-          { text: '操作', value: 'actions', sortable: false }
-        ],
-        users: [
-          { id: 1, username: '张三', email: 'zhangsan@example.com', role: '管理员', status: '启用', createdAt: '2024-01-01' },
-          { id: 2, username: '李四', email: 'lisi@example.com', role: '编辑', status: '启用', createdAt: '2024-01-02' },
-          { id: 3, username: '王五', email: 'wangwu@example.com', role: '用户', status: '禁用', createdAt: '2024-01-03' },
-          { id: 4, username: '赵六', email: 'zhaoliu@example.com', role: '用户', status: '启用', createdAt: '2024-01-04' },
-          { id: 5, username: '孙七', email: 'sunqi@example.com', role: '编辑', status: '启用', createdAt: '2024-01-05' }
-        ]
-      };
-    },
-    template: `
-      <jh-layout v-bind="args">
-        <template v-slot:pageHeaderExtra>
-          <v-text-field
-            v-model="search"
-            append-icon="mdi-magnify"
-            label="搜索用户"
-            single-line
-            hide-details
-            dense
-            outlined
-            style="max-width: 300px"
-            class="mr-2"
-          ></v-text-field>
-          <v-btn color="primary" elevation="0">
-            <v-icon left>mdi-plus</v-icon>
-            新增用户
-          </v-btn>
-        </template>
-
-        <v-card>
-          <v-data-table
-            :headers="headers"
-            :items="users"
-            :search="search"
-            class="elevation-0"
-          >
-            <template v-slot:item.status="{ item }">
-              <v-chip
-                small
-                :color="item.status === '启用' ? 'success' : 'error'"
-                text-color="white"
-              >
-                {{ item.status }}
-              </v-chip>
-            </template>
-            <template v-slot:item.actions="{ item }">
-              <v-btn icon small>
-                <v-icon small>mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn icon small>
-                <v-icon small>mdi-delete</v-icon>
-              </v-btn>
-            </template>
-          </v-data-table>
-        </v-card>
-      </jh-layout>
-    `
-  })
-};
-
-// 响应式预览
-export const 响应式预览 = {
-  args: {
-    ...侧边布局.args
-  },
-  render: 侧边布局.render,
-  parameters: {
-    viewport: {
-      defaultViewport: 'mobile1'
-    }
-  }
+  render: 基础示例.render
 };

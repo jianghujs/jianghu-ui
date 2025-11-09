@@ -215,44 +215,33 @@
 | title | String | 'JianghuJS' | 应用标题 |
 | logo | String | '' | Logo 图标 |
 | menuData | Array | [] | 菜单数据 |
+| rightMenuList | Array | [] | 右侧菜单列表 |
 | currentPath | String | '' | 当前路由路径 |
-| layout | String | 'side' | 布局模式 |
-| sidebarWidth | Number | 256 | 侧边栏宽度 |
-| headerHeight | Number | 64 | 头部高度 |
-| headerTheme | String | 'light' | 头部主题 |
-| sidebarTheme | String | 'dark' | 侧边栏主题 |
-| showBreadcrumb | Boolean | true | 显示面包屑 |
-| showPageHeader | Boolean | false | 显示页面头部 |
-| pageTitle | String | '' | 页面标题 |
-| showFooter | Boolean | false | 显示底部 |
+| contentBackground | String | '#f5f5f5' | 内容区域背景色 |
 | showAvatar | Boolean | true | 显示用户头像 |
 | userInfo | Object | {} | 用户信息 |
-| showLogout | Boolean | true | 显示退出登录 |
+| avatarMenuList | Array | [] | 用户菜单列表 |
 | showSettings | Boolean | false | 显示设置按钮 |
 
 ### Events
 | 事件名 | 参数 | 说明 |
 |--------|------|------|
-| menu-click | (item) | 菜单点击 |
-| breadcrumb-click | (item) | 面包屑点击 |
+| menu-click | (menu, index) | 菜单点击 |
 | logout | - | 退出登录 |
-| sidebar-toggle | { collapsed, visible } | 侧边栏切换 |
+| update:contentBackground | (value) | 内容背景色更新 |
+| update:showAvatar | (value) | 显示头像更新 |
 
 ### Slots
 | 插槽名 | 说明 |
 |--------|------|
-| logo | 自定义 Logo |
-| headerRight | 头部右侧内容 |
-| pageHeader | 页面头部 |
-| pageHeaderExtra | 页面头部额外操作 |
+| logo (title) | 自定义 Logo 区域 |
 | default | 主内容区域 |
-| footer | 底部内容 |
-| sidebarFooter | 侧边栏底部 |
 
-### Layout Modes
-- `side`: 侧边布局
-- `top`: 顶部布局
-- `mix`: 混合布局
+### 设置面板功能
+- **内容背景色**: 自定义内容区域背景色
+- **功能开关**: 显示/隐藏用户头像
+- **快速预设**: 默认主题、暗色主题、紧凑模式
+- **重置按钮**: 恢复默认设置
 
 ---
 

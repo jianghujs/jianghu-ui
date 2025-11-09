@@ -381,15 +381,17 @@ async fetchDetail(params) {
 
 ## JhLayout 快速参考
 
-### 侧边布局
+### 基础用法
 ```vue
 <jh-layout
   title="管理系统"
   logo="mdi-view-dashboard"
-  layout="side"
   :menu-data="menuData"
   :current-path="currentPath"
+  content-background="#f5f5f5"
+  show-settings
   @menu-click="handleMenuClick"
+  @logout="handleLogout"
 >
   <v-container>
     <!-- 页面内容 -->
@@ -397,7 +399,7 @@ async fetchDetail(params) {
 </jh-layout>
 ```
 
-### 菜单数据
+### 菜单数据结构
 ```javascript
 menuData: [
   {
@@ -427,14 +429,53 @@ menuData: [
 ### 用户信息和菜单
 ```vue
 <jh-layout
-  :user-info="{ username: '管理员', email: 'admin@example.com' }"
+  :user-info="{ 
+    username: '管理员', 
+    userId: 'admin',
+    roles: ['超级管理员']
+  }"
   :avatar-menu-list="[
     { name: '个人中心', icon: 'mdi-account-circle', path: '/profile' },
     { name: '账户设置', icon: 'mdi-cog', path: '/settings' }
   ]"
-  show-logout
+  :show-avatar="true"
   @logout="handleLogout"
 />
+```
+
+### 右侧菜单
+```vue
+<jh-layout
+  :right-menu-list="[
+    { title: '帮助中心', icon: 'mdi-help-circle', id: 'help' },
+    { title: '消息通知', icon: 'mdi-bell', id: 'notification' }
+  ]"
+/>
+```
+
+### 自定义 Logo
+```vue
+<jh-layout>
+  <template v-slot:logo>
+    <div class="d-flex align-center">
+      <v-avatar color="primary" size="32" class="mr-2">
+        <span class="white--text">JH</span>
+      </v-avatar>
+      <span class="text-h6">JianghuJS</span>
+    </div>
+  </template>
+</jh-layout>
+```
+
+### 设置面板
+```vue
+<jh-layout
+  :show-settings="true"
+  :content-background.sync="contentBg"
+  :show-avatar.sync="showAvatar"
+>
+  <!-- 启用设置按钮，用户可以实时调整布局配置 -->
+</jh-layout>
 ```
 
 ---

@@ -1,7 +1,7 @@
 import JhFormFields from './JhFormFields.vue';
 
 export default {
-  title: '数据录入/JhFormFields',
+  title: '数据录入/JhFormFields - 数据结构化',
   component: JhFormFields,
   parameters: {
     docs: {
