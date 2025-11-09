@@ -40,8 +40,20 @@
             >
               mdi-drag
             </v-icon>
+            <!-- 折叠按钮 -->
+            <v-btn
+              v-if="collapsible"
+              icon
+              x-small
+              @click="toggleCollapse(item)"
+              class="mr-2"
+            >
+              <v-icon small>
+                {{ isCollapsed(item) ? 'mdi-chevron-down' : 'mdi-chevron-up' }}
+              </v-icon>
+            </v-btn>
             <!-- 序号 -->
-            <span v-if="showIndex" class="jh-form-list-item-index">
+            <span v-if="showIndex && alwaysShowItemLabel" class="jh-form-list-item-index">
               #{{ index + 1 }}
             </span>
           </div>
@@ -49,61 +61,68 @@
           <!-- 操作按钮 -->
           <div v-if="showItemActions && !disabled && !readonly" class="jh-form-list-item-actions">
             <slot name="item-actions" :item="item" :index="index" :removeItem="removeItem" :copyItem="copyItem">
-              <v-btn
-                v-if="copyable"
-                icon
-                small
-                @click="copyItem(index)"
-                title="复制"
-              >
-                <v-icon small>mdi-content-copy</v-icon>
-              </v-btn>
-              <v-btn
-                icon
-                small
-                color="error"
-                @click="removeItem(index)"
-                :disabled="listData.length <= min"
-                title="删除"
-              >
-                <v-icon small>mdi-delete</v-icon>
-              </v-btn>
+              <template v-if="actionRender">
+                <component :is="{ render: () => renderActionButtons(item, index) }" />
+              </template>
+              <template v-else>
+                <v-btn
+                  v-if="copyable"
+                  icon
+                  small
+                  @click="copyItem(index)"
+                  title="复制"
+                >
+                  <v-icon small>mdi-content-copy</v-icon>
+                </v-btn>
+                <v-btn
+                  icon
+                  small
+                  color="error"
+                  @click="removeItem(index)"
+                  :disabled="listData.length <= min"
+                  title="删除"
+                >
+                  <v-icon small>mdi-delete</v-icon>
+                </v-btn>
+              </template>
             </slot>
           </div>
         </v-card-title>
 
-        <v-divider></v-divider>
+        <v-divider v-if="!isCollapsed(item)"></v-divider>
 
         <!-- 列表项内容 -->
-        <v-card-text class="pa-4">
-          <slot name="item" :item="item" :index="index" :fields="fields" :updateItem="(key, value) => updateItemField(index, key, value)">
-            <jh-form
-              :ref="`itemForm_${index}`"
-              :fields="fields"
-              :initial-data="item"
-              :layout="itemLayout"
-              :label-width="itemLabelWidth"
-              :dense="dense"
-              :outlined="outlined"
-              :disabled="disabled"
-              :readonly="readonly"
-              :hide-details="false"
-              @field-change="handleItemFieldChange(index, $event)"
-            >
-              <!-- 传递字段插槽 -->
-              <template v-for="field in fields" v-slot:[`field-${field.key}`]="slotProps">
-                <slot
-                  :name="`field-${field.key}`"
-                  v-bind="{ ...slotProps, index, item }"
-                ></slot>
-              </template>
-            </jh-form>
-          </slot>
-        </v-card-text>
+        <v-expand-transition>
+          <v-card-text v-show="!isCollapsed(item)" class="pa-4">
+            <slot name="item" :item="item" :index="index" :fields="fields" :updateItem="(key, value) => updateItemField(index, key, value)">
+              <jh-form
+                :ref="`itemForm_${index}`"
+                :fields="fields"
+                :initial-data="item"
+                :layout="itemLayout"
+                :label-width="itemLabelWidth"
+                :dense="dense"
+                :outlined="outlined"
+                :disabled="disabled"
+                :readonly="readonly"
+                :hide-details="false"
+                @field-change="handleItemFieldChange(index, $event)"
+              >
+                <!-- 传递字段插槽 -->
+                <template v-for="field in fields" v-slot:[`field-${field.key}`]="slotProps">
+                  <slot
+                    :name="`field-${field.key}`"
+                    v-bind="{ ...slotProps, index, item }"
+                  ></slot>
+                </template>
+              </jh-form>
+            </slot>
+          </v-card-text>
+        </v-expand-transition>
 
         <!-- 验证错误提示 -->
         <v-alert
-          v-if="validationErrors[index]"
+          v-if="validationErrors[index] && !isCollapsed(item)"
           type="error"
           dense
           text
@@ -230,18 +249,42 @@
       {{ validationErrors._list }}
     </v-alert>
 
+    <!-- 最大数量限制提示 -->
+    <v-alert
+      v-if="showMaxLimitAlert"
+      type="warning"
+      dense
+      text
+      dismissible
+      class="mt-3"
+      @input="showMaxLimitAlert = false"
+    >
+      {{ maxLimitText }} (最大: {{ max }})
+    </v-alert>
+
+    <!-- 最小数量限制提示 -->
+    <v-alert
+      v-if="showMinLimitAlert"
+      type="warning"
+      dense
+      text
+      dismissible
+      class="mt-3"
+      @input="showMinLimitAlert = false"
+    >
+      {{ minLimitText }} (最小: {{ min }})
+    </v-alert>
+
     <!-- 列表底部 - 添加按钮 -->
-    <div v-if="!disabled && !readonly" class="jh-form-list-footer mt-4">
+    <div v-if="!disabled && !readonly && computedCreatorButtonProps !== false" class="jh-form-list-footer mt-4">
       <slot name="footer" :addItem="addItem" :canAdd="canAdd">
         <v-btn
-          :color="addButtonProps.color || 'primary'"
-          :outlined="addButtonProps.outlined !== false"
+          v-bind="computedCreatorButtonProps"
           :disabled="!canAdd"
-          v-bind="addButtonProps"
           @click="addItem()"
         >
           <v-icon left>mdi-plus</v-icon>
-          {{ addButtonText }}
+          {{ computedCreatorButtonProps.text || addButtonText }}
         </v-btn>
       </slot>
     </div>
@@ -421,6 +464,75 @@ export default {
       type: String,
       default: '',
     },
+
+    // 始终显示项标签 (card 模式)
+    alwaysShowItemLabel: {
+      type: Boolean,
+      default: true,
+    },
+
+    // 自定义项渲染函数
+    itemRender: {
+      type: Function,
+      default: null,
+    },
+
+    // 创建按钮配置 (ProFormList 风格)
+    creatorButtonProps: {
+      type: [Object, Boolean],
+      default: () => ({}),
+    },
+
+    // 创建记录的初始值 (ProFormList 风格)
+    creatorRecord: {
+      type: [Object, Function],
+      default: null,
+    },
+
+    // 操作守卫 (删除前确认)
+    actionGuard: {
+      type: Object,
+      default: () => ({
+        beforeAddRow: null,
+        beforeRemoveRow: null,
+      }),
+    },
+
+    // 删除后回调
+    onAfterRemove: {
+      type: Function,
+      default: null,
+    },
+
+    // 卡片是否可折叠
+    collapsible: {
+      type: Boolean,
+      default: false,
+    },
+
+    // 默认折叠状态
+    defaultCollapsed: {
+      type: Boolean,
+      default: false,
+    },
+
+    // 操作按钮渲染配置
+    actionRender: {
+      type: Function,
+      default: null,
+    },
+
+    // 最大数量提示文本
+    maxLimitText: {
+      type: String,
+      default: '已达到最大数量限制',
+    },
+
+    // 最小数量提示文本
+    minLimitText: {
+      type: String,
+      default: '已达到最小数量限制',
+    },
   },
 
   data() {
@@ -428,6 +540,9 @@ export default {
       listData: [],
       validationErrors: {},
       sortableInstance: null,
+      collapsedItems: new Set(), // 折叠状态管理
+      showMaxLimitAlert: false, // 显示最大数量提示
+      showMinLimitAlert: false, // 显示最小数量提示
     };
   },
 
@@ -443,6 +558,28 @@ export default {
 
     canAdd() {
       return this.listData.length < this.max;
+    },
+
+    // 计算创建按钮配置
+    computedCreatorButtonProps() {
+      if (this.creatorButtonProps === false) return false;
+      return {
+        color: 'primary',
+        outlined: true,
+        ...this.creatorButtonProps,
+      };
+    },
+
+    // 计算创建记录初始值
+    computedCreatorRecord() {
+      if (this.creatorRecord) {
+        return typeof this.creatorRecord === 'function'
+          ? this.creatorRecord
+          : () => this.creatorRecord;
+      }
+      return typeof this.defaultValue === 'function'
+        ? this.defaultValue
+        : () => this.defaultValue;
     },
   },
 
@@ -499,17 +636,25 @@ export default {
     },
 
     // 添加项
-    addItem(item = null, index = null) {
+    async addItem(item = null, index = null) {
       // 检查最大数量限制
       if (this.listData.length >= this.max) {
+        this.showMaxLimitAlert = true;
+        setTimeout(() => {
+          this.showMaxLimitAlert = false;
+        }, 3000);
         this.$emit('max-limit', this.max);
         return;
       }
 
+      // 执行添加前守卫
+      if (this.actionGuard?.beforeAddRow) {
+        const canAdd = await this.actionGuard.beforeAddRow(this.listData.length);
+        if (canAdd === false) return;
+      }
+
       // 获取默认值
-      const defaultValue = typeof this.defaultValue === 'function'
-        ? this.defaultValue(this.listData.length)
-        : { ...this.defaultValue };
+      const defaultValue = this.computedCreatorRecord(this.listData.length);
 
       // 创建新项
       const newItem = {
@@ -534,8 +679,18 @@ export default {
     async removeItem(index) {
       // 检查最小数量限制
       if (this.listData.length <= this.min) {
+        this.showMinLimitAlert = true;
+        setTimeout(() => {
+          this.showMinLimitAlert = false;
+        }, 3000);
         this.$emit('min-limit', this.min);
         return;
+      }
+
+      // 执行删除前守卫
+      if (this.actionGuard?.beforeRemoveRow) {
+        const canRemove = await this.actionGuard.beforeRemoveRow(index, this.listData[index]);
+        if (canRemove === false) return;
       }
 
       // 确认弹窗
@@ -549,9 +704,16 @@ export default {
 
       // 清理验证错误
       delete this.validationErrors[index];
+      // 清理折叠状态
+      this.collapsedItems.delete(removedItem.__id__);
 
       this.emitInput();
       this.$emit('remove', this.getCleanItem(removedItem), index);
+      
+      // 执行删除后回调
+      if (this.onAfterRemove) {
+        this.onAfterRemove(index, this.getCleanItem(removedItem));
+      }
     },
 
     // 复制项
@@ -620,6 +782,35 @@ export default {
         classes.push('jh-form-list-item--error');
       }
       return classes.join(' ');
+    },
+
+    // 切换折叠状态
+    toggleCollapse(item) {
+      const id = item.__id__;
+      if (this.collapsedItems.has(id)) {
+        this.collapsedItems.delete(id);
+      } else {
+        this.collapsedItems.add(id);
+      }
+      this.$forceUpdate();
+    },
+
+    // 判断是否折叠
+    isCollapsed(item) {
+      return this.collapsedItems.has(item.__id__);
+    },
+
+    // 渲染操作按钮
+    renderActionButtons(item, index) {
+      if (this.actionRender) {
+        return this.actionRender({
+          item: this.getCleanItem(item),
+          index,
+          removeItem: () => this.removeItem(index),
+          copyItem: () => this.copyItem(index),
+        });
+      }
+      return null;
     },
 
     // 获取字段组件

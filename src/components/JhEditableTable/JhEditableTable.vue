@@ -290,6 +290,61 @@ export default {
       type: String,
       default: 'id',
     },
+
+    // 可编辑类型 (EditableProTable 风格)
+    editableType: {
+      type: String,
+      default: 'multiple', // single | multiple
+      validator: (v) => ['single', 'multiple'].includes(v),
+    },
+
+    // 最大行数
+    maxRows: {
+      type: Number,
+      default: Infinity,
+    },
+
+    // 值变化回调
+    onValuesChange: {
+      type: Function,
+      default: null,
+    },
+
+    // 添加行前守卫
+    beforeAddRow: {
+      type: Function,
+      default: null,
+    },
+
+    // 删除行前守卫
+    beforeRemoveRow: {
+      type: Function,
+      default: null,
+    },
+
+    // 自定义操作渲染
+    actionRender: {
+      type: Function,
+      default: null,
+    },
+
+    // 受控模式的编辑行keys
+    editableKeys: {
+      type: Array,
+      default: null,
+    },
+
+    // 保存数据时的回调
+    onSave: {
+      type: Function,
+      default: null,
+    },
+
+    // 删除数据时的回调
+    onDelete: {
+      type: Function,
+      default: null,
+    },
   },
 
   data() {
@@ -387,8 +442,17 @@ export default {
     },
 
     // 开始编辑行
-    handleEdit(item) {
+    async handleEdit(item) {
       const key = this.getRowKey(item);
+
+      // single 模式下，关闭其他编辑行
+      if (this.editableType === 'single' && this.editingKeys.size > 0) {
+        const currentKey = Array.from(this.editingKeys)[0];
+        const currentItem = this.internalData.find(row => this.getRowKey(row) === currentKey);
+        if (currentItem) {
+          await this.handleCancel(currentItem);
+        }
+      }
 
       // 保存原始数据
       this.originalData.set(key, { ...item });
@@ -397,15 +461,22 @@ export default {
       this.editingKeys.add(key);
 
       this.$emit('edit', item);
+      this.$emit('update:editableKeys', Array.from(this.editingKeys));
     },
 
     // 保存行
-    handleSave(item) {
+    async handleSave(item) {
       const key = this.getRowKey(item);
 
       // 验证数据
       if (!this.validateRow(item)) {
         return;
+      }
+
+      // 执行保存回调
+      if (this.onSave) {
+        const result = await this.onSave(key, item, this.originalData.get(key));
+        if (result === false) return;
       }
 
       // 从编辑集合中移除
@@ -417,6 +488,12 @@ export default {
 
       this.$emit('save', item);
       this.$emit('change', this.internalData);
+      this.$emit('update:editableKeys', Array.from(this.editingKeys));
+      
+      // 触发值变化回调
+      if (this.onValuesChange) {
+        this.onValuesChange(item, this.internalData);
+      }
     },
 
     // 取消编辑
@@ -451,9 +528,21 @@ export default {
     },
 
     // 删除行
-    handleDelete(item) {
+    async handleDelete(item) {
       const key = this.getRowKey(item);
       const index = this.internalData.findIndex(row => this.getRowKey(row) === key);
+
+      // 执行删除前守卫
+      if (this.beforeRemoveRow) {
+        const canDelete = await this.beforeRemoveRow(item, index);
+        if (canDelete === false) return;
+      }
+
+      // 执行删除回调
+      if (this.onDelete) {
+        const result = await this.onDelete(key, item);
+        if (result === false) return;
+      }
 
       if (index > -1) {
         this.internalData.splice(index, 1);
@@ -467,7 +556,19 @@ export default {
     },
 
     // 添加新行
-    handleAddRow() {
+    async handleAddRow() {
+      // 检查最大行数限制
+      if (this.internalData.length >= this.maxRows) {
+        this.$emit('max-rows', this.maxRows);
+        return;
+      }
+
+      // 执行添加前守卫
+      if (this.beforeAddRow) {
+        const canAdd = await this.beforeAddRow();
+        if (canAdd === false) return;
+      }
+
       const newRow = {
         _uuid: this.generateUUID(),
         _isNew: true,
