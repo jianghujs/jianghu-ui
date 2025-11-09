@@ -834,3 +834,324 @@ export const 混合布局 = {
     ],
   },
 };
+
+// 提示信息示例
+export const 提示信息 = {
+  args: {
+    fields: [
+      {
+        key: 'username',
+        label: '用户名',
+        type: 'text',
+        placeholder: '请输入用户名',
+        required: true,
+        tooltip: '用户名用于登录系统,长度4-20个字符',
+        extra: '用户名一旦设置不可修改',
+        cols: { md: 6 },
+      },
+      {
+        key: 'password',
+        label: '密码',
+        type: 'text',
+        placeholder: '请输入密码',
+        required: true,
+        tooltip: '密码长度至少8位,包含字母、数字和特殊字符',
+        extra: '建议使用强密码以保护账户安全',
+        props: { type: 'password' },
+        cols: { md: 6 },
+      },
+      {
+        key: 'email',
+        label: '邮箱',
+        type: 'text',
+        placeholder: '请输入邮箱',
+        rules: 'email',
+        tooltip: '用于接收系统通知和找回密码',
+        cols: { md: 6 },
+      },
+      {
+        key: 'phone',
+        label: '手机号',
+        type: 'text',
+        placeholder: '请输入手机号',
+        rules: 'phone',
+        tooltip: '用于接收短信验证码',
+        extra: '请确保手机号真实有效',
+        cols: { md: 6 },
+      },
+    ],
+  },
+};
+
+// 数据转换示例
+export const 数据转换 = {
+  args: {
+    fields: [
+      {
+        key: 'price',
+        label: '价格(元)',
+        type: 'number',
+        placeholder: '请输入价格',
+        required: true,
+        tooltip: '输入金额,提交时会自动转换为分',
+        // 提交时转换为分
+        transform: (value) => value ? Math.round(value * 100) : 0,
+        cols: { md: 6 },
+      },
+      {
+        key: 'tags',
+        label: '标签',
+        type: 'select',
+        placeholder: '请选择标签',
+        multiple: true,
+        chips: true,
+        options: [
+          { text: 'Vue', value: 'vue' },
+          { text: 'React', value: 'react' },
+          { text: 'Angular', value: 'angular' },
+          { text: 'Node.js', value: 'nodejs' },
+        ],
+        tooltip: '可以选择多个标签',
+        // 提交时转换为逗号分隔的字符串
+        transform: (value) => Array.isArray(value) ? value.join(',') : value,
+        cols: { md: 6 },
+      },
+      {
+        key: 'discount',
+        label: '折扣(%)',
+        type: 'number',
+        placeholder: '请输入折扣',
+        tooltip: '输入百分比,提交时会转换为小数',
+        // 提交时转换为小数
+        transform: (value) => value ? value / 100 : 0,
+        cols: { md: 6 },
+      },
+      {
+        key: 'description',
+        label: '描述',
+        type: 'textarea',
+        placeholder: '请输入描述',
+        rows: 3,
+        // 提交时去除首尾空格
+        transform: (value) => value ? value.trim() : '',
+        cols: { md: 12 },
+      },
+    ],
+    initialData: {
+      price: 99.99,
+      tags: ['vue', 'react'],
+      discount: 15,
+      description: '  这是一个示例描述  ',
+    },
+    omitNil: true,
+  },
+  render: (args) => ({
+    components: { JhForm },
+    setup() {
+      return { args };
+    },
+    template: `
+      <div>
+        <JhForm v-bind="args" ref="form">
+          <template #actions="{ validate, resetForm, formData }">
+            <v-row class="mt-4">
+              <v-col cols="12" class="text-right">
+                <v-btn class="mr-2" @click="resetForm">重置</v-btn>
+                <v-btn color="success" @click="handleSubmit">查看转换后的数据</v-btn>
+              </v-col>
+            </v-row>
+          </template>
+        </JhForm>
+        <v-divider class="my-4"></v-divider>
+        <div class="pa-4 grey lighten-4">
+          <h4 class="mb-2">说明:</h4>
+          <ul>
+            <li>价格: 99.99元 → 9999分</li>
+            <li>标签: ['vue', 'react'] → 'vue,react'</li>
+            <li>折扣: 15% → 0.15</li>
+            <li>描述: 自动去除首尾空格</li>
+          </ul>
+        </div>
+      </div>
+    `,
+    methods: {
+      async handleSubmit() {
+        const isValid = await this.$refs.form.validate();
+        if (isValid) {
+          const transformedData = this.$refs.form.getTransformedData();
+          console.log('原始数据:', this.$refs.form.getFormData());
+          console.log('转换后数据:', transformedData);
+          alert('转换后的数据已打印到控制台,请查看');
+        }
+      },
+    },
+  }),
+};
+
+// onFinish 回调示例
+export const 提交回调 = {
+  args: {
+    fields: [
+      {
+        key: 'title',
+        label: '标题',
+        type: 'text',
+        placeholder: '请输入标题',
+        required: true,
+      },
+      {
+        key: 'content',
+        label: '内容',
+        type: 'textarea',
+        placeholder: '请输入内容',
+        required: true,
+        rows: 4,
+        cols: { md: 12 },
+      },
+    ],
+    initialData: {
+      title: '',
+      content: '',
+    },
+  },
+  render: (args) => ({
+    components: { JhForm },
+    data() {
+      return {
+        args: {
+          ...args,
+          onFinish: this.handleFinish,
+          onFinishFailed: this.handleFinishFailed,
+        },
+        loading: false,
+      };
+    },
+    template: `
+      <div>
+        <JhForm v-bind="args">
+          <template #actions="{ validate, resetForm }">
+            <v-row class="mt-4">
+              <v-col cols="12" class="text-right">
+                <v-btn class="mr-2" @click="resetForm" :disabled="loading">重置</v-btn>
+                <v-btn 
+                  color="success" 
+                  @click="validate" 
+                  :loading="loading"
+                >
+                  提交
+                </v-btn>
+              </v-col>
+            </v-row>
+          </template>
+        </JhForm>
+        <v-alert v-if="submitResult" :type="submitResult.type" class="mt-4">
+          {{ submitResult.message }}
+        </v-alert>
+      </div>
+    `,
+    data() {
+      return {
+        submitResult: null,
+      };
+    },
+    methods: {
+      async handleFinish(values) {
+        this.loading = true;
+        this.submitResult = null;
+        
+        // 模拟 API 调用
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        console.log('提交成功:', values);
+        this.submitResult = {
+          type: 'success',
+          message: '提交成功! 数据: ' + JSON.stringify(values),
+        };
+        this.loading = false;
+      },
+      handleFinishFailed(values) {
+        console.log('验证失败:', values);
+        this.submitResult = {
+          type: 'error',
+          message: '表单验证失败,请检查必填项',
+        };
+      },
+    },
+  }),
+};
+
+// 只读模式示例
+export const 只读模式 = {
+  args: {
+    readonly: true,
+    fields: [
+      {
+        key: 'username',
+        label: '用户名',
+        type: 'text',
+        cols: { md: 6 },
+      },
+      {
+        key: 'email',
+        label: '邮箱',
+        type: 'text',
+        cols: { md: 6 },
+      },
+      {
+        key: 'role',
+        label: '角色',
+        type: 'select',
+        options: [
+          { text: '管理员', value: 'admin' },
+          { text: '普通用户', value: 'user' },
+        ],
+        cols: { md: 6 },
+      },
+      {
+        key: 'status',
+        label: '状态',
+        type: 'radio',
+        options: [
+          { text: '激活', value: 'active' },
+          { text: '禁用', value: 'inactive' },
+        ],
+        cols: { md: 6 },
+      },
+      {
+        key: 'receiveNotification',
+        label: '接收通知',
+        type: 'switch',
+        switchLabel: '接收邮件通知',
+        cols: { md: 6 },
+      },
+      {
+        key: 'tags',
+        label: '标签',
+        type: 'select',
+        multiple: true,
+        options: [
+          { text: 'Vue', value: 'vue' },
+          { text: 'React', value: 'react' },
+          { text: 'Angular', value: 'angular' },
+        ],
+        cols: { md: 6 },
+      },
+      {
+        key: 'bio',
+        label: '个人简介',
+        type: 'textarea',
+        rows: 3,
+        cols: { md: 12 },
+      },
+    ],
+    initialData: {
+      username: '张三',
+      email: 'zhangsan@example.com',
+      role: 'admin',
+      status: 'active',
+      receiveNotification: true,
+      tags: ['vue', 'react'],
+      bio: '这是一段个人简介,用于展示只读模式下的文本域显示效果。',
+    },
+  },
+};

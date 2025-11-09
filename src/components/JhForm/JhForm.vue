@@ -33,6 +33,12 @@
             >
               <span v-if="field.required && showRequiredMark" class="error--text mr-1">*</span>
               {{ field.label }}
+              <v-tooltip v-if="field.tooltip" bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon small class="ml-1" v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+                </template>
+                <span>{{ field.tooltip }}</span>
+              </v-tooltip>
             </div>
 
             <!-- 字段输入区域 -->
@@ -44,6 +50,17 @@
               >
                 <span v-if="field.required && showRequiredMark" class="error--text">*</span>
                 {{ field.label }}
+                <v-tooltip v-if="field.tooltip" bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon small class="ml-1" v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+                  </template>
+                  <span>{{ field.tooltip }}</span>
+                </v-tooltip>
+              </div>
+
+              <!-- 额外提示信息 -->
+              <div v-if="field.extra" class="jh-field-extra text-caption grey--text mb-2">
+                {{ field.extra }}
               </div>
 
               <!-- 只读模式展示 -->
@@ -437,6 +454,48 @@ export default {
         integer: [v => !v || Number.isInteger(Number(v)) || '请输入整数'],
       }),
     },
+
+    // 提交按钮配置
+    submitter: {
+      type: [Object, Boolean],
+      default: undefined,
+    },
+
+    // 提交成功回调
+    onFinish: {
+      type: Function,
+      default: undefined,
+    },
+
+    // 提交失败回调
+    onFinishFailed: {
+      type: Function,
+      default: undefined,
+    },
+
+    // 日期格式化
+    dateFormatter: {
+      type: [String, Function, Boolean],
+      default: 'YYYY-MM-DD',
+    },
+
+    // 忽略 null/undefined 值
+    omitNil: {
+      type: Boolean,
+      default: true,
+    },
+
+    // Grid 模式配置
+    grid: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Grid 列配置
+    colProps: {
+      type: Object,
+      default: () => ({}),
+    },
   },
 
   data() {
@@ -764,9 +823,65 @@ export default {
     async submit() {
       const isValid = await this.validate();
       if (isValid) {
-        this.$emit('submit', this.formData);
+        const transformedData = this.getTransformedData();
+        this.$emit('submit', transformedData);
+        
+        // 调用 onFinish 回调
+        if (this.onFinish) {
+          try {
+            await this.onFinish(transformedData);
+          } catch (error) {
+            console.error('Form submit error:', error);
+          }
+        }
+      } else {
+        // 调用 onFinishFailed 回调
+        if (this.onFinishFailed) {
+          this.onFinishFailed(this.formData);
+        }
       }
       return isValid;
+    },
+
+    // 获取转换后的数据
+    getTransformedData() {
+      const data = { ...this.formData };
+      
+      // 应用字段级别的 transform
+      this.fields.forEach(field => {
+        if (field.key && field.transform && typeof field.transform === 'function') {
+          data[field.key] = field.transform(data[field.key], data);
+        }
+      });
+
+      // 忽略 null/undefined 值
+      if (this.omitNil) {
+        Object.keys(data).forEach(key => {
+          if (data[key] === null || data[key] === undefined || data[key] === '') {
+            delete data[key];
+          }
+        });
+      }
+
+      return data;
+    },
+
+    // 获取字段的依赖值
+    getDependenciesValues(dependencies) {
+      if (!dependencies || !Array.isArray(dependencies)) return [];
+      return dependencies.map(key => this.formData[key]);
+    },
+
+    // 检查依赖是否变化
+    checkDependenciesChanged(field, oldValues, newValues) {
+      if (!field.dependencies) return false;
+      
+      for (let i = 0; i < field.dependencies.length; i++) {
+        if (oldValues[i] !== newValues[i]) {
+          return true;
+        }
+      }
+      return false;
     },
   },
 };
@@ -835,5 +950,11 @@ export default {
 /* 只读文本 */
 .jh-form-readonly-text {
   word-break: break-word;
+}
+
+/* 额外提示信息 */
+.jh-field-extra {
+  margin-top: -8px;
+  line-height: 1.5;
 }
 </style>
