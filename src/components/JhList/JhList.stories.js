@@ -1,7 +1,7 @@
 import JhList from './JhList.vue';
 
 export default {
-  title: 'ProComponents/JhList',
+  title: '数据展示/JhList - 高级列表',
   component: JhList,
   tags: ['autodocs'],
 };

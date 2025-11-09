@@ -20,6 +20,11 @@
 - **JhTable**: 表格组件
 - **JhEditableTable**: 可编辑表格组件
 - **JhTableAttachment**: 附件表格组件
+- **JhDescriptions**: 描述列表组件 - 基于 Ant Design ProDescriptions，支持水平/垂直布局、可编辑、多种 ValueType
+- **JhList**: 列表组件
+- **JhStatisticCard**: 统计卡片组件
+- **JhCheckCard**: 多选卡片组件
+- **JhWaterMark**: 水印组件
 
 ### 表单组件
 - **JhForm**: 表单组件
