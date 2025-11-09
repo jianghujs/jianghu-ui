@@ -1,5 +1,42 @@
 <template>
-  <div class="jh-pro-table rounded-lg elevation-0">
+  <div :class="['jh-pro-table', { 'jh-pro-table-card': cardBordered, 'jh-pro-table-ghost': ghost }]">
+    <!-- 表格标题区 -->
+    <div v-if="headerTitle || $slots['header-title'] || $slots['toolbar-actions'] || $slots['toolbar-extra']" class="jh-pro-table-header">
+      <div class="jh-pro-table-header-left">
+        <!-- 标题 -->
+        <div v-if="headerTitle || $slots['header-title']" class="jh-pro-table-title">
+          <slot name="header-title">
+            <span class="jh-pro-table-title-text">{{ headerTitle }}</span>
+            <v-tooltip v-if="tooltip" bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon small class="ml-1" v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+              </template>
+              <span>{{ tooltip }}</span>
+            </v-tooltip>
+          </slot>
+        </div>
+        <!-- 左侧操作按钮 -->
+        <div v-if="$slots['toolbar-actions']" class="jh-pro-table-header-actions">
+          <slot name="toolbar-actions">
+            <v-btn
+              v-if="showCreateButton"
+              color="success"
+              class="mr-2"
+              @click.stop="$emit('create-click')"
+              small
+            >
+              <v-icon left small>mdi-plus</v-icon>
+              <span class="d-none d-sm-inline">新增</span>
+            </v-btn>
+          </slot>
+        </div>
+      </div>
+      <div class="jh-pro-table-header-right">
+        <!-- 右侧额外内容 -->
+        <slot name="toolbar-extra"></slot>
+      </div>
+    </div>
+
     <!-- 高级筛选栏 -->
     <jh-query-filter
       v-if="showFilter && filterFields && filterFields.length > 0"
@@ -30,10 +67,24 @@
       </template>
     </jh-query-filter>
 
+    <!-- 批量操作提示栏 -->
+    <div v-if="showSelect && selectedItems.length > 0" class="jh-pro-table-alert">
+      <div class="jh-pro-table-alert-info">
+        <slot name="alert" :selected-row-keys="selectedRowKeys" :selected-rows="selectedItems">
+          <v-icon small class="mr-2" color="primary">mdi-checkbox-marked-circle</v-icon>
+          <span>已选择 <strong class="primary--text">{{ selectedItems.length }}</strong> 项</span>
+          <v-btn text x-small class="ml-2" @click="clearSelection">清空</v-btn>
+        </slot>
+      </div>
+      <div class="jh-pro-table-alert-actions">
+        <slot name="alert-actions" :selected-row-keys="selectedRowKeys" :selected-rows="selectedItems"></slot>
+      </div>
+    </div>
+
     <!-- 工具栏 -->
-    <v-row v-if="toolbar !== false" class="ma-0 pb-3 pa-3 pa-md-0" align="center">
-      <!-- 左侧操作按钮插槽 -->
-      <div class="flex items-center gap-2">
+    <v-row v-if="toolbar !== false" class="jh-pro-table-toolbar ma-0 pb-3 pa-3 pa-md-0" align="center">
+      <!-- 左侧操作按钮插槽（仅在没有标题区时显示） -->
+      <div v-if="!headerTitle && !$slots['header-title']" class="flex items-center gap-2">
         <slot name="toolbar-actions">
           <v-btn
             v-if="showCreateButton"
@@ -58,7 +109,7 @@
           v-model="searchInputInternal"
           :prefix="isMobile ? '' : '筛选'"
           :placeholder="isMobile ? '筛选' : ''"
-          class="jh-v-input jh-toolbar-search"
+          class="jh-v-input jh-toolbar-search border"
           dense
           filled
           single-line
@@ -164,11 +215,13 @@
         >
           <v-icon>{{ isFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen' }}</v-icon>
         </v-btn>
-
-        <!-- 额外工具栏操作插槽 -->
-        <slot name="toolbar-extra"></slot>
       </div>
     </v-row>
+
+    <!-- 表格额外内容区 -->
+    <div v-if="$slots['table-extra']" class="jh-pro-table-extra">
+      <slot name="table-extra"></slot>
+    </div>
 
     <!-- 表格 -->
     <v-data-table
@@ -547,6 +600,40 @@ export default {
       default: false
     },
 
+    // ========== 标题和样式配置 ==========
+    // 表格标题
+    headerTitle: {
+      type: String,
+      default: ''
+    },
+    // 标题提示信息
+    tooltip: {
+      type: String,
+      default: ''
+    },
+    // 是否显示卡片边框
+    cardBordered: {
+      type: Boolean,
+      default: true
+    },
+    // 幽灵模式（无边框无背景）
+    ghost: {
+      type: Boolean,
+      default: false
+    },
+
+    // ========== 轮询配置 ==========
+    // 轮询间隔（毫秒），0 表示不轮询
+    polling: {
+      type: Number,
+      default: 0
+    },
+    // 搜索防抖时间（毫秒）
+    debounceTime: {
+      type: Number,
+      default: 300
+    },
+
     // ========== 其他配置 ==========
     loading: {
       type: Boolean,
@@ -605,10 +692,16 @@ export default {
       currentDensity: this.size,
       isFullscreen: false,
       selectedItems: [],
-      filterValues: {}
+      filterValues: {},
+      pollingTimer: null,
+      searchDebounceTimer: null
     };
   },
   computed: {
+    // 选中的行 keys
+    selectedRowKeys() {
+      return this.selectedItems.map(item => item[this.rowKey]);
+    },
     // 工具栏配置
     toolbarConfig() {
       if (this.toolbar === false) return {};
@@ -688,7 +781,13 @@ export default {
     searchInputInternal(val) {
       this.$emit('update:searchInput', val);
       if (this.request) {
-        this.reload();
+        // 使用防抖
+        if (this.searchDebounceTimer) {
+          clearTimeout(this.searchDebounceTimer);
+        }
+        this.searchDebounceTimer = setTimeout(() => {
+          this.reload();
+        }, this.debounceTime);
       }
     },
     size(val) {
@@ -701,9 +800,15 @@ export default {
     if (this.request) {
       this.reload();
     }
+    // 启动轮询
+    this.startPolling();
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize);
+    this.stopPolling();
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
   },
   methods: {
     // 初始化列配置
@@ -872,6 +977,21 @@ export default {
     // 窗口大小改变
     handleResize() {
       this.isMobile = window.innerWidth < 500;
+    },
+    // 启动轮询
+    startPolling() {
+      if (this.polling > 0 && this.request) {
+        this.pollingTimer = setInterval(() => {
+          this.reload();
+        }, this.polling);
+      }
+    },
+    // 停止轮询
+    stopPolling() {
+      if (this.pollingTimer) {
+        clearInterval(this.pollingTimer);
+        this.pollingTimer = null;
+      }
     }
   }
 };
@@ -881,6 +1001,142 @@ export default {
 /* 表格容器 */
 .jh-pro-table {
   border-radius: 8px;
+  position: relative;
+}
+
+/* 卡片样式 */
+.jh-pro-table-card {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* 幽灵模式 */
+.jh-pro-table-ghost {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* 表格标题区 */
+.jh-pro-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  min-height: 64px;
+}
+
+.jh-pro-table-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.jh-pro-table-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jh-pro-table-title {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.jh-pro-table-title-text {
+  line-height: 24px;
+}
+
+.jh-pro-table-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 批量操作提示栏 */
+.jh-pro-table-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 4px;
+  margin: 16px 24px 0;
+}
+
+.jh-pro-table-alert-info {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.jh-pro-table-alert-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 工具栏 */
+.jh-pro-table-toolbar {
+  padding: 16px 24px !important;
+}
+
+/* 表格额外内容区 */
+.jh-pro-table-extra {
+  padding: 16px 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* 移动端适配 */
+@media (max-width: 600px) {
+  .jh-pro-table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 16px;
+    min-height: auto;
+  }
+
+  .jh-pro-table-header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .jh-pro-table-header-right {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  .jh-pro-table-alert {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 12px 16px 0;
+    padding: 8px 12px;
+  }
+
+  .jh-pro-table-alert-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .jh-pro-table-toolbar {
+    padding: 12px 16px !important;
+  }
+
+  .jh-pro-table-extra {
+    padding: 12px 16px;
+  }
 }
 
 /* 工具栏搜索框响应式 */

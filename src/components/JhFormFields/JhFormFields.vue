@@ -1,7 +1,23 @@
 <template>
-  <v-form :ref="formRef" :lazy-validation="lazyValidation" :class="formClasses">
-    <v-row :class="rowClass">
-      <!-- 表单分组 -->
+  <div :class="formFieldsClasses">
+    <!-- 标题区域 -->
+    <div v-if="title || $slots.title" class="jh-form-fields-header">
+      <slot name="title">
+        <div class="jh-form-fields-title">
+          {{ title }}
+          <v-tooltip v-if="tooltip" bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon small class="ml-1" v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+            </template>
+            <span>{{ tooltip }}</span>
+          </v-tooltip>
+        </div>
+      </slot>
+      <div v-if="description" class="jh-form-fields-description">{{ description }}</div>
+    </div>
+
+    <!-- 字段内容区域 -->
+    <v-row :class="rowClass" :dense="dense">
       <template v-for="(field, index) in visibleFields">
         <!-- 分组标题 -->
         <v-col v-if="field.type === 'group'" :key="`group-${index}`" cols="12">
@@ -23,7 +39,7 @@
           :xl="getFieldXl(field)"
           :class="getFieldColClass(field)"
         >
-          <!-- 水平布局容器 -->
+          <!-- 字段包装器 -->
           <div :class="getFieldWrapperClass(field)">
             <!-- 字段标签 (水平布局) -->
             <div
@@ -78,7 +94,8 @@
                   :single-line="getSingleLine(field)"
                   :filled="getFilled(field)"
                   :outlined="getOutlined(field)"
-                  v-model="formData[field.key]"
+                  :value="getFieldValue(field.key)"
+                  @input="handleInput(field.key, $event)"
                   :rules="getRules(field)"
                   :disabled="getFieldDisabled(field)"
                   :readonly="field.readonly"
@@ -87,7 +104,6 @@
                   :suffix="field.suffix"
                   :hide-details="field.hideDetails || hideDetails"
                   v-bind="field.props"
-                  @input="handleInput(field.key, $event)"
                   @change="handleChange(field.key, $event)"
                   @blur="handleBlur(field.key, $event)"
                 ></v-text-field>
@@ -99,7 +115,8 @@
                   :dense="getDense(field)"
                   :filled="getFilled(field)"
                   :outlined="getOutlined(field)"
-                  v-model="formData[field.key]"
+                  :value="getFieldValue(field.key)"
+                  @input="handleInput(field.key, $event)"
                   :rules="getRules(field)"
                   :disabled="getFieldDisabled(field)"
                   :readonly="field.readonly"
@@ -107,7 +124,6 @@
                   :rows="field.rows || 3"
                   :hide-details="field.hideDetails || hideDetails"
                   v-bind="field.props"
-                  @input="handleInput(field.key, $event)"
                   @change="handleChange(field.key, $event)"
                   @blur="handleBlur(field.key, $event)"
                 ></v-textarea>
@@ -121,14 +137,14 @@
                   :single-line="getSingleLine(field)"
                   :filled="getFilled(field)"
                   :outlined="getOutlined(field)"
-                  v-model="formData[field.key]"
+                  :value="getFieldValue(field.key)"
+                  @input="handleInput(field.key, $event)"
                   :rules="getRules(field)"
                   :disabled="getFieldDisabled(field)"
                   :readonly="field.readonly"
                   :placeholder="field.placeholder"
                   :hide-details="field.hideDetails || hideDetails"
                   v-bind="field.props"
-                  @input="handleInput(field.key, $event)"
                   @change="handleChange(field.key, $event)"
                   @blur="handleBlur(field.key, $event)"
                 ></v-text-field>
@@ -140,8 +156,9 @@
                   :dense="getDense(field)"
                   :filled="getFilled(field)"
                   :outlined="getOutlined(field)"
-                  v-model="formData[field.key]"
-                  :items="field.options || []"
+                  :value="getFieldValue(field.key)"
+                  @input="handleInput(field.key, $event)"
+                  :items="getFieldOptions(field)"
                   :rules="getRules(field)"
                   :disabled="getFieldDisabled(field)"
                   :readonly="field.readonly"
@@ -152,7 +169,6 @@
                   :chips="field.chips"
                   :hide-details="field.hideDetails || hideDetails"
                   v-bind="field.props"
-                  @input="handleInput(field.key, $event)"
                   @change="handleChange(field.key, $event)"
                   @blur="handleBlur(field.key, $event)"
                 ></v-select>
@@ -164,8 +180,9 @@
                   :dense="getDense(field)"
                   :filled="getFilled(field)"
                   :outlined="getOutlined(field)"
-                  v-model="formData[field.key]"
-                  :items="field.options || []"
+                  :value="getFieldValue(field.key)"
+                  @input="handleInput(field.key, $event)"
+                  :items="getFieldOptions(field)"
                   :rules="getRules(field)"
                   :disabled="getFieldDisabled(field)"
                   :readonly="field.readonly"
@@ -174,7 +191,6 @@
                   :item-value="field.itemValue || 'value'"
                   :hide-details="field.hideDetails || hideDetails"
                   v-bind="field.props"
-                  @input="handleInput(field.key, $event)"
                   @change="handleChange(field.key, $event)"
                   @blur="handleBlur(field.key, $event)"
                 ></v-autocomplete>
@@ -194,7 +210,7 @@
                       :dense="getDense(field)"
                       :filled="getFilled(field)"
                       :outlined="getOutlined(field)"
-                      v-model="formData[field.key]"
+                      :value="getFieldValue(field.key)"
                       :rules="getRules(field)"
                       :disabled="getFieldDisabled(field)"
                       :placeholder="field.placeholder"
@@ -205,8 +221,8 @@
                     ></v-text-field>
                   </template>
                   <v-date-picker
-                    v-model="formData[field.key]"
-                    @input="dateMenus[field.key] = false; handleInput(field.key, formData[field.key])"
+                    :value="getFieldValue(field.key)"
+                    @input="dateMenus[field.key] = false; handleInput(field.key, $event)"
                     :locale="field.locale || 'zh-cn'"
                     v-bind="field.pickerProps"
                   ></v-date-picker>
@@ -227,7 +243,7 @@
                       :dense="getDense(field)"
                       :filled="getFilled(field)"
                       :outlined="getOutlined(field)"
-                      v-model="formData[field.key]"
+                      :value="getFieldValue(field.key)"
                       :rules="getRules(field)"
                       :disabled="getFieldDisabled(field)"
                       :placeholder="field.placeholder"
@@ -238,8 +254,8 @@
                     ></v-text-field>
                   </template>
                   <v-time-picker
-                    v-model="formData[field.key]"
-                    @input="timeMenus[field.key] = false; handleInput(field.key, formData[field.key])"
+                    :value="getFieldValue(field.key)"
+                    @input="timeMenus[field.key] = false; handleInput(field.key, $event)"
                     format="24hr"
                     v-bind="field.pickerProps"
                   ></v-time-picker>
@@ -248,43 +264,43 @@
                 <!-- 开关 -->
                 <v-switch
                   v-else-if="field.type === 'switch'"
-                  v-model="formData[field.key]"
+                  :input-value="getFieldValue(field.key)"
+                  @change="handleChange(field.key, $event)"
                   :label="field.switchLabel"
                   :disabled="getFieldDisabled(field)"
                   :readonly="field.readonly"
                   :color="field.color || 'success'"
                   :hide-details="field.hideDetails || hideDetails"
                   v-bind="field.props"
-                  @change="handleChange(field.key, $event)"
                 ></v-switch>
 
                 <!-- 复选框 -->
                 <v-checkbox
                   v-else-if="field.type === 'checkbox'"
-                  v-model="formData[field.key]"
+                  :input-value="getFieldValue(field.key)"
+                  @change="handleChange(field.key, $event)"
                   :label="field.checkboxLabel"
                   :disabled="getFieldDisabled(field)"
                   :readonly="field.readonly"
                   :color="field.color || 'success'"
                   :hide-details="field.hideDetails || hideDetails"
                   v-bind="field.props"
-                  @change="handleChange(field.key, $event)"
                 ></v-checkbox>
 
                 <!-- 单选按钮组 -->
                 <v-radio-group
                   v-else-if="field.type === 'radio'"
-                  v-model="formData[field.key]"
+                  :value="getFieldValue(field.key)"
+                  @change="handleChange(field.key, $event)"
                   :rules="getRules(field)"
                   :disabled="getFieldDisabled(field)"
                   :readonly="field.readonly"
                   :row="field.row !== false"
                   :hide-details="field.hideDetails || hideDetails"
                   v-bind="field.props"
-                  @change="handleChange(field.key, $event)"
                 >
                   <v-radio
-                    v-for="option in field.options"
+                    v-for="option in getFieldOptions(field)"
                     :key="option.value"
                     :label="option.text"
                     :value="option.value"
@@ -297,7 +313,8 @@
                   v-else-if="field.type === 'slot'"
                   :name="`field-${field.key}`"
                   :field="field"
-                  :formData="formData"
+                  :value="getFieldValue(field.key)"
+                  :values="values"
                   :updateField="updateField"
                 ></slot>
               </template>
@@ -307,143 +324,37 @@
       </template>
     </v-row>
 
-    <!-- 表单底部插槽 -->
-    <slot name="actions" :formData="formData" :validate="validate" :resetForm="resetForm"></slot>
-  </v-form>
+    <!-- 底部插槽 -->
+    <slot name="footer" :values="values"></slot>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'JhForm',
+  name: 'JhFormFields',
 
   props: {
-    // 表单字段配置
-    fields: {
-      type: Array,
-      default: () => [],
-    },
-
-    // 初始表单数据
-    initialData: {
-      type: Object,
-      default: () => ({}),
-    },
-
-    // 表单引用名称
-    formRef: {
-      type: String,
-      default: 'jhForm',
-    },
-
-    // 懒加载验证
-    lazyValidation: {
-      type: Boolean,
-      default: true,
-    },
-
-    // 表单布局模式: 'horizontal' | 'vertical' | 'inline' | 'grid'
-    layout: {
-      type: String,
-      default: 'vertical',
-      validator: (v) => ['horizontal', 'vertical', 'inline', 'grid'].includes(v),
-    },
-
-    // 是否显示标签
-    showLabels: {
-      type: Boolean,
-      default: true,
-    },
-
-    // 标签位置 ('top' | 'left') - 已废弃,使用 layout 替代
-    labelPosition: {
-      type: String,
-      default: 'top',
-      validator: (v) => ['top', 'left'].includes(v),
-    },
-
-    // 标签宽度 (horizontal 布局时生效)
-    labelWidth: {
-      type: [Number, String],
-      default: 'auto',
-    },
-
-    // 标签对齐方式 (horizontal 布局时生效)
-    labelAlign: {
-      type: String,
-      default: 'right',
-      validator: (v) => ['left', 'right', 'center'].includes(v),
-    },
-
-    // 是否显示必填标记
-    showRequiredMark: {
-      type: Boolean,
-      default: true,
-    },
-
-    // 只读模式
-    readonly: {
-      type: Boolean,
-      default: false,
-    },
-
-    // 禁用模式
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-
-    // 默认输入框样式
-    defaultDense: {
-      type: Boolean,
-      default: true,
-    },
-
-    defaultFilled: {
-      type: Boolean,
-      default: true,
-    },
-
-    defaultOutlined: {
-      type: Boolean,
-      default: false,
-    },
-
-    defaultSingleLine: {
-      type: Boolean,
-      default: true,
-    },
-
-    // 默认列宽 (md)
-    defaultColsMd: {
-      type: Number,
-      default: 6,
-    },
-
-    // 隐藏详情信息
-    hideDetails: {
-      type: [Boolean, String],
-      default: false,
-    },
-
-    // 自定义标签样式类
-    labelClass: {
-      type: String,
-      default: 'jh-input-label',
-    },
-
-    // 自定义输入框样式类
-    inputClass: {
-      type: String,
-      default: 'jh-v-input',
-    },
-
-    // 自定义行样式类
-    rowClass: {
-      type: String,
-      default: '',
-    },
-
-    // 验证规则集合
+    fields: { type: Array, default: () => [] },
+    value: { type: Object, default: () => ({}) },
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    tooltip: { type: String, default: '' },
+    layout: { type: String, default: 'vertical', validator: (v) => ['horizontal', 'vertical', 'inline'].includes(v) },
+    showLabels: { type: Boolean, default: true },
+    labelWidth: { type: [Number, String], default: 'auto' },
+    labelAlign: { type: String, default: 'right', validator: (v) => ['left', 'right', 'center'].includes(v) },
+    showRequiredMark: { type: Boolean, default: true },
+    readonly: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+    defaultDense: { type: Boolean, default: true },
+    defaultFilled: { type: Boolean, default: true },
+    defaultOutlined: { type: Boolean, default: false },
+    defaultSingleLine: { type: Boolean, default: true },
+    defaultColsMd: { type: Number, default: 6 },
+    hideDetails: { type: [Boolean, String], default: false },
+    labelClass: { type: String, default: 'jh-input-label' },
+    inputClass: { type: String, default: 'jh-v-input' },
+    rowClass: { type: String, default: '' },
     validationRules: {
       type: Object,
       default: () => ({
@@ -454,117 +365,141 @@ export default {
         integer: [v => !v || Number.isInteger(Number(v)) || '请输入整数'],
       }),
     },
-
-    // 提交按钮配置
-    submitter: {
-      type: [Object, Boolean],
-      default: undefined,
-    },
-
-    // 提交成功回调
-    onFinish: {
-      type: Function,
-      default: undefined,
-    },
-
-    // 提交失败回调
-    onFinishFailed: {
-      type: Function,
-      default: undefined,
-    },
-
-    // 日期格式化
-    dateFormatter: {
-      type: [String, Function, Boolean],
-      default: 'YYYY-MM-DD',
-    },
-
-    // 忽略 null/undefined 值
-    omitNil: {
-      type: Boolean,
-      default: true,
-    },
-
-    // Grid 模式配置
-    grid: {
-      type: Boolean,
-      default: false,
-    },
-
-    // Grid 列配置
-    colProps: {
-      type: Object,
-      default: () => ({}),
-    },
+    dense: { type: Boolean, default: false },
+    bordered: { type: Boolean, default: false },
+    dependencies: { type: Array, default: () => [] },
   },
 
   data() {
     return {
-      formData: {},
+      values: {},
       dateMenus: {},
       timeMenus: {},
+      dependencyWatchers: [],
     };
   },
 
   computed: {
-    // 表单样式类
-    formClasses() {
+    formFieldsClasses() {
       return {
-        'jh-form': true,
-        [`jh-form--${this.layout}`]: true,
-        'jh-form--readonly': this.readonly,
-        'jh-form--disabled': this.disabled,
+        'jh-form-fields': true,
+        'jh-form-fields--bordered': this.bordered,
+        'jh-form-fields--readonly': this.readonly,
+        'jh-form-fields--disabled': this.disabled,
+        [`jh-form-fields--${this.layout}`]: true,
       };
     },
 
-    // 过滤可见字段
     visibleFields() {
       return this.fields.filter(field => {
-        // 如果字段有 visible 函数,根据函数结果判断
         if (typeof field.visible === 'function') {
-          return field.visible(this.formData);
+          return field.visible(this.values);
         }
-        // 如果字段有 visible 布尔值
         if (field.visible !== undefined) {
           return field.visible;
         }
-        // 默认显示
         return true;
       });
     },
   },
 
   watch: {
-    initialData: {
+    value: {
       handler(val) {
-        this.formData = { ...val };
+        this.values = { ...val };
       },
       immediate: true,
       deep: true,
     },
+
+    dependencies: {
+      handler(newDeps) {
+        this.setupDependencyWatchers(newDeps);
+      },
+      immediate: true,
+    },
   },
 
   mounted() {
-    // 初始化表单数据
-    this.initFormData();
+    this.initValues();
+    this.setupFieldDependencies();
+  },
+
+  beforeDestroy() {
+    this.dependencyWatchers.forEach(unwatch => unwatch());
+    this.dependencyWatchers = [];
   },
 
   methods: {
-    // 初始化表单数据
-    initFormData() {
-      const data = { ...this.initialData };
-
-      // 从 fields 中提取默认值
+    initValues() {
+      const values = { ...this.value };
       this.fields.forEach(field => {
-        if (field.defaultValue !== undefined && data[field.key] === undefined) {
-          data[field.key] = field.defaultValue;
+        if (field.defaultValue !== undefined && values[field.key] === undefined) {
+          values[field.key] = field.defaultValue;
         }
       });
-
-      this.formData = data;
+      this.values = values;
     },
 
-    // 获取字段列宽配置
+    setupFieldDependencies() {
+      this.fields.forEach(field => {
+        if (field.dependencies && Array.isArray(field.dependencies)) {
+          field.dependencies.forEach(depKey => {
+            const unwatch = this.$watch(
+              () => this.values[depKey],
+              (newVal, oldVal) => {
+                if (newVal !== oldVal) {
+                  this.handleDependencyChange(field, depKey, newVal, oldVal);
+                }
+              }
+            );
+            this.dependencyWatchers.push(unwatch);
+          });
+        }
+      });
+    },
+
+    setupDependencyWatchers(deps) {
+      this.dependencyWatchers.forEach(unwatch => unwatch());
+      this.dependencyWatchers = [];
+
+      deps.forEach(depKey => {
+        const unwatch = this.$watch(
+          () => this.values[depKey],
+          (newVal, oldVal) => {
+            if (newVal !== oldVal) {
+              this.$emit('dependency-change', { key: depKey, value: newVal, oldValue: oldVal, values: this.values });
+            }
+          }
+        );
+        this.dependencyWatchers.push(unwatch);
+      });
+    },
+
+    handleDependencyChange(field, depKey, newVal, oldVal) {
+      if (typeof field.onDependencyChange === 'function') {
+        field.onDependencyChange(depKey, newVal, oldVal, this.values);
+      }
+      this.$emit('field-dependency-change', {
+        field: field.key,
+        dependency: depKey,
+        value: newVal,
+        oldValue: oldVal,
+        values: this.values,
+      });
+    },
+
+    getFieldValue(key) {
+      return this.values[key];
+    },
+
+    getFieldOptions(field) {
+      if (typeof field.options === 'function') {
+        return field.options(this.values);
+      }
+      return field.options || [];
+    },
+
     getFieldCols(field) {
       if (this.layout === 'inline') return 'auto';
       if (field.cols) {
@@ -602,25 +537,21 @@ export default {
       return field.cols || this.defaultColsMd;
     },
 
-    // 获取字段列样式类
     getFieldColClass(field) {
       return field.colClass || '';
     },
 
-    // 获取字段包装器样式类
     getFieldWrapperClass(field) {
       const fieldLayout = field.layout || this.layout;
       const layoutClass = fieldLayout === 'horizontal' ? 'd-flex align-center' : '';
       return `jh-field-wrapper ${layoutClass}`;
     },
 
-    // 获取水平布局标签样式类
     getHorizontalLabelClass(field) {
       const align = field.labelAlign || this.labelAlign;
       return `jh-field-label jh-input-label jh-field-label--horizontal text-${align} flex-shrink-0`;
     },
 
-    // 获取水平布局标签样式
     getHorizontalLabelStyle(field) {
       const width = field.labelWidth || this.labelWidth;
       return {
@@ -629,111 +560,89 @@ export default {
       };
     },
 
-    // 获取垂直布局标签样式类
     getVerticalLabelClass(field) {
       return `jh-field-label jh-input-label jh-field-label--vertical mb-1`;
     },
 
-    // 获取字段输入区域样式类
     getFieldInputClass(field) {
       const fieldLayout = field.layout || this.layout;
       return fieldLayout === 'horizontal' ? 'jh-field-input flex-grow-1' : 'jh-field-input';
     },
 
-    // 判断字段是否禁用
     getFieldDisabled(field) {
-      // 优先使用字段的 disabled 函数
       if (typeof field.disabled === 'function') {
-        return field.disabled(this.formData);
+        return field.disabled(this.values);
       }
-      // 其次使用字段的 disabled 布尔值
       if (field.disabled !== undefined) {
         return field.disabled;
       }
-      // 最后使用全局禁用
       return this.disabled;
     },
 
-    // 判断字段是否只读
     isFieldReadonly(field) {
-      // 优先使用字段的 readonly 函数
       if (typeof field.readonly === 'function') {
-        return field.readonly(this.formData);
+        return field.readonly(this.values);
       }
-      // 其次使用字段的 readonly 布尔值
       if (field.readonly !== undefined) {
         return field.readonly;
       }
-      // 最后使用全局只读
       return this.readonly;
     },
 
-    // 获取只读模式的显示值
     getReadonlyValue(field) {
-      const value = this.formData[field.key];
+      const value = this.values[field.key];
 
-      // 如果字段有自定义只读渲染函数
       if (typeof field.readonlyRender === 'function') {
-        return field.readonlyRender(value, this.formData);
+        return field.readonlyRender(value, this.values);
       }
 
-      // 处理 select/radio 类型,显示 text 而不是 value
       if ((field.type === 'select' || field.type === 'radio') && field.options) {
+        const options = this.getFieldOptions(field);
         if (field.multiple && Array.isArray(value)) {
           return value.map(v => {
-            const option = field.options.find(opt => opt.value === v);
+            const option = options.find(opt => opt.value === v);
             return option ? option.text : v;
           }).join(', ');
         } else {
-          const option = field.options.find(opt => opt.value === value);
+          const option = options.find(opt => opt.value === value);
           return option ? option.text : value;
         }
       }
 
-      // 处理 switch/checkbox
       if (field.type === 'switch' || field.type === 'checkbox') {
         return value ? '是' : '否';
       }
 
-      // 默认直接显示值
       return value || '-';
     },
 
-    // 获取 dense 属性值
     getDense(field) {
       return field.dense !== undefined ? field.dense : this.defaultDense;
     },
 
-    // 获取 filled 属性值
     getFilled(field) {
       return field.filled !== undefined ? field.filled : this.defaultFilled;
     },
 
-    // 获取 outlined 属性值
     getOutlined(field) {
       return field.outlined !== undefined ? field.outlined : this.defaultOutlined;
     },
 
-    // 获取 singleLine 属性值
     getSingleLine(field) {
       return field.singleLine !== undefined ? field.singleLine : this.defaultSingleLine;
     },
 
-    // 获取验证规则
     getRules(field) {
       const rules = [];
 
-      // 处理 required
       if (field.required) {
         rules.push(v => !!v || `${field.label || '此字段'}为必填项`);
       }
 
-      // 处理自定义规则
       if (field.rules) {
         if (Array.isArray(field.rules)) {
           rules.push(...field.rules);
         } else if (typeof field.rules === 'string') {
-          // 支持字符串规则名称,如 'require' 或 'require|email'
           const ruleNames = field.rules.split('|');
           ruleNames.forEach(name => {
             const trimmedName = name.trim();
@@ -747,171 +656,102 @@ export default {
       return rules;
     },
 
-    // 处理输入事件
     handleInput(key, value) {
-      this.$emit('input', key, value, this.formData);
-      this.$emit('field-change', { key, value, formData: this.formData });
+      this.$set(this.values, key, value);
+      this.$emit('input', this.values);
+      this.$emit('field-input', { key, value, values: this.values });
     },
 
-    // 处理改变事件
     handleChange(key, value) {
-      this.$emit('change', key, value, this.formData);
-      this.$emit('field-change', { key, value, formData: this.formData });
+      this.$set(this.values, key, value);
+      this.$emit('input', this.values);
+      this.$emit('field-change', { key, value, values: this.values });
     },
 
-    // 处理失焦事件
     handleBlur(key, value) {
-      this.$emit('blur', key, value, this.formData);
+      this.$emit('field-blur', { key, value, values: this.values });
     },
 
-    // 更新字段值(供插槽使用)
     updateField(key, value) {
-      this.$set(this.formData, key, value);
-      this.handleChange(key, value);
+      this.$set(this.values, key, value);
+      this.$emit('input', this.values);
+      this.$emit('field-change', { key, value, values: this.values });
     },
 
-    // 获取表单引用(供父组件调用)
-    getForm() {
-      return this.$refs[this.formRef];
+    getValues() {
+      return { ...this.values };
     },
 
-    // 获取表单数据
-    getFormData() {
-      return { ...this.formData };
-    },
-
-    // 设置表单数据
     setFieldsValue(values) {
-      this.formData = { ...this.formData, ...values };
+      this.values = { ...this.values, ...values };
+      this.$emit('input', this.values);
     },
 
-    // 设置单个字段值
     setFieldValue(key, value) {
-      this.$set(this.formData, key, value);
+      this.$set(this.values, key, value);
+      this.$emit('input', this.values);
     },
 
-    // 重置表单
-    resetForm() {
-      const form = this.$refs[this.formRef];
-      if (form) {
-        form.reset();
-      }
-      this.initFormData();
-      this.$emit('reset', this.formData);
-    },
-
-    // 重置表单验证
-    resetValidation() {
-      const form = this.$refs[this.formRef];
-      if (form) {
-        form.resetValidation();
-      }
-    },
-
-    // 验证表单
-    async validate() {
-      const form = this.$refs[this.formRef];
-      if (form) {
-        const isValid = await form.validate();
-        this.$emit('validate', isValid, this.formData);
-        return isValid;
-      }
-      return true;
-    },
-
-    // 提交表单
-    async submit() {
-      const isValid = await this.validate();
-      if (isValid) {
-        const transformedData = this.getTransformedData();
-        this.$emit('submit', transformedData);
-        
-        // 调用 onFinish 回调
-        if (this.onFinish) {
-          try {
-            await this.onFinish(transformedData);
-          } catch (error) {
-            console.error('Form submit error:', error);
-          }
-        }
-      } else {
-        // 调用 onFinishFailed 回调
-        if (this.onFinishFailed) {
-          this.onFinishFailed(this.formData);
-        }
-      }
-      return isValid;
-    },
-
-    // 获取转换后的数据
-    getTransformedData() {
-      const data = { ...this.formData };
-      
-      // 应用字段级别的 transform
+    resetFields() {
+      const values = {};
       this.fields.forEach(field => {
-        if (field.key && field.transform && typeof field.transform === 'function') {
-          data[field.key] = field.transform(data[field.key], data);
+        if (field.defaultValue !== undefined) {
+          values[field.key] = field.defaultValue;
         }
       });
-
-      // 忽略 null/undefined 值
-      if (this.omitNil) {
-        Object.keys(data).forEach(key => {
-          if (data[key] === null || data[key] === undefined || data[key] === '') {
-            delete data[key];
-          }
-        });
-      }
-
-      return data;
-    },
-
-    // 获取字段的依赖值
-    getDependenciesValues(dependencies) {
-      if (!dependencies || !Array.isArray(dependencies)) return [];
-      return dependencies.map(key => this.formData[key]);
-    },
-
-    // 检查依赖是否变化
-    checkDependenciesChanged(field, oldValues, newValues) {
-      if (!field.dependencies) return false;
-      
-      for (let i = 0; i < field.dependencies.length; i++) {
-        if (oldValues[i] !== newValues[i]) {
-          return true;
-        }
-      }
-      return false;
+      this.values = values;
+      this.$emit('input', this.values);
+      this.$emit('reset', this.values);
     },
   },
 };
 </script>
 
 <style scoped>
-/* 表单布局样式 */
-.jh-form {
+.jh-form-fields {
   width: 100%;
 }
 
-/* 水平布局 */
-.jh-form--horizontal .jh-field-label--horizontal {
+.jh-form-fields--bordered {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.jh-form-fields-header {
+  margin-bottom: 16px;
+}
+
+.jh-form-fields-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+}
+
+.jh-form-fields-description {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.jh-form-fields--horizontal .jh-field-label--horizontal {
   padding-top: 0;
   line-height: 1.5;
 }
 
-/* 行内布局 */
-.jh-form--inline .v-input {
+.jh-form-fields--inline .v-input {
   margin-bottom: 0 !important;
 }
 
-/* 只读模式 */
-.jh-form--readonly .jh-form-readonly-text {
+.jh-form-fields--readonly .jh-form-readonly-text {
   padding: 8px 0;
   min-height: 40px;
   color: rgba(0, 0, 0, 0.87);
 }
 
-/* 字段标签 */
 .jh-field-label {
 
 }
@@ -924,7 +764,6 @@ export default {
   display: block;
 }
 
-/* 表单分组标题 */
 .jh-form-group-title {
   margin-top: 8px;
   margin-bottom: 16px;
@@ -935,22 +774,18 @@ export default {
   font-weight: 500;
 }
 
-/* 字段包装器 */
 .jh-field-wrapper {
   width: 100%;
 }
 
-/* 字段输入区域 */
 .jh-field-input {
   width: 100%;
 }
 
-/* 只读文本 */
 .jh-form-readonly-text {
   word-break: break-word;
 }
 
-/* 额外提示信息 */
 .jh-field-extra {
   margin-top: -8px;
   line-height: 1.5;

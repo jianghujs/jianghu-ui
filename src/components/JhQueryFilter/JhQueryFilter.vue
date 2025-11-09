@@ -3,185 +3,31 @@
     <!-- 查询表单 -->
     <v-form ref="queryForm" @submit.prevent="handleSearch">
       <v-row :class="rowClass">
-        <!-- 显示的字段 -->
-        <template v-for="(field, index) in visibleFields">
-          <v-col
-            :key="field.key"
-            :cols="field.cols || colSpan.xs || 12"
-            :sm="field.sm || colSpan.sm || 12"
-            :md="field.md || colSpan.md || 8"
-            :lg="field.lg || colSpan.lg || 6"
-            :class="field.colClass"
-          >
-            <!-- 字段标签 -->
-            <span v-if="field.label && showLabels" :class="labelClass">
-              {{ field.label }}
-            </span>
-
-            <!-- 文本输入框 -->
-            <v-text-field
-              v-if="field.type === 'text' || !field.type"
-              :class="inputClass"
-              :dense="getDense(field)"
-              :single-line="getSingleLine(field)"
-              :filled="getFilled(field)"
-              :outlined="getOutlined(field)"
-              v-model="formData[field.key]"
-              :disabled="field.disabled"
-              :placeholder="field.placeholder"
-              :prefix="field.prefix"
-              :suffix="field.suffix"
-              :hide-details="true"
-              clearable
-              v-bind="field.props"
-              @input="handleFieldChange(field.key, $event)"
-              @keyup.enter="handleSearch"
-            ></v-text-field>
-
-            <!-- 数字输入框 -->
-            <v-text-field
-              v-else-if="field.type === 'number'"
-              :class="inputClass"
-              type="number"
-              :dense="getDense(field)"
-              :single-line="getSingleLine(field)"
-              :filled="getFilled(field)"
-              :outlined="getOutlined(field)"
-              v-model="formData[field.key]"
-              :disabled="field.disabled"
-              :placeholder="field.placeholder"
-              :hide-details="true"
-              clearable
-              v-bind="field.props"
-              @input="handleFieldChange(field.key, $event)"
-              @keyup.enter="handleSearch"
-            ></v-text-field>
-
-            <!-- 下拉选择框 -->
-            <v-select
-              v-else-if="field.type === 'select'"
-              :class="inputClass"
-              :dense="getDense(field)"
-              :filled="getFilled(field)"
-              :outlined="getOutlined(field)"
-              v-model="formData[field.key]"
-              :items="field.options || []"
-              :disabled="field.disabled"
-              :placeholder="field.placeholder"
-              :item-text="field.itemText || 'text'"
-              :item-value="field.itemValue || 'value'"
-              :multiple="field.multiple"
-              :chips="field.chips"
-              :hide-details="true"
-              clearable
-              v-bind="field.props"
-              @change="handleFieldChange(field.key, $event)"
-            ></v-select>
-
-            <!-- 自动完成 -->
-            <v-autocomplete
-              v-else-if="field.type === 'autocomplete'"
-              :class="inputClass"
-              :dense="getDense(field)"
-              :filled="getFilled(field)"
-              :outlined="getOutlined(field)"
-              v-model="formData[field.key]"
-              :items="field.options || []"
-              :disabled="field.disabled"
-              :placeholder="field.placeholder"
-              :item-text="field.itemText || 'text'"
-              :item-value="field.itemValue || 'value'"
-              :hide-details="true"
-              clearable
-              v-bind="field.props"
-              @change="handleFieldChange(field.key, $event)"
-            ></v-autocomplete>
-
-            <!-- 日期选择器 -->
-            <v-menu
-              v-else-if="field.type === 'date'"
-              v-model="dateMenus[field.key]"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-              min-width="290px"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  :class="inputClass"
-                  :dense="getDense(field)"
-                  :filled="getFilled(field)"
-                  :outlined="getOutlined(field)"
-                  v-model="formData[field.key]"
-                  :disabled="field.disabled"
-                  :placeholder="field.placeholder"
-                  :hide-details="true"
-                  clearable
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                v-model="formData[field.key]"
-                @input="dateMenus[field.key] = false; handleFieldChange(field.key, formData[field.key])"
-                :locale="field.locale || 'zh-cn'"
-                v-bind="field.pickerProps"
-              ></v-date-picker>
-            </v-menu>
-
-            <!-- 日期范围选择器 -->
-            <v-menu
-              v-else-if="field.type === 'daterange'"
-              v-model="dateMenus[field.key]"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-              min-width="290px"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  :class="inputClass"
-                  :dense="getDense(field)"
-                  :filled="getFilled(field)"
-                  :outlined="getOutlined(field)"
-                  :value="formatDateRange(field.key)"
-                  :disabled="field.disabled"
-                  :placeholder="field.placeholder"
-                  :hide-details="true"
-                  clearable
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                  @click:clear="clearDateRange(field.key)"
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                v-model="formData[field.key]"
-                range
-                @input="handleFieldChange(field.key, formData[field.key])"
-                :locale="field.locale || 'zh-cn'"
-                v-bind="field.pickerProps"
-              ></v-date-picker>
-            </v-menu>
-
-            <!-- 自定义字段插槽 -->
-            <slot
-              v-else-if="field.type === 'slot'"
-              :name="`field-${field.key}`"
-              :field="field"
-              :formData="formData"
-              :updateField="updateField"
-            ></slot>
-          </v-col>
-        </template>
+        <!-- 使用 JhFormFields 渲染字段 -->
+        <JhFormFields
+          v-model="formData"
+          :fields="visibleFieldsWithConfig"
+          :showLabels="showLabels"
+          :labelClass="labelClass"
+          :inputClass="inputClass"
+          :defaultDense="dense"
+          :defaultFilled="filled"
+          :defaultOutlined="outlined"
+          :defaultSingleLine="singleLine"
+          :hideDetails="true"
+          layout="vertical"
+          @field-change="handleFieldChange"
+        >
+          <!-- 透传自定义字段插槽 -->
+          <template v-for="field in fields" v-slot:[`field-${field.key}`]="slotProps">
+            <slot :name="`field-${field.key}`" v-bind="slotProps"></slot>
+          </template>
+        </JhFormFields>
 
         <!-- 操作按钮列 -->
-        <v-col
-          class="d-flex align-end flex-column justify-center"
-        >
-          <span class="opacity-0"  v-if="showLabels" :class="labelClass">
-              工具栏
+        <v-col class="d-flex align-end flex-column justify-center">
+          <span class="opacity-0" v-if="showLabels" :class="labelClass">
+            工具栏
           </span>
 
           <slot name="buttons" :formData="formData" :search="handleSearch" :reset="handleReset">
@@ -234,8 +80,14 @@
 </template>
 
 <script>
+import JhFormFields from '../JhFormFields/JhFormFields.vue';
+
 export default {
   name: 'JhQueryFilter',
+
+  components: {
+    JhFormFields,
+  },
 
   props: {
     // 查询字段配置
@@ -378,7 +230,6 @@ export default {
     return {
       formData: {},
       collapsed: this.defaultCollapsed,
-      dateMenus: {},
       searching: false,
     };
   },
@@ -390,6 +241,25 @@ export default {
         return this.fields;
       }
       return this.fields.slice(0, this.defaultVisibleCount);
+    },
+
+    // 为字段添加查询过滤器特有的配置
+    visibleFieldsWithConfig() {
+      return this.visibleFields.map(field => ({
+        ...field,
+        // 设置列宽配置
+        cols: field.cols || { 
+          xs: this.colSpan.xs || 12,
+          sm: this.colSpan.sm || 12,
+          md: this.colSpan.md || 8,
+          lg: this.colSpan.lg || 6,
+        },
+        // 查询过滤器字段默认可清空
+        props: {
+          clearable: true,
+          ...field.props,
+        },
+      }));
     },
   },
 
@@ -426,55 +296,14 @@ export default {
       this.formData = data;
     },
 
-    // 获取 dense 属性值
-    getDense(field) {
-      return field.dense !== undefined ? field.dense : this.dense;
-    },
-
-    // 获取 filled 属性值
-    getFilled(field) {
-      return field.filled !== undefined ? field.filled : this.filled;
-    },
-
-    // 获取 outlined 属性值
-    getOutlined(field) {
-      return field.outlined !== undefined ? field.outlined : this.outlined;
-    },
-
-    // 获取 singleLine 属性值
-    getSingleLine(field) {
-      return field.singleLine !== undefined ? field.singleLine : this.singleLine;
-    },
-
-    // 格式化日期范围显示
-    formatDateRange(key) {
-      const dateRange = this.formData[key];
-      if (Array.isArray(dateRange) && dateRange.length === 2) {
-        return `${dateRange[0]} ~ ${dateRange[1]}`;
-      }
-      return '';
-    },
-
-    // 清空日期范围
-    clearDateRange(key) {
-      this.$set(this.formData, key, []);
-      this.handleFieldChange(key, []);
-    },
-
     // 处理字段变化
-    handleFieldChange(key, value) {
+    handleFieldChange({ key, value }) {
       this.$emit('field-change', { key, value, formData: this.formData });
 
       // 如果配置了实时查询
       if (this.fields.find(f => f.key === key)?.realtime) {
         this.handleSearch();
       }
-    },
-
-    // 更新字段值（供插槽使用）
-    updateField(key, value) {
-      this.$set(this.formData, key, value);
-      this.handleFieldChange(key, value);
     },
 
     // 切换折叠状态

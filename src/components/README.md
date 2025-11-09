@@ -23,6 +23,7 @@
 
 ### 表单组件
 - **JhForm**: 表单组件
+- **JhFormFields**: 表单字段集组件 - 基于 Ant Design ProComponents FieldSet，支持字段依赖和动态联动
 - **JhFormList**: 表单列表组件
 - **JhQueryFilter**: 查询过滤组件
 - **JhStepsForm**: 分步表单组件

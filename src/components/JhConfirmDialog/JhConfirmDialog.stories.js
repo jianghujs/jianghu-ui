@@ -1,7 +1,7 @@
 import JhConfirmDialog from './JhConfirmDialog.vue';
 
 export default {
-  title: '反馈/JhConfirmDialog - 确认对话框',
+  title: '基础组件/JhConfirmDialog - 确认对话框',
   component: JhConfirmDialog,
   tags: ['autodocs'],
   argTypes: {

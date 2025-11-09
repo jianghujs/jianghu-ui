@@ -1,7 +1,7 @@
 import JhToast from './JhToast.vue';
 
 export default {
-  title: '反馈/JhToast - 消息提示',
+  title: '基础组件/JhToast - 消息提示',
   component: JhToast,
   tags: ['autodocs'],
   argTypes: {

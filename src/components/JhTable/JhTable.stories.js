@@ -54,6 +54,22 @@ export default {
       control: false,
       description: '数据请求函数（服务端分页），返回 { data, total, success }',
     },
+    headerTitle: {
+      control: 'text',
+      description: '表格标题',
+    },
+    tooltip: {
+      control: 'text',
+      description: '标题提示信息',
+    },
+    cardBordered: {
+      control: 'boolean',
+      description: '是否显示卡片边框',
+    },
+    ghost: {
+      control: 'boolean',
+      description: '幽灵模式（无边框无背景）',
+    },
     toolbar: {
       control: 'object',
       description: '工具栏配置 { search, refresh, setting, density, fullscreen }',
@@ -74,6 +90,14 @@ export default {
       control: 'select',
       options: ['default', 'medium', 'compact'],
       description: '表格密度',
+    },
+    polling: {
+      control: 'number',
+      description: '轮询间隔（毫秒），0 表示不轮询',
+    },
+    debounceTime: {
+      control: 'number',
+      description: '搜索防抖时间（毫秒）',
     },
   },
   parameters: {
@@ -1021,140 +1045,6 @@ export const 完整CRUD示例 = {
           '待审核': 'warning'
         };
         return colorMap[status] || 'default';
-      },
-    },
-  }),
-};
-
-// CRUD页面
-export const CRUD页面 = {
-  render: () => ({
-    components: { JhTable },
-    data() {
-      return {
-        headers: [
-          { text: 'ID', value: 'id', width: 80 },
-          { text: '用户名', value: 'username', copyable: true },
-          { text: '邮箱', value: 'email', ellipsis: true, copyable: true },
-          { text: '手机号', value: 'phone' },
-          { text: '状态', value: 'status' },
-          { text: '创建时间', value: 'createdAt', sortable: true },
-          { text: '操作', value: 'action', width: '200px', sortable: false },
-        ],
-        items: [],
-        loading: false,
-        selectedRows: [],
-        actionColumn: {
-          buttons: [
-            {
-              text: '查看',
-              type: 'link',
-              icon: 'mdi-eye',
-              color: 'primary',
-              onClick: (row) => {
-                alert('查看详情: ' + row.username);
-              },
-            },
-            {
-              text: '编辑',
-              type: 'link',
-              icon: 'mdi-pencil',
-              color: 'success',
-              onClick: (row) => {
-                alert('编辑: ' + row.username);
-              },
-              visible: (row) => row.status !== '禁用',
-            },
-            {
-              text: '删除',
-              type: 'link',
-              icon: 'mdi-delete',
-              color: 'error',
-              confirm: '确认删除该用户？',
-              onClick: (row) => {
-                this.handleDelete(row);
-              },
-            },
-          ],
-        },
-      };
-    },
-    mounted() {
-      this.loadData();
-    },
-    template: `
-      <div>
-        <!-- 批量操作栏 -->
-        <v-alert
-          v-if="selectedRows.length > 0"
-          type="info"
-          dense
-          text
-          class="mb-4"
-        >
-          <div class="d-flex align-center">
-            <span>已选择 <strong>{{ selectedRows.length }}</strong> 项</span>
-            <v-spacer></v-spacer>
-            <v-btn small text color="error" @click="handleBatchDelete">
-              批量删除
-            </v-btn>
-            <v-btn small text @click="clearSelection">
-              取消选择
-            </v-btn>
-          </div>
-        </v-alert>
-
-        <!-- 表格 -->
-        <jh-table
-          ref="tableRef"
-          :headers="headers"
-          :items="items"
-          :loading="loading"
-          :action-column="actionColumn"
-          :show-select="true"
-          @create-click="handleCreate"
-          @selection-change="handleSelectionChange"
-          @refresh="loadData"
-        >
-          <!-- 自定义状态列 -->
-          <template v-slot:item.status="{ item }">
-            <v-chip
-              :color="item.status === '启用' ? 'success' : item.status === '禁用' ? 'error' : 'warning'"
-              small
-              label
-            >
-              {{ item.status }}
-            </v-chip>
-          </template>
-        </jh-table>
-      </div>
-    `,
-    methods: {
-      async loadData() {
-        this.loading = true;
-        await new Promise(resolve => setTimeout(resolve, 500));
-        this.items = sampleItems;
-        this.loading = false;
-      },
-      handleCreate() {
-        alert('打开新增表单');
-      },
-      handleDelete(row) {
-        console.log('删除:', row);
-        this.items = this.items.filter(item => item.id !== row.id);
-      },
-      handleBatchDelete() {
-        if (confirm('确认删除选中的 ' + this.selectedRows.length + ' 项？')) {
-          const ids = this.selectedRows.map(row => row.id);
-          this.items = this.items.filter(item => !ids.includes(item.id));
-          this.clearSelection();
-        }
-      },
-      handleSelectionChange({ selectedRows }) {
-        this.selectedRows = selectedRows;
-      },
-      clearSelection() {
-        this.$refs.tableRef.clearSelection();
       },
     },
   }),

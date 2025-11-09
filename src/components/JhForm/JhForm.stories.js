@@ -1,4 +1,5 @@
 import JhForm from './JhForm.vue';
+import JhFormFields from '../JhFormFields/JhFormFields.vue';
 
 export default {
   title: '数据录入/JhForm - 高级表单',
@@ -1155,3 +1156,150 @@ export const 只读模式 = {
     },
   },
 };
+
+// 使用 JhFormFields 组合表单
+export const 使用JhFormFields组合 = () => ({
+  components: { JhFormFields },
+  data() {
+    return {
+      formData: {
+        userType: 'personal',
+      },
+      basicFields: [
+        {
+          key: 'username',
+          label: '用户名',
+          type: 'text',
+          placeholder: '请输入用户名',
+          required: true,
+        },
+        {
+          key: 'email',
+          label: '邮箱',
+          type: 'text',
+          placeholder: '请输入邮箱',
+          rules: 'email',
+        },
+      ],
+      typeFields: [
+        {
+          key: 'userType',
+          label: '用户类型',
+          type: 'radio',
+          options: [
+            { text: '个人用户', value: 'personal' },
+            { text: '企业用户', value: 'company' },
+          ],
+          defaultValue: 'personal',
+          cols: { md: 12 },
+        },
+        {
+          key: 'personalName',
+          label: '真实姓名',
+          type: 'text',
+          placeholder: '请输入真实姓名',
+          required: true,
+          visible: (values) => values.userType === 'personal',
+          dependencies: ['userType'],
+        },
+        {
+          key: 'idCard',
+          label: '身份证号',
+          type: 'text',
+          placeholder: '请输入身份证号',
+          visible: (values) => values.userType === 'personal',
+          dependencies: ['userType'],
+        },
+        {
+          key: 'companyName',
+          label: '公司名称',
+          type: 'text',
+          placeholder: '请输入公司名称',
+          required: true,
+          visible: (values) => values.userType === 'company',
+          dependencies: ['userType'],
+        },
+        {
+          key: 'businessLicense',
+          label: '营业执照号',
+          type: 'text',
+          placeholder: '请输入营业执照号',
+          visible: (values) => values.userType === 'company',
+          dependencies: ['userType'],
+        },
+      ],
+      contactFields: [
+        {
+          key: 'phone',
+          label: '手机号',
+          type: 'text',
+          placeholder: '请输入手机号',
+          rules: 'phone',
+        },
+        {
+          key: 'address',
+          label: '地址',
+          type: 'textarea',
+          placeholder: '请输入地址',
+          rows: 3,
+          cols: { md: 12 },
+        },
+      ],
+    };
+  },
+  template: `
+    <v-container>
+      <v-form>
+        <!-- 基本信息字段集 -->
+        <JhFormFields
+          v-model="formData"
+          :fields="basicFields"
+          title="基本信息"
+          description="请填写您的基本信息"
+          bordered
+        />
+        
+        <!-- 用户类型字段集 (带依赖联动) -->
+        <JhFormFields
+          v-model="formData"
+          :fields="typeFields"
+          title="用户类型"
+          description="根据用户类型显示不同的字段"
+          tooltip="字段会根据选择动态显示"
+          bordered
+          class="mt-4"
+        />
+        
+        <!-- 联系方式字段集 -->
+        <JhFormFields
+          v-model="formData"
+          :fields="contactFields"
+          title="联系方式"
+          bordered
+          class="mt-4"
+        />
+        
+        <!-- 提交按钮 -->
+        <v-row class="mt-4">
+          <v-col cols="12" class="text-right">
+            <v-btn class="mr-2" @click="resetForm">重置</v-btn>
+            <v-btn color="primary" @click="submitForm">提交</v-btn>
+          </v-col>
+        </v-row>
+      </v-form>
+      
+      <v-divider class="my-4"></v-divider>
+      <div class="text-caption grey--text">表单数据:</div>
+      <pre class="mt-2 pa-3 grey lighten-4 rounded">{{ formData }}</pre>
+    </v-container>
+  `,
+  methods: {
+    submitForm() {
+      console.log('提交数据:', this.formData);
+      alert('提交成功! 请查看控制台');
+    },
+    resetForm() {
+      this.formData = { userType: 'personal' };
+    },
+  },
+});

@@ -1,7 +1,7 @@
 import JhMask from './JhMask.vue';
 
 export default {
-  title: '反馈/JhMask - 遮罩层',
+  title: '基础组件/JhMask - 遮罩层',
   component: JhMask,
   tags: ['autodocs'],
   argTypes: {

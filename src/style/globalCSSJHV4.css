@@ -342,3 +342,7 @@ body .v-navigation-drawer.jh-drawer-level-2 {
 .jh-form .v-input--selection-controls {
   margin-top: 0;
 }
+
+.jh-field-input>.jh-v-input .v-input__slot {
+  border: 1px solid #DFDFDF!important;
+}
