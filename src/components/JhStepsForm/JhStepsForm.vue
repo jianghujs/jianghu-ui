@@ -1,100 +1,264 @@
 <template>
-  <v-card flat class="jh-steps-form">
-    <!-- 步骤指示器 -->
-    <v-stepper v-model="currentStepIndex" :alt-labels="altLabels" :vertical="vertical">
-      <v-stepper-header v-if="!vertical">
-        <template v-for="(step, index) in steps">
-          <v-stepper-step
+  <div :class="['jh-steps-form-container', { 'is-vertical': vertical }]" :style="containerStyle">
+    <template v-if="vertical">
+      <!-- 垂直布局：左侧步骤指示器 -->
+      <div class="jh-steps-form-stepper">
+        <div class="vertical-steps">
+          <div 
+            v-for="(step, index) in steps" 
             :key="`step-${index}`"
-            :complete="currentStepIndex > index + 1"
-            :step="index + 1"
-            :editable="editable && index < currentStepIndex"
-            @click="editable && handleStepClick(index)"
+            :class="[
+              'vertical-step-item',
+              {
+                'active': currentStepIndex === index + 1,
+                'completed': currentStepIndex > index + 1,
+                'editable': editable && index < currentStepIndex - 1
+              }
+            ]"
+            @click="editable && index < currentStepIndex - 1 && handleStepClick(index)"
           >
-            {{ step.title }}
-            <small v-if="step.subTitle">{{ step.subTitle }}</small>
-          </v-stepper-step>
-          <v-divider v-if="index < steps.length - 1" :key="`divider-${index}`"></v-divider>
-        </template>
-      </v-stepper-header>
-
-      <v-stepper-items>
-        <v-stepper-content
-          v-for="(step, index) in steps"
-          :key="`content-${index}`"
-          :step="index + 1"
-        >
-          <!-- 步骤标题(垂直模式) -->
-          <div v-if="vertical" class="mb-4">
-            <div class="text-h6">{{ step.title }}</div>
-            <div v-if="step.subTitle" class="text-caption text--secondary">{{ step.subTitle }}</div>
+            <div class="step-number">
+              <v-icon v-if="currentStepIndex > index + 1" small color="success">mdi-check</v-icon>
+              <span v-else>{{ index + 1 }}</span>
+            </div>
+            <div class="step-info">
+              <div class="step-title">{{ step.title }}</div>
+              <div v-if="step.subTitle" class="step-subtitle">{{ step.subTitle }}</div>
+            </div>
           </div>
-
-          <!-- 步骤内容 -->
+        </div>
+      </div>
+      
+      <!-- 垂直布局：右侧内容区域 -->
+      <div class="jh-steps-form-content">
+        <v-card flat>
           <div class="step-content">
-            <!-- 使用插槽渲染步骤内容 -->
-            <slot
-              v-if="step.slot"
-              :name="step.slot"
-              :step="step"
-              :index="index"
-              :formData="formData"
-            ></slot>
+            <template v-for="(step, index) in steps">
+              <div v-if="currentStepIndex === index + 1" :key="`content-${index}`">
+                <!-- 使用插槽渲染步骤内容 -->
+                <slot
+                  v-if="step.slot"
+                  :name="step.slot"
+                  :step="step"
+                  :index="index"
+                  :formData="formData"
+                ></slot>
 
-            <!-- 使用 JhForm 渲染步骤表单 -->
-            <jh-form
-              v-else-if="step.fields"
-              :ref="`stepForm${index}`"
-              :fields="step.fields"
-              :initial-data="formData[`step${index}`] || {}"
-              :show-buttons="false"
-              :outlined="outlined"
-              :dense="dense"
-              @change="handleStepFormChange(index, $event)"
-            />
+                <!-- 使用 JhForm 渲染步骤表单 -->
+                <jh-form
+                  v-else-if="step.fields"
+                  :ref="`stepForm${index}`"
+                  :fields="step.fields"
+                  :initial-data="formData[`step${index}`] || {}"
+                  :show-buttons="false"
+                  :outlined="outlined"
+                  :dense="dense"
+                  v-bind="mergedFormProps"
+                  @change="handleStepFormChange(index, $event)"
+                />
 
-            <!-- 默认内容 -->
-            <div v-else>
-              <slot :step="step" :index="index" :formData="formData"></slot>
-            </div>
+                <!-- 默认内容 -->
+                <div v-else>
+                  <slot :step="step" :index="index" :formData="formData"></slot>
+                </div>
+              </div>
+            </template>
           </div>
-
+          
           <!-- 步骤操作按钮 -->
-          <div class="step-actions d-flex justify-space-between mt-6">
-            <v-btn
-              v-if="index > 0"
-              text
-              @click="handlePrevious"
-              :disabled="submitting"
-            >
-              {{ previousButtonText }}
-            </v-btn>
-            <v-spacer v-else></v-spacer>
-
-            <div>
+          <div v-if="!submitter || submitter.render !== false" class="step-actions d-flex justify-space-between mt-6">
+            <!-- 自定义渲染提交器 -->
+            <template v-if="submitter && submitter.render">
+              <slot 
+                name="submitter" 
+                :step="steps[currentStepIndex - 1]"
+                :index="currentStepIndex - 1"
+                :onPrevious="handlePrevious"
+                :onNext="handleNext"
+                :onFinish="handleFinish"
+                :submitting="submitting"
+                :validating="validating"
+              >
+                <component 
+                  :is="submitter.render" 
+                  :step="steps[currentStepIndex - 1]"
+                  :index="currentStepIndex - 1"
+                  :onPrevious="handlePrevious"
+                  :onNext="handleNext"
+                  :onFinish="handleFinish"
+                  :submitting="submitting"
+                  :validating="validating"
+                />
+              </slot>
+            </template>
+            
+            <!-- 默认按钮 -->
+            <template v-else>
               <v-btn
-                v-if="index < steps.length - 1"
-                color="primary"
-                @click="handleNext"
-                :loading="validating"
+                v-if="currentStepIndex > 1 && (!submitter || submitter.showPrevious !== false)"
+                text
+                @click="handlePrevious"
                 :disabled="submitting"
+                v-bind="submitter && submitter.previousButtonProps"
               >
-                {{ nextButtonText }}
+                {{ (submitter && submitter.previousText) || previousButtonText }}
               </v-btn>
-              <v-btn
-                v-else
-                color="primary"
-                @click="handleFinish"
-                :loading="submitting"
-              >
-                {{ finishButtonText }}
-              </v-btn>
-            </div>
+              <v-spacer v-else></v-spacer>
+
+              <div>
+                <v-btn
+                  v-if="currentStepIndex < steps.length"
+                  color="primary"
+                  @click="handleNext"
+                  :loading="validating"
+                  :disabled="submitting"
+                  v-bind="submitter && submitter.nextButtonProps"
+                >
+                  {{ (submitter && submitter.nextText) || nextButtonText }}
+                </v-btn>
+                <v-btn
+                  v-else
+                  color="primary"
+                  @click="handleFinish"
+                  :loading="submitting"
+                  v-bind="submitter && submitter.submitButtonProps"
+                >
+                  {{ (submitter && submitter.submitText) || finishButtonText }}
+                </v-btn>
+              </div>
+            </template>
           </div>
-        </v-stepper-content>
-      </v-stepper-items>
-    </v-stepper>
-  </v-card>
+        </v-card>
+      </div>
+    </template>
+    
+    <template v-else>
+      <!-- 水平布局：使用原有的 v-stepper 结构 -->
+      <v-stepper 
+        v-model="currentStepIndex" 
+        :alt-labels="altLabels" 
+        v-bind="stepsProps"
+        class="w-full"
+      >
+        <v-stepper-header>
+          <template v-for="(step, index) in steps">
+            <v-stepper-step
+              :key="`step-${index}`"
+              :complete="currentStepIndex > index + 1"
+              :step="index + 1"
+              :editable="editable && index < currentStepIndex"
+              @click="editable && handleStepClick(index)"
+            >
+              {{ step.title }}
+              <small v-if="step.subTitle">{{ step.subTitle }}</small>
+            </v-stepper-step>
+            <v-divider v-if="index < steps.length - 1" :key="`divider-${index}`"></v-divider>
+          </template>
+        </v-stepper-header>
+
+        <v-stepper-items>
+          <v-stepper-content
+            v-for="(step, index) in steps"
+            :key="`content-${index}`"
+            :step="index + 1"
+          >
+            <div class="step-content">
+              <!-- 使用插槽渲染步骤内容 -->
+              <slot
+                v-if="step.slot"
+                :name="step.slot"
+                :step="step"
+                :index="index"
+                :formData="formData"
+              ></slot>
+
+              <!-- 使用 JhForm 渲染步骤表单 -->
+              <jh-form
+                v-else-if="step.fields"
+                :ref="`stepForm${index}`"
+                :fields="step.fields"
+                :initial-data="formData[`step${index}`] || {}"
+                :show-buttons="false"
+                :outlined="outlined"
+                :dense="dense"
+                v-bind="mergedFormProps"
+                @change="handleStepFormChange(index, $event)"
+              />
+
+              <!-- 默认内容 -->
+              <div v-else>
+                <slot :step="step" :index="index" :formData="formData"></slot>
+              </div>
+            </div>
+
+            <!-- 步骤操作按钮 -->
+            <div v-if="!submitter || submitter.render !== false" class="step-actions d-flex justify-space-between mt-6">
+              <!-- 自定义渲染提交器 -->
+              <template v-if="submitter && submitter.render">
+                <slot 
+                  name="submitter" 
+                  :step="step"
+                  :index="index"
+                  :onPrevious="handlePrevious"
+                  :onNext="handleNext"
+                  :onFinish="handleFinish"
+                  :submitting="submitting"
+                  :validating="validating"
+                >
+                  <component 
+                    :is="submitter.render" 
+                    :step="step"
+                    :index="index"
+                    :onPrevious="handlePrevious"
+                    :onNext="handleNext"
+                    :onFinish="handleFinish"
+                    :submitting="submitting"
+                    :validating="validating"
+                  />
+                </slot>
+              </template>
+              
+              <!-- 默认按钮 -->
+              <template v-else>
+                <v-btn
+                  v-if="index > 0 && (!submitter || submitter.showPrevious !== false)"
+                  text
+                  @click="handlePrevious"
+                  :disabled="submitting"
+                  v-bind="submitter && submitter.previousButtonProps"
+                >
+                  {{ (submitter && submitter.previousText) || previousButtonText }}
+                </v-btn>
+                <v-spacer v-else></v-spacer>
+
+                <div>
+                  <v-btn
+                    v-if="index < steps.length - 1"
+                    color="primary"
+                    @click="handleNext"
+                    :loading="validating"
+                    :disabled="submitting"
+                    v-bind="submitter && submitter.nextButtonProps"
+                  >
+                    {{ (submitter && submitter.nextText) || nextButtonText }}
+                  </v-btn>
+                  <v-btn
+                    v-else
+                    color="primary"
+                    @click="handleFinish"
+                    :loading="submitting"
+                    v-bind="submitter && submitter.submitButtonProps"
+                  >
+                    {{ (submitter && submitter.submitText) || finishButtonText }}
+                  </v-btn>
+                </div>
+              </template>
+            </div>
+          </v-stepper-content>
+        </v-stepper-items>
+      </v-stepper>
+    </template>
+  </div>
 </template>
 
 <script>
@@ -118,8 +282,13 @@ export default {
       type: Number,
       default: 0,
     },
-    // 当前激活步骤 (支持 .sync)
+    // 当前激活步骤 (支持 v-model)
     value: {
+      type: Number,
+      default: null,
+    },
+    // 当前步骤 (支持 .sync)
+    current: {
       type: Number,
       default: null,
     },
@@ -176,27 +345,112 @@ export default {
       type: Function,
       default: null,
     },
+    // 步骤变化回调
+    onCurrentChange: {
+      type: Function,
+      default: null,
+    },
+    // 表单字段变化回调
+    onFormChange: {
+      type: Function,
+      default: null,
+    },
+    // 传递给 v-stepper 的额外属性
+    stepsProps: {
+      type: Object,
+      default: () => ({}),
+    },
+    // 传递给所有步骤表单的公共属性
+    formProps: {
+      type: Object,
+      default: () => ({}),
+    },
+    // 自定义步骤表单渲染
+    stepFormRender: {
+      type: Function,
+      default: null,
+    },
+    // 提交按钮配置
+    submitter: {
+      type: [Object, Boolean],
+      default: null,
+      // {
+      //   render: false, // 隐藏按钮
+      //   render: Function, // 自定义渲染
+      //   showPrevious: true,
+      //   previousText: '上一步',
+      //   previousButtonProps: {},
+      //   nextText: '下一步',
+      //   nextButtonProps: {},
+      //   submitText: '提交',
+      //   submitButtonProps: {},
+      // }
+    },
+    // 容器样式
+    containerStyle: {
+      type: [Object, String],
+      default: null,
+    },
   },
   data() {
+    const initialIndex = this.current !== null ? this.current : 
+                        (this.value !== null ? this.value : this.initialStep);
     return {
-      currentStepIndex: this.value !== null ? this.value + 1 : this.initialStep + 1,
+      currentStepIndex: initialIndex + 1,
       formData: {},
       validating: false,
+      formMapRef: {}, // 存储所有步骤表单实例
     };
+  },
+  computed: {
+    // 合并表单属性
+    mergedFormProps() {
+      return {
+        ...this.formProps,
+        outlined: this.outlined,
+        dense: this.dense,
+      };
+    },
   },
   watch: {
     value(newVal) {
-      if (newVal !== null) {
+      if (newVal !== null && newVal + 1 !== this.currentStepIndex) {
         this.currentStepIndex = newVal + 1;
       }
     },
-    currentStepIndex(newVal) {
-      this.$emit('input', newVal - 1);
-      this.$emit('step-change', {
-        current: newVal - 1,
-        step: this.steps[newVal - 1],
-      });
+    current(newVal) {
+      if (newVal !== null && newVal + 1 !== this.currentStepIndex) {
+        this.currentStepIndex = newVal + 1;
+      }
     },
+    currentStepIndex(newVal, oldVal) {
+      const stepIndex = newVal - 1;
+      
+      // 触发 v-model 更新
+      this.$emit('input', stepIndex);
+      
+      // 触发 .sync 更新
+      this.$emit('update:current', stepIndex);
+      
+      // 触发步骤变化事件
+      this.$emit('step-change', {
+        current: stepIndex,
+        step: this.steps[stepIndex],
+      });
+      
+      // 触发 onCurrentChange 回调
+      if (this.onCurrentChange && oldVal !== undefined) {
+        this.onCurrentChange(stepIndex);
+      }
+    },
+  },
+  mounted() {
+    // 初始化表单实例映射
+    this.updateFormMapRef();
+  },
+  updated() {
+    // 更新表单实例映射
+    this.updateFormMapRef();
   },
   methods: {
     // 处理步骤点击
@@ -210,6 +464,29 @@ export default {
     handleStepFormChange(index, values) {
       this.$set(this.formData, `step${index}`, values);
       this.$emit('change', this.formData);
+      
+      // 触发 onFormChange 回调
+      if (this.onFormChange) {
+        this.onFormChange({
+          stepIndex: index,
+          values,
+          allValues: this.formData,
+        });
+      }
+    },
+
+    // 更新表单实例映射
+    updateFormMapRef() {
+      const newFormMapRef = {};
+      this.steps.forEach((step, index) => {
+        if (step.fields) {
+          const formRef = this.$refs[`stepForm${index}`];
+          if (formRef && formRef[0]) {
+            newFormMapRef[index] = formRef[0];
+          }
+        }
+      });
+      this.formMapRef = newFormMapRef;
     },
 
     // 上一步
@@ -321,13 +598,137 @@ export default {
     setFormData(data) {
       this.formData = { ...data };
     },
+
+    // 获取表单实例映射
+    getFormMapRef() {
+      return this.formMapRef;
+    },
+
+    // 获取指定步骤的表单实例
+    getStepFormRef(stepIndex) {
+      return this.formMapRef[stepIndex] || null;
+    },
+
+    // 验证所有步骤
+    async validateAll() {
+      const results = [];
+      for (let i = 0; i < this.steps.length; i++) {
+        const isValid = await this.validateCurrentStep(i);
+        results.push(isValid);
+      }
+      return results.every(r => r);
+    },
   },
 };
 </script>
 
 <style scoped>
+.jh-steps-form-container {
+  display: flex;
+  width: 100%;
+}
+
+/* 垂直布局样式 */
+.jh-steps-form-stepper {
+  width: 250px;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 16px;
+}
+
+.jh-steps-form-content {
+  flex: 1;
+  padding: 16px 24px;
+}
+
+.vertical-steps {
+  display: flex;
+  flex-direction: column;
+}
+
+.vertical-step-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 0;
+  position: relative;
+  cursor: default;
+}
+
+.vertical-step-item.editable {
+  cursor: pointer;
+}
+
+.vertical-step-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 40px;
+  width: 1px;
+  height: calc(100% - 16px);
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.vertical-step-item.completed:not(:last-child)::after {
+  background-color: #4caf50;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.vertical-step-item.active .step-number {
+  background-color: #1976d2;
+  color: white;
+}
+
+.vertical-step-item.completed .step-number {
+  background-color: #4caf50;
+  color: white;
+}
+
+.step-info {
+  flex: 1;
+}
+
+.step-title {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.vertical-step-item.active .step-title {
+  color: #1976d2;
+}
+
+.step-subtitle {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+  line-height: 1.2;
+}
+
 .jh-steps-form {
   width: 100%;
+}
+
+/* 水平布局时隐藏垂直步骤指示器 */
+.jh-steps-form-container:not(.is-vertical) .jh-steps-form-stepper {
+  display: none;
+}
+
+.jh-steps-form-container:not(.is-vertical) .jh-steps-form-content {
+  width: 100%;
+  padding: 0;
 }
 
 .step-content {

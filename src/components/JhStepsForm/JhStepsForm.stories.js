@@ -807,3 +807,418 @@ export const 带验证 = {
   }),
   args: {},
 };
+
+// v-model 控制步骤
+export const VModel控制步骤 = {
+  render: (args) => ({
+    components: { JhStepsForm },
+    data() {
+      return {
+        currentStep: 0,
+        steps: [
+          {
+            title: '步骤1',
+            fields: [
+              {
+                name: 'field1',
+                label: '字段1',
+                type: 'text',
+                cols: 12,
+              },
+            ],
+          },
+          {
+            title: '步骤2',
+            fields: [
+              {
+                name: 'field2',
+                label: '字段2',
+                type: 'text',
+                cols: 12,
+              },
+            ],
+          },
+          {
+            title: '步骤3',
+            fields: [
+              {
+                name: 'field3',
+                label: '字段3',
+                type: 'text',
+                cols: 12,
+              },
+            ],
+          },
+        ],
+      };
+    },
+    template: `
+      <v-container>
+        <v-alert type="info" text class="mb-4">
+          使用 v-model 控制当前步骤，当前步骤: {{ currentStep + 1 }}
+        </v-alert>
+        <v-btn-toggle v-model="currentStep" mandatory class="mb-4">
+          <v-btn small>步骤1</v-btn>
+          <v-btn small>步骤2</v-btn>
+          <v-btn small>步骤3</v-btn>
+        </v-btn-toggle>
+        <jh-steps-form
+          v-model="currentStep"
+          :steps="steps"
+          @finish="handleFinish"
+        />
+      </v-container>
+    `,
+    methods: {
+      handleFinish(data) {
+        console.log('完成表单:', data);
+        alert('表单提交成功!');
+      },
+    },
+  }),
+  args: {},
+};
+
+// 自定义提交按钮
+export const 自定义提交按钮 = {
+  render: (args) => ({
+    components: { JhStepsForm },
+    data() {
+      return {
+        steps: [
+          {
+            title: '基本信息',
+            fields: [
+              {
+                name: 'name',
+                label: '姓名',
+                type: 'text',
+                required: true,
+                cols: 12,
+              },
+            ],
+          },
+          {
+            title: '联系方式',
+            fields: [
+              {
+                name: 'email',
+                label: '邮箱',
+                type: 'email',
+                required: true,
+                cols: 12,
+              },
+            ],
+          },
+          {
+            title: '完成',
+            slot: 'step-finish',
+          },
+        ],
+      };
+    },
+    template: `
+      <v-container>
+        <v-alert type="info" text class="mb-4">
+          自定义按钮文本和样式
+        </v-alert>
+        <jh-steps-form
+          :steps="steps"
+          :submitter="{
+            previousText: '返回',
+            nextText: '继续',
+            submitText: '立即提交',
+            previousButtonProps: { color: 'secondary', outlined: true },
+            nextButtonProps: { color: 'primary', large: true },
+            submitButtonProps: { color: 'success', large: true },
+          }"
+          @finish="handleFinish"
+        >
+          <template #step-finish>
+            <v-alert type="success" text>
+              所有信息已填写完成，点击"立即提交"按钮完成操作
+            </v-alert>
+          </template>
+        </jh-steps-form>
+      </v-container>
+    `,
+    methods: {
+      handleFinish(data) {
+        console.log('完成表单:', data);
+        alert('表单提交成功!');
+      },
+    },
+  }),
+  args: {},
+};
+
+// 表单实例访问
+export const 表单实例访问 = {
+  render: (args) => ({
+    components: { JhStepsForm },
+    data() {
+      return {
+        steps: [
+          {
+            title: '步骤1',
+            fields: [
+              {
+                name: 'username',
+                label: '用户名',
+                type: 'text',
+                required: true,
+                cols: 12,
+              },
+            ],
+          },
+          {
+            title: '步骤2',
+            fields: [
+              {
+                name: 'email',
+                label: '邮箱',
+                type: 'email',
+                required: true,
+                cols: 12,
+              },
+            ],
+          },
+          {
+            title: '步骤3',
+            fields: [
+              {
+                name: 'phone',
+                label: '手机号',
+                type: 'tel',
+                required: true,
+                cols: 12,
+              },
+            ],
+          },
+        ],
+      };
+    },
+    template: `
+      <v-container>
+        <v-alert type="info" text class="mb-4">
+          演示如何访问表单实例进行操作
+        </v-alert>
+        <v-row class="mb-4">
+          <v-col>
+            <v-btn color="primary" @click="validateAll" small>验证所有步骤</v-btn>
+            <v-btn color="secondary" @click="getFormData" small class="ml-2">获取表单数据</v-btn>
+            <v-btn color="warning" @click="resetForm" small class="ml-2">重置表单</v-btn>
+            <v-btn color="info" @click="getFormMapRef" small class="ml-2">获取表单实例</v-btn>
+          </v-col>
+        </v-row>
+        <jh-steps-form
+          ref="stepsForm"
+          :steps="steps"
+          @finish="handleFinish"
+        />
+      </v-container>
+    `,
+    methods: {
+      async validateAll() {
+        const isValid = await this.$refs.stepsForm.validateAll();
+        alert('所有步骤验证结果: ' + (isValid ? '通过' : '失败'));
+        console.log('验证结果:', isValid);
+      },
+      getFormData() {
+        const data = this.$refs.stepsForm.getFormData();
+        console.log('表单数据:', data);
+        alert('表单数据已输出到控制台');
+      },
+      resetForm() {
+        this.$refs.stepsForm.reset();
+        alert('表单已重置');
+      },
+      getFormMapRef() {
+        const formMapRef = this.$refs.stepsForm.getFormMapRef();
+        console.log('表单实例映射:', formMapRef);
+        alert('表单实例已输出到控制台');
+      },
+      handleFinish(data) {
+        console.log('完成表单:', data);
+        alert('表单提交成功!');
+      },
+    },
+  }),
+  args: {},
+};
+
+// 步骤变化监听
+export const 步骤变化监听 = {
+  render: (args) => ({
+    components: { JhStepsForm },
+    data() {
+      return {
+        currentStep: 0,
+        stepHistory: [],
+        formChanges: [],
+        steps: [
+          {
+            title: '步骤1',
+            fields: [
+              {
+                name: 'field1',
+                label: '字段1',
+                type: 'text',
+                cols: 12,
+              },
+            ],
+          },
+          {
+            title: '步骤2',
+            fields: [
+              {
+                name: 'field2',
+                label: '字段2',
+                type: 'text',
+                cols: 12,
+              },
+            ],
+          },
+          {
+            title: '步骤3',
+            fields: [
+              {
+                name: 'field3',
+                label: '字段3',
+                type: 'text',
+                cols: 12,
+              },
+            ],
+          },
+        ],
+      };
+    },
+    template: `
+      <v-container>
+        <v-alert type="info" text class="mb-4">
+          监听步骤变化和表单字段变化事件
+        </v-alert>
+        <v-row>
+          <v-col cols="12" md="8">
+            <jh-steps-form
+              v-model="currentStep"
+              :steps="steps"
+              :on-current-change="handleStepChange"
+              :on-form-change="handleFormChange"
+              @finish="handleFinish"
+            />
+          </v-col>
+          <v-col cols="12" md="4">
+            <v-card outlined>
+              <v-card-title class="text-subtitle-1">步骤历史</v-card-title>
+              <v-card-text>
+                <v-chip
+                  v-for="(step, index) in stepHistory"
+                  :key="index"
+                  small
+                  class="ma-1"
+                >
+                  步骤 {{ step + 1 }}
+                </v-chip>
+              </v-card-text>
+            </v-card>
+            <v-card outlined class="mt-4">
+              <v-card-title class="text-subtitle-1">表单变化</v-card-title>
+              <v-card-text style="max-height: 300px; overflow-y: auto;">
+                <div v-for="(change, index) in formChanges" :key="index" class="text-caption mb-2">
+                  <strong>步骤{{ change.stepIndex + 1 }}:</strong> {{ JSON.stringify(change.values) }}
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    `,
+    methods: {
+      handleStepChange(stepIndex) {
+        console.log('步骤变化:', stepIndex);
+        this.stepHistory.push(stepIndex);
+      },
+      handleFormChange({ stepIndex, values, allValues }) {
+        console.log('表单变化:', { stepIndex, values, allValues });
+        this.formChanges.push({ stepIndex, values });
+        // 只保留最近10条记录
+        if (this.formChanges.length > 10) {
+          this.formChanges.shift();
+        }
+      },
+      handleFinish(data) {
+        console.log('完成表单:', data);
+        alert('表单提交成功!');
+      },
+    },
+  }),
+  args: {},
+};
+
+// 公共表单属性
+export const 公共表单属性 = {
+  render: (args) => ({
+    components: { JhStepsForm },
+    data() {
+      return {
+        steps: [
+          {
+            title: '步骤1',
+            fields: [
+              {
+                name: 'field1',
+                label: '字段1',
+                type: 'text',
+                hint: '这是提示信息',
+                cols: 12,
+              },
+              {
+                name: 'field2',
+                label: '字段2',
+                type: 'text',
+                hint: '这也是提示信息',
+                cols: 12,
+              },
+            ],
+          },
+          {
+            title: '步骤2',
+            fields: [
+              {
+                name: 'field3',
+                label: '字段3',
+                type: 'text',
+                hint: '提示信息会显示',
+                cols: 12,
+              },
+            ],
+          },
+        ],
+      };
+    },
+    template: `
+      <v-container>
+        <v-alert type="info" text class="mb-4">
+          使用 formProps 为所有步骤表单设置公共属性
+        </v-alert>
+        <jh-steps-form
+          :steps="steps"
+          :form-props="{
+            outlined: true,
+            dense: true,
+            hideDetails: false,
+          }"
+          @finish="handleFinish"
+        />
+      </v-container>
+    `,
+    methods: {
+      handleFinish(data) {
+        console.log('完成表单:', data);
+        alert('表单提交成功!');
+      },
+    },
+  }),
+  args: {},
+};
