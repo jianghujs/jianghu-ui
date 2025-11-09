@@ -1,7 +1,7 @@
 import JhModal from './JhModal.vue';
 
 export default {
-  title: '基础组件/JhModal',
+  title: '基础组件/JhModal - 弹窗',
   component: JhModal,
   parameters: {
     docs: {

@@ -15,6 +15,7 @@ import JhTreeSelect from './components/JhTreeSelect/JhTreeSelect.vue';
 
 // Layout Components
 import JhPageContainer from './components/JhPageContainer/JhPageContainer.vue';
+import JhCard from './components/JhCard/JhCard.vue';
 
 // Feedback Components
 import JhMask from './components/JhMask/JhMask.vue';
@@ -45,6 +46,7 @@ const components = {
   JhTreeSelect,
   // Layout Components
   JhPageContainer,
+  JhCard,
 
   // Pro Components
   JhForm,
@@ -96,6 +98,7 @@ export {
   JhTreeSelect,
   // Layout Components
   JhPageContainer,
+  JhCard,
 
   // Pro Components
   JhForm,

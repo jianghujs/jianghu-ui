@@ -1,7 +1,7 @@
 import JhDrawer from './JhDrawer.vue';
 
 export default {
-  title: '基础组件/JhDrawer',
+  title: '基础组件/JhDrawer - 抽屉',
   component: JhDrawer,
   parameters: {
     docs: {
