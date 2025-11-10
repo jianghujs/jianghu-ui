@@ -52,7 +52,7 @@
       :show-labels="false"
       :search-text="filterSearchText"
       :reset-text="filterResetText"
-      class="pa-0 -mx-3"
+      class="pa-0"
       @search="handleFilterSearch"
       @reset="handleFilterReset"
     >
@@ -1004,12 +1004,6 @@ export default {
   position: relative;
 }
 
-/* 卡片样式 */
-.jh-pro-table-card {
-  background: #fff;
-  border: 1px solid #f0f0f0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-}
 
 /* 幽灵模式 */
 .jh-pro-table-ghost {
@@ -1086,7 +1080,7 @@ export default {
 
 /* 工具栏 */
 .jh-pro-table-toolbar {
-  padding: 16px 24px !important;
+  padding: 16px 0 !important;
 }
 
 /* 表格额外内容区 */
