@@ -491,6 +491,70 @@ export default {
 - ✅ 移动端优化 - 响应式设计
 - ✅ 丰富的插槽系统 - 高度可定制
 
+## 🚀 最新增强能力（v2.1）
+
+### 1. 原生 v-data-table 属性透传
+通过 `dataTableProps` 或直接在 `<jh-table>` 上声明属性，即可传递 Vuetify `v-data-table` 的原生能力（如 `hide-default-footer`、`show-expand`、`item-class` 等），迁移老项目时几乎零成本。
+
+```vue
+<jh-table
+  :headers="headers"
+  :items="items"
+  hide-default-footer
+  :data-table-props="{ showExpand: true, disablePagination: true }"
+/>
+```
+
+### 2. 多列排序 & 受控排序
+- 新增 `sortBy`、`sortDesc`、`multiSort`、`mustSort` 属性
+- 新增 `sort-change`、`update:sortBy`、`update:sortDesc` 事件
+- 服务端模式自动携带 `sorter` 信息，便于后端直接解析
+
+```vue
+<jh-table
+  :headers="headers"
+  :request="fetchData"
+  multi-sort
+  :sort-by="['createdAt']"
+  :sort-desc="[true]"
+  @sort-change="({ sorter }) => console.log(sorter)"
+/>
+```
+
+### 3. 列状态持久化（columnsState）
+
+```vue
+<jh-table
+  :headers="headers"
+  :columns-state="{
+    persistenceKey: 'user-table-columns',
+    defaultVisible: { email: false },
+    value: customState
+  }"
+  @columns-state-change="val => customState = val"
+/>
+```
+
+> 会自动使用 `localStorage` 缓存列显示状态，刷新或重新登录依旧生效。
+
+### 4. 对齐 ProTable 的 rowSelection API
+- `rowSelection.type = 'radio' | 'checkbox'`
+- `rowSelection.defaultSelectedRowKeys`
+- `rowSelection.selectedRowKeys`（受控模式）
+- `rowSelection.onChange(selectedKeys, selectedRows)`
+
+```vue
+<jh-table
+  :headers="headers"
+  :items="items"
+  :row-selection="{
+    type: 'radio',
+    defaultSelectedRowKeys: [1],
+    onChange: (keys, rows) => console.log(keys, rows)
+  }"
+/>
+```
+
 ## 📱 响应式设计
 
 组件针对移动端进行了全面优化：
@@ -507,6 +571,13 @@ export default {
 - 自定义样式覆盖
 
 ## 📝 更新日志
+
+### v2.1.0 (2024-04)
+- ♻️ `dataTableProps` + `$attrs` 透传原生 `v-data-table` 能力，迁移更顺滑
+- ✨ 新增列状态持久化 `columnsState`，支持 `localStorage` 和受控模式
+- ✨ 新增 `sortBy`/`sortDesc`/`multiSort`/`mustSort` 以及 `sort-change` 事件
+- ✨ rowSelection 对齐 ProTable（`type`、`defaultSelectedRowKeys`、`selectedRowKeys`、`onChange`）
+- 🧼 selection 事件、`page`、`items-per-page`、`click:row` 等事件与 Vuetify 行为保持一致
 
 ### v2.0.0 (2024-01)
 - ✨ 新增 ProTable 样式系统（headerTitle, tooltip, cardBordered, ghost）

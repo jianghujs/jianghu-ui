@@ -334,27 +334,114 @@ export default {
   name: 'JhFormFields',
 
   props: {
-    fields: { type: Array, default: () => [] },
-    value: { type: Object, default: () => ({}) },
-    title: { type: String, default: '' },
-    description: { type: String, default: '' },
-    tooltip: { type: String, default: '' },
-    layout: { type: String, default: 'vertical', validator: (v) => ['horizontal', 'vertical', 'inline'].includes(v) },
-    showLabels: { type: Boolean, default: true },
-    labelWidth: { type: [Number, String], default: 'auto' },
-    labelAlign: { type: String, default: 'right', validator: (v) => ['left', 'right', 'center'].includes(v) },
-    showRequiredMark: { type: Boolean, default: true },
-    readonly: { type: Boolean, default: false },
-    disabled: { type: Boolean, default: false },
-    defaultDense: { type: Boolean, default: true },
-    defaultFilled: { type: Boolean, default: true },
-    defaultOutlined: { type: Boolean, default: false },
-    defaultSingleLine: { type: Boolean, default: true },
-    defaultColsMd: { type: Number, default: 6 },
-    hideDetails: { type: [Boolean, String], default: false },
-    labelClass: { type: String, default: 'jh-input-label' },
-    inputClass: { type: String, default: 'jh-v-input' },
-    rowClass: { type: String, default: '' },
+    // 字段配置列表
+    fields: {
+      type: Array,
+      default: () => []
+    },
+    // 表单的初始值
+    value: {
+      type: Object,
+      default: () => ({})
+    },
+    // 分组标题
+    title: {
+      type: String,
+      default: ''
+    },
+    // 分组描述
+    description: {
+      type: String,
+      default: ''
+    },
+    // 标题旁的 tooltip
+    tooltip: {
+      type: String,
+      default: ''
+    },
+    // 布局方式 horizontal | vertical | inline
+    layout: {
+      type: String,
+      default: 'vertical',
+      validator: (v) => ['horizontal', 'vertical', 'inline'].includes(v)
+    },
+    // 是否展示 label
+    showLabels: {
+      type: Boolean,
+      default: true
+    },
+    // label 固定宽度
+    labelWidth: {
+      type: [Number, String],
+      default: 'auto'
+    },
+    // label 对齐方式
+    labelAlign: {
+      type: String,
+      default: 'right',
+      validator: (v) => ['left', 'right', 'center'].includes(v)
+    },
+    // 是否展示必填星号
+    showRequiredMark: {
+      type: Boolean,
+      default: true
+    },
+    // 只读模式
+    readonly: {
+      type: Boolean,
+      default: false
+    },
+    // 禁用全部字段
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    // 默认 dense 样式
+    defaultDense: {
+      type: Boolean,
+      default: true
+    },
+    // 默认 filled 样式
+    defaultFilled: {
+      type: Boolean,
+      default: true
+    },
+    // 默认 outlined 样式
+    defaultOutlined: {
+      type: Boolean,
+      default: false
+    },
+    // 默认单行 label
+    defaultSingleLine: {
+      type: Boolean,
+      default: true
+    },
+    // md 断点下的默认列宽
+    defaultColsMd: {
+      type: Number,
+      default: 6
+    },
+    // 是否隐藏 Vuetify 的 details
+    hideDetails: {
+      type: [Boolean, String],
+      default: false
+    },
+    // label 的额外类名
+    labelClass: {
+      type: String,
+      default: 'jh-input-label'
+    },
+    // 输入框额外类名
+    inputClass: {
+      type: String,
+      default: 'jh-v-input'
+    },
+    // 行容器类名
+    rowClass: {
+      type: String,
+      default: ''
+    },
+    // 通用校验规则
     validationRules: {
       type: Object,
       default: () => ({
@@ -365,9 +452,21 @@ export default {
         integer: [v => !v || Number.isInteger(Number(v)) || '请输入整数'],
       }),
     },
-    dense: { type: Boolean, default: false },
-    bordered: { type: Boolean, default: false },
-    dependencies: { type: Array, default: () => [] },
+    // 压缩外边距/间距
+    dense: {
+      type: Boolean,
+      default: false
+    },
+    // 是否显示边框
+    bordered: {
+      type: Boolean,
+      default: false
+    },
+    // 字段依赖配置
+    dependencies: {
+      type: Array,
+      default: () => []
+    },
   },
 
   data() {

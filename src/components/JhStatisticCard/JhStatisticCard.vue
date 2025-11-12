@@ -85,7 +85,9 @@ const isVueEChartsAvailable = () => {
 const VChart = {
   name: 'VChart',
   props: {
+    // ECharts 的 option 配置
     option: Object,
+    // 是否在容器尺寸变化时自动 resize
     autoresize: {
       type: Boolean,
       default: true,

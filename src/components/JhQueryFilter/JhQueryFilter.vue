@@ -143,16 +143,19 @@ export default {
       default: true,
     },
 
+    // 是否使用 filled 风格输入框
     filled: {
       type: Boolean,
       default: true,
     },
 
+    // 是否使用 outlined 风格输入框
     outlined: {
       type: Boolean,
       default: false,
     },
 
+    // 是否单行显示标签
     singleLine: {
       type: Boolean,
       default: true,
@@ -164,16 +167,19 @@ export default {
       default: '查询',
     },
 
+    // 重置按钮文案
     resetText: {
       type: String,
       default: '重置',
     },
 
+    // 折叠状态下展示“展开”按钮文案
     expandText: {
       type: String,
       default: '展开',
     },
 
+    // 展开状态下展示“收起”按钮文案
     collapseText: {
       type: String,
       default: '收起',
@@ -210,16 +216,19 @@ export default {
       default: 'jh-v-input',
     },
 
+    // 每行容器的自定义类，用于控制间距
     rowClass: {
       type: String,
       default: 'ma-0',
     },
 
+    // 按钮区域根元素类名
     buttonClass: {
       type: String,
       default: 'gap-2',
     },
 
+    // 按钮列（v-col）的类名
     buttonColumnClass: {
       type: String,
       default: '',

@@ -56,11 +56,13 @@
 export default {
   name: 'JhPageContainer',
   props: {
+    // 页面主标题，显示在顶部 Title 区域
     pageName: {
       type: String,
       required: true,
       default: '页面标题'
     },
+    // 是否展示右上角的帮助按钮
     showHelpButton: {
       type: Boolean,
       default: true

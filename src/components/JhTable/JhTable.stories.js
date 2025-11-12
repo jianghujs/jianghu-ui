@@ -99,6 +99,30 @@ export default {
       control: 'number',
       description: '搜索防抖时间（毫秒）',
     },
+    dataTableProps: {
+      control: 'object',
+      description: '透传给 v-data-table 的原生属性 (例如 height、disable-pagination)',
+    },
+    sortBy: {
+      control: 'object',
+      description: '受控排序字段（字符串或数组）',
+    },
+    sortDesc: {
+      control: 'object',
+      description: '受控排序方向（布尔或数组）',
+    },
+    multiSort: {
+      control: 'boolean',
+      description: '是否允许多列排序',
+    },
+    mustSort: {
+      control: 'boolean',
+      description: '是否必须始终存在排序字段',
+    },
+    columnsState: {
+      control: 'object',
+      description: '列状态配置 { persistenceKey, defaultVisible, value }',
+    },
   },
   parameters: {
     docs: {
@@ -418,6 +442,20 @@ export const 服务端分页 = {
           );
         }
 
+        const sorter = params.sorter || {};
+        if (Array.isArray(sorter.sortBy) && sorter.sortBy.length > 0) {
+          filteredData.sort((a, b) => {
+            for (let i = 0; i < sorter.sortBy.length; i += 1) {
+              const key = sorter.sortBy[i];
+              const desc = sorter.sortDesc?.[i];
+              if (a[key] === b[key]) continue;
+              if (a[key] > b[key]) return desc ? -1 : 1;
+              if (a[key] < b[key]) return desc ? 1 : -1;
+            }
+            return 0;
+          });
+        }
+
         const total = filteredData.length;
         const start = (page - 1) * pageSize;
         const end = start + pageSize;
@@ -436,19 +474,158 @@ export const 服务端分页 = {
   }),
 };
 
+// 原生属性透传 + 列状态持久化
+export const 增强特性 = {
+  render: () => ({
+    components: { JhTable },
+    data() {
+      return {
+        headers: sampleHeaders,
+        columnsState: null,
+        toolbar: {
+          search: true,
+          refresh: true,
+          setting: true,
+          density: true,
+          fullscreen: true,
+        },
+        filterFields: [
+          { key: 'username', label: '用户名', type: 'text' },
+          {
+            key: 'status',
+            label: '状态',
+            type: 'select',
+            options: [
+              { label: '启用', value: '启用' },
+              { label: '禁用', value: '禁用' },
+              { label: '待审核', value: '待审核' },
+            ],
+          },
+        ],
+      };
+    },
+    template: `
+      <div>
+        <div class="mb-4 pa-4 purple lighten-5 rounded">
+          <strong>列状态持久化 + 多列排序 + v-data-table 属性透传</strong>
+          <p class="mb-0 mt-2">隐藏列 / 切换排序 / 设置高度，刷新页面后仍旧保持。</p>
+        </div>
+        <jh-table
+          ref="advancedTable"
+          :headers="headers"
+          :request="fetchData"
+          :toolbar="toolbar"
+          :columns-state="{
+            persistenceKey: 'storybook-jh-table-columns',
+            value: columnsState
+          }"
+          :show-filter="true"
+          :filter-fields="filterFields"
+          multi-sort
+          must-sort
+          :sort-by="['createdAt']"
+          :sort-desc="[true]"
+          hide-default-footer
+          :data-table-props="{ height: '420px', fixedHeader: true }"
+          @columns-state-change="handleColumnStateChange"
+          @sort-change="handleSortChange"
+          @filter-search="handleFilterChange"
+        >
+          <template #toolbar-extra>
+            <v-btn small outlined color="primary" @click="triggerManualReload">
+              <v-icon left x-small>mdi-refresh</v-icon>
+              重新拉取
+            </v-btn>
+          </template>
+        </jh-table>
+      </div>
+    `,
+    methods: {
+      async fetchData(params) {
+        console.log('增强特性请求参数:', params);
+        await new Promise(resolve => setTimeout(resolve, 400));
+        let filtered = [...allMockData];
+
+        if (params.search) {
+          filtered = filtered.filter(item =>
+            Object.values(item).some(val =>
+              String(val).toLowerCase().includes(params.search.toLowerCase())
+            )
+          );
+        }
+
+        if (params.filters && params.filters.status) {
+          filtered = filtered.filter(item => item.status === params.filters.status);
+        }
+
+        const sorter = params.sorter || {};
+        if (Array.isArray(sorter.sortBy) && sorter.sortBy.length > 0) {
+          filtered.sort((a, b) => {
+            for (let i = 0; i < sorter.sortBy.length; i += 1) {
+              const key = sorter.sortBy[i];
+              const desc = sorter.sortDesc?.[i];
+              if (a[key] === b[key]) continue;
+              if (a[key] > b[key]) return desc ? -1 : 1;
+              if (a[key] < b[key]) return desc ? 1 : -1;
+            }
+            return 0;
+          });
+        }
+
+        const page = params.page || 1;
+        const pageSize = params.pageSize || 10;
+        const total = filtered.length;
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+
+        return {
+          data: filtered.slice(start, end),
+          total,
+          success: true,
+        };
+      },
+      handleColumnStateChange(val) {
+        this.columnsState = val;
+      },
+      handleSortChange(payload) {
+        console.log('排序变化:', payload);
+      },
+      handleFilterChange(filters) {
+        console.log('筛选条件:', filters);
+      },
+      triggerManualReload() {
+        this.$refs.advancedTable?.reload?.();
+      },
+    },
+  }),
+};
+
 // 行选择
 export const 行选择 = {
   args: {
     ...基础示例.args,
-    showSelect: true,
+    rowSelection: {
+      type: 'checkbox',
+      defaultSelectedRowKeys: [1],
+    },
   },
   render: (args) => ({
     components: { JhTable },
     data() {
       return {
-        args,
+        args: {
+          ...args,
+          rowSelection: {
+            ...(args.rowSelection || {}),
+          },
+        },
         selectedRows: [],
       };
+    },
+    created() {
+      if (this.args.rowSelection) {
+        this.args.rowSelection.onChange = this.handleRowSelectionOnChange;
+      }
     },
     template: `
       <div>
@@ -480,6 +657,9 @@ export const 行选择 = {
       handleSelectionChange({ selectedRows }) {
         this.selectedRows = selectedRows;
         console.log('选中的行:', selectedRows);
+      },
+      handleRowSelectionOnChange(keys, rows) {
+        console.log('rowSelection.onChange:', keys, rows);
       },
       clearSelection() {
         this.$refs.tableRef.clearSelection();
