@@ -15,21 +15,6 @@
             </v-tooltip>
           </slot>
         </div>
-        <!-- 左侧操作按钮 -->
-        <div v-if="$slots['toolbar-actions']" class="jh-pro-table-header-actions">
-          <slot name="toolbar-actions">
-            <v-btn
-              v-if="showCreateButton"
-              color="success"
-              class="mr-2"
-              @click.stop="$emit('create-click')"
-              small
-            >
-              <v-icon left small>mdi-plus</v-icon>
-              <span class="d-none d-sm-inline">新增</span>
-            </v-btn>
-          </slot>
-        </div>
       </div>
       <div class="jh-pro-table-header-right">
         <!-- 右侧额外内容 -->
