@@ -16,26 +16,32 @@
 export default {
   name: 'JhMarkdownEditor',
   props: {
+    // 双向绑定的 Markdown 文本内容
     value: {
       type: String,
       default: ""
     },
+    // 编辑器空状态提示
     placeholder: {
       type: String,
       default: "请输入内容..."
     },
+    // 编辑器容器高度
     height: {
       type: String,
       default: 'calc(100vh - 400px)'
     },
+    // 编辑器容器宽度百分比
     width: {
       type: Number,
       default: 100
     },
+    // Editor.md 依赖库的静态资源路径
     editorPath: {
       type: String,
       default: '/public/plugins/editor.md/lib/'
     },
+    // 自定义工具栏按钮列表
     toolbarIcons: {
       type: Array,
       default: () => [
@@ -47,6 +53,7 @@ export default {
         "|", "image", "code", "table"
       ]
     },
+    // 是否只读模式（禁用编辑）
     readonly: {
       type: Boolean,
       default: false

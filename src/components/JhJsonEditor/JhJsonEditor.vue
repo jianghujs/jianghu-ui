@@ -13,24 +13,29 @@
 export default {
   name: 'JhJsonEditor',
   props: {
+    // 编辑器绑定的 JSON 数据，可以是字符串或对象
     value: {
       type: [String, Number, Object, Array],
       default: () => ({})
     },
+    // 初始化时是否展开所有节点
     expandedOnStart: {
       type: Boolean,
       default: false
     },
+    // 默认模式 tree | code | form | text | view
     mode: {
       type: String,
       default: "code"
     },
+    // 可切换的模式集合
     modes: {
       type: Array,
       default: function () {
         return ["tree", "code", "form", "text", "view"];
       }
     },
+    // 编辑器容器高度
     height: {
       type: String,
       default: 'calc(100vh - 240px)'

@@ -79,42 +79,37 @@
 export default {
   name: 'JhFileInput',
   props: {
+    // 已选文件集合，可为 File[]、字符串路径数组或单个字符串
     value: {
       type: [Array, String],
       default: () => []
-      /**
-       * 文件数组
-       * [{
-       *   name: '文件名',
-       *   size: 文件大小,
-       *   type: '文件类型'
-       * }]
-       * or
-       * ['xx/文件1.jpg', 'xx/文件2.pdf', 'xx/文件3.docx']
-       * or
-       * 'xx/文件.jpg'
-       */
     },
+    // 限制最大可上传文件数，0 表示不限制
     maxFiles: {
       type: Number,
       default: 0  // 0 表示不限制
     },
+    // input accept 属性，控制允许的文件类型
     accept: {
       type: String,
       default: '*/*'  // 默认接受所有文件类型
     },
+    // 是否允许多选
     multiple: {
       type: Boolean,
       default: false
     },
+    // 额外的校验规则
     rules: {
       type: Array,
       default: () => []
     },
+    // 只读模式（禁用上传和删除）
     readonly: {
       type: Boolean,
       default: false
     },
+    // 上传接口需要拼接的路径前缀
     uploadPrefix: {
       type: String,
       default: '/upload/'

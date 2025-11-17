@@ -1,5 +1,5 @@
 <template>
-  <div :class="['jh-pro-table', { 'jh-pro-table-card': cardBordered, 'jh-pro-table-ghost': ghost }]">
+  <div :class="wrapperClass" :style="wrapperStyle">
     <!-- 表格标题区 -->
     <div v-if="headerTitle || $slots['header-title'] || $slots['toolbar-actions'] || $slots['toolbar-extra']" class="jh-pro-table-header">
       <div class="jh-pro-table-header-left">
@@ -13,21 +13,6 @@
               </template>
               <span>{{ tooltip }}</span>
             </v-tooltip>
-          </slot>
-        </div>
-        <!-- 左侧操作按钮 -->
-        <div v-if="$slots['toolbar-actions']" class="jh-pro-table-header-actions">
-          <slot name="toolbar-actions">
-            <v-btn
-              v-if="showCreateButton"
-              color="success"
-              class="mr-2"
-              @click.stop="$emit('create-click')"
-              small
-            >
-              <v-icon left small>mdi-plus</v-icon>
-              <span class="d-none d-sm-inline">新增</span>
-            </v-btn>
           </slot>
         </div>
       </div>
@@ -68,7 +53,7 @@
     </jh-query-filter>
 
     <!-- 批量操作提示栏 -->
-    <div v-if="showSelect && selectedItems.length > 0" class="jh-pro-table-alert">
+    <div v-if="showSelectComputed && selectedItems.length > 0" class="jh-pro-table-alert">
       <div class="jh-pro-table-alert-info">
         <slot name="alert" :selected-row-keys="selectedRowKeys" :selected-rows="selectedItems">
           <v-icon small class="mr-2" color="primary">mdi-checkbox-marked-circle</v-icon>
@@ -226,26 +211,36 @@
     <!-- 表格 -->
     <v-data-table
       ref="dataTable"
+      v-bind="mergedDataTableProps"
+      v-on="dataTableListeners"
       :headers="visibleHeaders"
       :items="currentItems"
       :search="searchInputInternal"
       :footer-props="currentFooterProps"
       :items-per-page="currentItemsPerPage"
-      :page.sync="currentPage"
+      :page="currentPage"
       :server-items-length="serverItemsLength"
       :mobile-breakpoint="mobileBreakpoint"
       :loading="currentLoading"
       :checkbox-color="checkboxColor"
       :class="[tableClassComputed, densityClass]"
       :fixed-header="fixedHeader"
-      :show-select="showSelect"
-      :single-select="singleSelect"
+      :show-select="showSelectComputed"
+      :single-select="singleSelectComputed"
       :value="selectedItems"
+      :item-key="rowKey"
+      :dense="dense"
+      :multi-sort="multiSort"
+      :must-sort="mustSort"
+      :sort-by="internalSortBy"
+      :sort-desc="internalSortDesc"
       class="jh-fixed-table-height elevation-0 mb-xs-4 mx-3 mx-md-0 mt-3"
       @click:row="handleRowClick"
       @input="handleSelectionChange"
       @update:page="handlePageChange"
       @update:items-per-page="handleItemsPerPageChange"
+      @update:sort-by="handleSortByUpdate"
+      @update:sort-desc="handleSortDescUpdate"
     >
       <!-- 自定义表头插槽 -->
       <template
@@ -436,6 +431,7 @@ import JhQueryFilter from '../JhQueryFilter/JhQueryFilter.vue';
 
 export default {
   name: 'JhTable',
+  inheritAttrs: false,
   components: {
     JhQueryFilter,
   },
@@ -531,6 +527,27 @@ export default {
       type: String,
       default: null
     },
+    // 原始 v-data-table 透传配置
+    dataTableProps: {
+      type: Object,
+      default: () => ({})
+    },
+    sortBy: {
+      type: [Array, String],
+      default: () => []
+    },
+    sortDesc: {
+      type: [Array, Boolean],
+      default: () => []
+    },
+    multiSort: {
+      type: Boolean,
+      default: false
+    },
+    mustSort: {
+      type: Boolean,
+      default: false
+    },
 
     // ========== 按钮配置 ==========
     showCreateButton: {
@@ -568,6 +585,15 @@ export default {
       //     }
       //   ]
       // }
+    },
+    // 列状态配置
+    columnsState: {
+      type: Object,
+      default: () => ({
+        persistenceKey: '',
+        defaultVisible: null,
+        value: null
+      })
     },
 
     // ========== 分页配置 ==========
@@ -694,7 +720,11 @@ export default {
       selectedItems: [],
       filterValues: {},
       pollingTimer: null,
-      searchDebounceTimer: null
+      searchDebounceTimer: null,
+      internalSortBy: this.normalizeSortBy(this.sortBy),
+      internalSortDesc: this.normalizeSortDesc(this.sortDesc),
+      sortChangeTimer: null,
+      hasAppliedDefaultRowSelection: false
     };
   },
   computed: {
@@ -758,6 +788,54 @@ export default {
         showCurrentPage: true
       };
       return { ...defaultProps, ...this.footerProps };
+    },
+    showSelectComputed() {
+      if (this.rowSelection === false) return false;
+      if (this.rowSelection && typeof this.rowSelection === 'object') {
+        return this.rowSelection.show !== false;
+      }
+      return this.showSelect;
+    },
+    singleSelectComputed() {
+      if (this.rowSelection && this.rowSelection.type === 'radio') {
+        return true;
+      }
+      return this.singleSelect;
+    },
+    isRowSelectionControlled() {
+      return !!(this.rowSelection && Array.isArray(this.rowSelection.selectedRowKeys));
+    },
+    wrapperClass() {
+      return [
+        'jh-pro-table',
+        this.$attrs.class,
+        {
+          'jh-pro-table-card': this.cardBordered,
+          'jh-pro-table-ghost': this.ghost
+        }
+      ];
+    },
+    wrapperStyle() {
+      return this.$attrs.style || null;
+    },
+    mergedDataTableProps() {
+      const { class: cls, style, ...rest } = this.$attrs || {};
+      return {
+        ...rest,
+        ...this.dataTableProps
+      };
+    },
+    dataTableListeners() {
+      const {
+        'click:row': clickRow,
+        input,
+        'update:page': updatePage,
+        'update:items-per-page': updateItemsPerPage,
+        'update:sort-by': updateSortBy,
+        'update:sort-desc': updateSortDesc,
+        ...rest
+      } = this.$listeners || {};
+      return rest;
     }
   },
   watch: {
@@ -770,6 +848,7 @@ export default {
     items(val) {
       if (!this.request) {
         this.currentItems = val || [];
+        this.$nextTick(() => this.applySelectionState());
       }
     },
     loading(val) {
@@ -792,6 +871,35 @@ export default {
     },
     size(val) {
       this.currentDensity = val;
+    },
+    sortBy(val) {
+      this.internalSortBy = this.normalizeSortBy(val);
+      this.scheduleSortChangeEmit();
+    },
+    sortDesc(val) {
+      this.internalSortDesc = this.normalizeSortDesc(val);
+      this.scheduleSortChangeEmit();
+    },
+    rowSelection: {
+      deep: true,
+      handler() {
+        this.hasAppliedDefaultRowSelection = false;
+        this.$nextTick(() => this.applySelectionState());
+      }
+    },
+    columnsState: {
+      deep: true,
+      handler(newVal) {
+        if (newVal && typeof newVal.value !== 'undefined' && newVal.value !== null) {
+          this.applyExternalColumnState(newVal.value);
+        }
+      }
+    },
+    showSelect() {
+      this.$nextTick(() => this.applySelectionState());
+    },
+    currentItems() {
+      this.$nextTick(() => this.applySelectionState());
     }
   },
   mounted() {
@@ -802,6 +910,7 @@ export default {
     }
     // 启动轮询
     this.startPolling();
+    this.$nextTick(() => this.applySelectionState());
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize);
@@ -809,27 +918,48 @@ export default {
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
     }
+    if (this.sortChangeTimer) {
+      clearTimeout(this.sortChangeTimer);
+    }
   },
   methods: {
     // 初始化列配置
     initColumns(headers) {
-      this.internalColumns = headers.map(h => ({
-        ...h,
-        visible: h.visible !== false,
-        text: h.text || h.title,
-        value: h.value || h.dataIndex || h.key
-      }));
+      const persistedState = this.getPersistedColumnState();
+      const externalState = this.columnsState?.value;
+      const defaultVisible = this.columnsState?.defaultVisible;
+      this.internalColumns = headers.map(h => {
+        const value = h.value || h.dataIndex || h.key;
+        const baseVisible = h.visible !== false;
+        const visible = this.resolveColumnVisible({
+          value,
+          baseVisible,
+          externalState,
+          persistedState,
+          defaultVisible
+        });
+        return {
+          ...h,
+          visible,
+          initiallyVisible: baseVisible,
+          text: h.text || h.title,
+          value
+        };
+      });
     },
     // 切换列显示
     toggleColumn(col) {
       col.visible = !col.visible;
+      this.emitColumnStateChange();
       this.$forceUpdate();
     },
     // 重置列配置
     resetColumns() {
       this.internalColumns.forEach(col => {
-        col.visible = true;
+        col.visible = col.initiallyVisible;
       });
+      this.clearPersistedColumnState();
+      this.emitColumnStateChange();
       this.$forceUpdate();
     },
     // 刷新表格
@@ -891,18 +1021,25 @@ export default {
     // 行点击
     handleRowClick(item, event) {
       this.$emit('row-click', item, event);
+      this.$emit('click:row', item, event);
     },
     // 选择改变
     handleSelectionChange(selectedItems) {
       this.selectedItems = selectedItems;
-      this.$emit('selection-change', {
+      const payload = {
         selectedRowKeys: selectedItems.map(item => item[this.rowKey]),
         selectedRows: selectedItems
-      });
+      };
+      this.$emit('selection-change', payload);
+      this.$emit('input', selectedItems);
+      if (this.rowSelection && typeof this.rowSelection.onChange === 'function') {
+        this.rowSelection.onChange(payload.selectedRowKeys, selectedItems);
+      }
     },
     // 页码改变
     handlePageChange(page) {
       this.currentPage = page;
+      this.$emit('update:page', page);
       if (this.request) {
         this.reload();
       }
@@ -911,6 +1048,7 @@ export default {
     handleItemsPerPageChange(itemsPerPage) {
       this.currentItemsPerPage = itemsPerPage;
       this.currentPage = 1;
+      this.$emit('update:items-per-page', itemsPerPage);
       if (this.request) {
         this.reload();
       }
@@ -943,7 +1081,7 @@ export default {
           page: this.currentPage,
           pageSize: this.currentItemsPerPage,
           search: this.searchInputInternal,
-          sorter: {},
+          sorter: this.buildSorterPayload(),
           filters: this.filterValues // 包含高级筛选的值
         };
 
@@ -952,6 +1090,7 @@ export default {
         if (response && response.success !== false) {
           this.currentItems = response.data || response.list || [];
           this.serverItemsLength = response.total || response.totalCount || this.currentItems.length;
+          this.$nextTick(() => this.applySelectionState());
         }
       } catch (error) {
         console.error('Failed to load data:', error);
@@ -969,6 +1108,12 @@ export default {
     clearSelection() {
       this.selectedItems = [];
       this.$refs.dataTable?.clearSelection?.();
+      const payload = { selectedRowKeys: [], selectedRows: [] };
+      this.$emit('selection-change', payload);
+      this.$emit('input', []);
+      if (this.rowSelection && typeof this.rowSelection.onChange === 'function') {
+        this.rowSelection.onChange([], []);
+      }
     },
     // 获取选中的行
     getSelectedRows() {
@@ -992,6 +1137,171 @@ export default {
         clearInterval(this.pollingTimer);
         this.pollingTimer = null;
       }
+    },
+    resolveColumnVisible({ value, baseVisible, externalState, persistedState, defaultVisible }) {
+      if (externalState && Object.prototype.hasOwnProperty.call(externalState, value)) {
+        return externalState[value];
+      }
+      if (persistedState && Object.prototype.hasOwnProperty.call(persistedState, value)) {
+        return persistedState[value];
+      }
+      if (defaultVisible && Object.prototype.hasOwnProperty.call(defaultVisible, value)) {
+        return defaultVisible[value];
+      }
+      return baseVisible;
+    },
+    getColumnStateSnapshot() {
+      return this.internalColumns.reduce((acc, col) => {
+        acc[col.value] = col.visible !== false;
+        return acc;
+      }, {});
+    },
+    emitColumnStateChange() {
+      const snapshot = this.getColumnStateSnapshot();
+      this.$emit('columns-state-change', snapshot);
+      if (this.columnsState && typeof this.columnsState.onChange === 'function') {
+        this.columnsState.onChange(snapshot);
+      }
+      this.persistColumnState(snapshot);
+    },
+    getPersistedColumnState() {
+      if (!this.columnsState || !this.columnsState.persistenceKey) return null;
+      if (typeof window === 'undefined') return null;
+      try {
+        const raw = window.localStorage.getItem(this.columnsState.persistenceKey);
+        return raw ? JSON.parse(raw) : null;
+      } catch (error) {
+        console.warn('[JhTable] Failed to parse persisted column state:', error);
+        return null;
+      }
+    },
+    persistColumnState(state) {
+      if (!this.columnsState || !this.columnsState.persistenceKey) return;
+      if (typeof window === 'undefined') return;
+      try {
+        if (state) {
+          window.localStorage.setItem(this.columnsState.persistenceKey, JSON.stringify(state));
+        } else {
+          window.localStorage.removeItem(this.columnsState.persistenceKey);
+        }
+      } catch (error) {
+        console.warn('[JhTable] Failed to persist column state:', error);
+      }
+    },
+    clearPersistedColumnState() {
+      if (!this.columnsState || !this.columnsState.persistenceKey) return;
+      if (typeof window === 'undefined') return;
+      try {
+        window.localStorage.removeItem(this.columnsState.persistenceKey);
+      } catch (error) {
+        console.warn('[JhTable] Failed to clear column state:', error);
+      }
+    },
+    applyExternalColumnState(state) {
+      if (!state) return;
+      this.internalColumns = this.internalColumns.map(col => ({
+        ...col,
+        visible: Object.prototype.hasOwnProperty.call(state, col.value) ? state[col.value] : col.visible
+      }));
+      this.$forceUpdate();
+    },
+    normalizeSortBy(value) {
+      if (Array.isArray(value)) return value;
+      if (typeof value === 'string' && value) return [value];
+      return [];
+    },
+    normalizeSortDesc(value) {
+      if (Array.isArray(value)) return value;
+      if (typeof value === 'boolean') return [value];
+      return [];
+    },
+    handleSortByUpdate(val) {
+      this.internalSortBy = this.normalizeSortBy(val);
+      this.scheduleSortChangeEmit();
+    },
+    handleSortDescUpdate(val) {
+      if (Array.isArray(val)) {
+        this.internalSortDesc = val;
+      } else if (typeof val === 'boolean') {
+        this.internalSortDesc = [val];
+      } else {
+        this.internalSortDesc = [];
+      }
+      this.scheduleSortChangeEmit();
+    },
+    scheduleSortChangeEmit() {
+      if (this.sortChangeTimer) {
+        clearTimeout(this.sortChangeTimer);
+      }
+      this.sortChangeTimer = setTimeout(() => {
+        this.sortChangeTimer = null;
+        this.emitSortChange();
+      }, 0);
+    },
+    emitSortChange() {
+      this.$emit('update:sortBy', this.internalSortBy);
+      this.$emit('update:sortDesc', this.internalSortDesc);
+      this.$emit('sort-change', {
+        sortBy: this.internalSortBy,
+        sortDesc: this.internalSortDesc,
+        sorter: this.buildSorterPayload()
+      });
+      if (this.request) {
+        this.currentPage = 1;
+        this.$emit('update:page', 1);
+        this.reload();
+      }
+    },
+    buildSorterPayload() {
+      if (!this.internalSortBy.length) return {};
+      const order = {};
+      this.internalSortBy.forEach((key, index) => {
+        order[key] = this.internalSortDesc[index] ? 'desc' : 'asc';
+      });
+      return {
+        sortBy: this.internalSortBy,
+        sortDesc: this.internalSortDesc,
+        order
+      };
+    },
+    applySelectionState() {
+      if (!this.showSelectComputed) {
+        if (this.selectedItems.length) {
+          this.selectedItems = [];
+          this.$emit('input', []);
+        }
+        return;
+      }
+      const controlledKeys = this.getControlledRowKeys();
+      if (controlledKeys) {
+        this.syncSelectionByKeys(controlledKeys);
+      } else {
+        this.applyDefaultRowSelection();
+      }
+    },
+    getControlledRowKeys() {
+      if (this.rowSelection && Array.isArray(this.rowSelection.selectedRowKeys)) {
+        return this.rowSelection.selectedRowKeys;
+      }
+      return null;
+    },
+    syncSelectionByKeys(keys) {
+      if (!Array.isArray(keys)) return;
+      const keySet = new Set(keys);
+      const matched = this.currentItems.filter(item => keySet.has(item[this.rowKey]));
+      this.selectedItems = matched;
+      this.$emit('input', matched);
+    },
+    applyDefaultRowSelection() {
+      if (this.hasAppliedDefaultRowSelection) return;
+      if (!this.rowSelection || !Array.isArray(this.rowSelection.defaultSelectedRowKeys)) return;
+      const keySet = new Set(this.rowSelection.defaultSelectedRowKeys);
+      const matched = this.currentItems.filter(item => keySet.has(item[this.rowKey]));
+      if (matched.length) {
+        this.selectedItems = matched;
+        this.$emit('input', matched);
+      }
+      this.hasAppliedDefaultRowSelection = true;
     }
   }
 };

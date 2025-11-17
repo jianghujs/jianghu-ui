@@ -1,24 +1,16 @@
-﻿# Repository Guidelines
+# Repository Guidelines
 
 ## Project Structure & Module Organization
-`src/` hosts all deliverable code: Vue 2 components live in `src/components/Jh*/` (one Vue file plus stories, README, and optional assets), shared tokens live in `src/style/` and helpers in `src/utils/`. `src/index.js` exports the npm and CDN surface. `.storybook/` contains the Storybook runtime plus MDX docs, `public/` serves static assets, and `dist/` plus `storybook-static/` are build outputs that stay untracked. Scenario sandboxes belong in `examples/` or `.test/jianghu-project/` when you need to mimic the upstream Jianghu host.
+Source lives in `src/`, with Vue single-file components grouped under `src/components/Jh*` (each folder keeps the `.vue` file plus `*.stories.js`). Utilities sit in `src/utils`, and Storybook MDX docs (e.g., `Introduction.stories.mdx`) stay at the root of `src`. Storybook config is in `.storybook/`. Build artifacts drop to `dist/` (library) and `storybook-static/` (docs); do not hand-edit them. Long-form docs, playground snippets, and public assets stay in `doc/`, `examples/`, and `public/`.
 
 ## Build, Test, and Development Commands
-- `npm install` - install pinned dependencies (prefer npm; if you use pnpm also update `pnpm-lock.yaml`).
-- `npm run storybook` - start Storybook at http://localhost:6006 with hot reload.
-- `npm run build-storybook` - produce `storybook-static/` for review or gh-pages.
-- `npm run serve-storybook` - wraps `http-server` to preview the static bundle.
-- `npm run build` / `npm run build:watch` - webpack builds the distributable `dist/` files.
-- `npm run deploy` - runs build plus docs and publishes Storybook via `gh-pages` (requires repo access).
+Run `npm install` to pull Vue 2, Vuetify 2, and Storybook. `npm run storybook` serves the interactive docs on `http://localhost:6006`. `npm run build-storybook` creates the static `storybook-static/` publish folder. `npm run build` compiles the distributable bundle via `webpack.config.js`, while `npm run build:watch` keeps it live during local work. `npm run serve-storybook` previews the static site, and `npm run deploy` (build + gh-pages) is for maintainers after review.
 
 ## Coding Style & Naming Conventions
-Follow the Vue Options API with 2-space indentation, single quotes in JS, and kebab-case prop/event names. Components and directories stay under the `Jh` prefix (`JhTable`, `JhFormList`). Shared mixins or tokens belong in `src/utils/` or `src/style/`. New stories live next to the component as `<Component>.stories.js` and should use grouped titles such as `Components/JhTable`. Reference Tailwind utility classes via `src/tailwind.css` and keep SCSS blocks scoped.
+Stick to 2-space indentation in Vue SFCs and JS files. Components use PascalCase directories/files (`JhCard/JhCard.vue`), export a matching name, and declare props/methods in camelCase. Emit names and custom events stay kebab-case to match Vue 2 templates. Keep Storybook stories colocated as `Component.stories.js` using CSF with minimal controls. No enforced linter exists, so mirror the surrounding style and avoid sweeping formatting-only changes.
 
 ## Testing Guidelines
-Storybook doubles as the living spec, so every feature needs at least one args-based story plus MDX notes when UX changes. During development run `npm run storybook` and smoke the relevant controls; before publishing run `npm run build-storybook` to catch static build failures. Integration flows that rely on Jianghu data should be mirrored inside `.test/jianghu-project/` HTML harnesses so the host team can manually verify them.
+Visual verification runs through Storybook; each feature or regression fix should include a new or updated story/MDX note that captures edge states (loading, error, RTL). Before a PR, run `npm run storybook` for interactive QA and `npm run build-storybook` to verify static output. If you add non-visual utilities, drop lightweight Jest-style tests under `src/__tests__/` (create as needed) and link scenarios from your stories.
 
 ## Commit & Pull Request Guidelines
-Commits are short and imperative (`jhTable`, `JhList: add filters`). Keep diffs focused and avoid committing `dist/` or `storybook-static/` unless cutting a release. Pull requests should include a concise description of the user impact, the stories touched, linked issues, and screenshots or GIFs for UI shifts. Mention any follow-up tasks if you defer work.
-
-## AI & Automation Notes
-When pairing with AI agents, preload `README.md`, `AI_KNOWLEDGE_BASE.md`, and `.cursorrules` so generated diffs stay context aware, and summarize which files you changed at the end of the session.
+History favors short, imperative commits that name the component (`jhTable`, `JhStepsForm`). Do the same: `<component|feature>: <brief intent>` in English or Chinese, but stay consistent within a PR. For pull requests provide: (1) change summary and user impact, (2) linked issue, (3) screenshots/GIFs for UI work, and (4) commands executed (`npm run storybook`, `npm run build`). Keep PRs component-scoped and call out breaking props or slot changes explicitly.

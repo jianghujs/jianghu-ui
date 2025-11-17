@@ -266,27 +266,113 @@
 export default {
   name: 'JhList',
   props: {
-    dataSource: { type: Array, default: () => [] },
-    request: { type: Function, default: null },
-    rowKey: { type: [String, Function], default: 'id' },
-    metas: { type: Object, default: () => ({}) },
-    layout: { type: String, default: 'list', validator: (v) => ['list', 'grid', 'card'].includes(v) },
-    grid: { type: Object, default: null },
-    size: { type: String, default: 'default', validator: (v) => ['small', 'default', 'large'].includes(v) },
-    split: { type: Boolean, default: true },
-    pagination: { type: [Object, Boolean], default: () => ({ current: 1, pageSize: 10, total: 0 }) },
-    rowSelection: { type: [Object, Boolean], default: null },
-    checkboxColor: { type: String, default: 'primary' },
-    expandable: { type: [Object, Boolean], default: null },
-    headerTitle: { type: String, default: '' },
-    tooltip: { type: String, default: '' },
-    cardBordered: { type: Boolean, default: true },
-    ghost: { type: Boolean, default: false },
-    toolbar: { type: [Object, Boolean], default: () => ({ search: true, refresh: true, layout: true, size: true }) },
-    search: { type: [Object, Boolean], default: false },
-    loading: { type: Boolean, default: false },
-    polling: { type: Number, default: 0 },
-    debounceTime: { type: Number, default: 300 }
+    // 静态数据源（非 request 模式）
+    dataSource: {
+      type: Array,
+      default: () => []
+    },
+    // 远程请求函数（返回 Promise）
+    request: {
+      type: Function,
+      default: null
+    },
+    // 行唯一键，可为字段名或函数
+    rowKey: {
+      type: [String, Function],
+      default: 'id'
+    },
+    // 字段映射配置（标题、描述等）
+    metas: {
+      type: Object,
+      default: () => ({})
+    },
+    // 展示布局 list | grid | card
+    layout: {
+      type: String,
+      default: 'list',
+      validator: (v) => ['list', 'grid', 'card'].includes(v)
+    },
+    // Grid 布局参数（cols、gutter 等）
+    grid: {
+      type: Object,
+      default: null
+    },
+    // 尺寸 small | default | large
+    size: {
+      type: String,
+      default: 'default',
+      validator: (v) => ['small', 'default', 'large'].includes(v)
+    },
+    // 是否展示分割线
+    split: {
+      type: Boolean,
+      default: true
+    },
+    // 分页配置（false 关闭分页）
+    pagination: {
+      type: [Object, Boolean],
+      default: () => ({ current: 1, pageSize: 10, total: 0 })
+    },
+    // 行选择配置
+    rowSelection: {
+      type: [Object, Boolean],
+      default: null
+    },
+    // 复选框颜色
+    checkboxColor: {
+      type: String,
+      default: 'primary'
+    },
+    // 行展开配置
+    expandable: {
+      type: [Object, Boolean],
+      default: null
+    },
+    // 标题文本
+    headerTitle: {
+      type: String,
+      default: ''
+    },
+    // 标题提示
+    tooltip: {
+      type: String,
+      default: ''
+    },
+    // 是否展示卡片边框
+    cardBordered: {
+      type: Boolean,
+      default: true
+    },
+    // 幽灵模式（无背景）
+    ghost: {
+      type: Boolean,
+      default: false
+    },
+    // 工具栏配置或开关
+    toolbar: {
+      type: [Object, Boolean],
+      default: () => ({ search: true, refresh: true, layout: true, size: true })
+    },
+    // 顶部搜索配置（false 关闭）
+    search: {
+      type: [Object, Boolean],
+      default: false
+    },
+    // 全局加载态
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    // 轮询刷新间隔（ms，0 关闭）
+    polling: {
+      type: Number,
+      default: 0
+    },
+    // 搜索输入防抖时间
+    debounceTime: {
+      type: Number,
+      default: 300
+    }
   },
   data() {
     return {

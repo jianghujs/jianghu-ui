@@ -279,23 +279,35 @@ const TreeNode = {
     </div>
   `,
   props: {
+    // 当前节点对象
     node: {
       type: Object,
       required: true
     },
+    // 当前节点所属层级
     level: {
       type: Number,
       default: 0
     },
+    // 选择模式（single/multiple）
     mode: String,
+    // 是否允许点击节点本身选择
     allowSelectNode: Boolean,
+    // 展开的节点 key 列表
     expandedNodes: Array,
+    // 临时选中节点集合
     tempSelectedNodes: Array,
+    // 节点唯一字段名
     nodeKey: String,
+    // 节点显示字段名
     nodeLabel: String,
+    // 子节点字段名
     nodeChildren: String,
+    // 当前搜索关键字
     searchKeyword: String,
+    // 判断节点是否选中的函数
     isNodeSelected: Function,
+    // 判断子节点是否全选的函数
     isNodeChildrenSelected: Function
   },
   computed: {
@@ -348,59 +360,73 @@ export default {
     TreeNode
   },
   props: {
+    // 双向绑定的已选节点
     value: {
       type: Array,
       default: () => []
     },
+    // 弹窗显示状态
     visible: {
       type: Boolean,
       default: false
     },
+    // 选择模式（multiple | single）
     mode: {
       type: String,
       default: 'multiple', // 'multiple' | 'single'
       validator: value => ['multiple', 'single'].includes(value)
     },
+    // 弹窗标题
     title: {
       type: String,
       default: '选择节点'
     },
+    // 搜索输入占位
     placeholder: {
       type: String,
       default: '搜索节点'
     },
+    // 弹窗最大宽度
     maxWidth: {
       type: String,
       default: '1000px'
     },
+    // 树型数据源
     data: {
       type: Array,
       default: () => []
     },
+    // 节点 key 字段名
     nodeKey: {
       type: String,
       default: 'id'
     },
+    // 节点 label 字段名
     nodeLabel: {
       type: String,
       default: 'label'
     },
+    // 子节点字段名
     nodeChildren: {
       type: String,
       default: 'children'
     },
+    // 是否允许点击节点选择
     allowSelectNode: {
       type: Boolean,
       default: false
     },
+    // 是否展示搜索框
     showSearch: {
       type: Boolean,
       default: true
     },
+    // 是否展示全选按钮
     showSelectAll: {
       type: Boolean,
       default: true
     },
+    // 数据加载状态
     loading: {
       type: Boolean,
       default: false
@@ -699,4 +725,3 @@ export default {
   background: #a8a8a8;
 }
 </style>
-
