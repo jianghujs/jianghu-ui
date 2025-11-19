@@ -26,6 +26,8 @@ import JhConfirmDialog from './components/JhConfirmDialog/JhConfirmDialog.vue';
 import JhForm from './components/JhForm/JhForm.vue';
 import JhModalForm from './components/JhModalForm/JhModalForm.vue';
 import JhDrawerForm from './components/JhDrawerForm/JhDrawerForm.vue';
+import JhModal from './components/JhModal/JhModal.vue';
+import JhDrawer from './components/JhDrawer/JhDrawer.vue';
 import JhStepsForm from './components/JhStepsForm/JhStepsForm.vue';
 import JhFormList from './components/JhFormList/JhFormList.vue';
 
@@ -52,6 +54,8 @@ const components = {
   JhForm,
   JhModalForm,
   JhDrawerForm,
+  JhModal,
+  JhDrawer,
   JhStepsForm,
   JhFormList,
   // Advanced Components
@@ -104,6 +108,8 @@ export {
   JhForm,
   JhModalForm,
   JhDrawerForm,
+  JhModal,
+  JhDrawer,
   JhStepsForm,
   JhFormList,
   // Advanced Components

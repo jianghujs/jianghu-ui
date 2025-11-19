@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jianghu UI 组件测试页</title>
+    <link
+      rel="stylesheet"
+      href="https://jianghujs.github.io/jianghu-ui/cdn/jianghu-ui.css"
+    />
+    <style>
+      body {
+        background-color: #f5f5f5;
+      }
+      .section-card {
+        margin-bottom: 32px;
+      }
+      .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <v-app>
+        <v-main>
+          <v-container>
+            <h1 class="mb-8">Jianghu UI 组件测试页</h1>
+
+            <v-card class="pa-6 section-card">
+              <div class="section-title">📊 JhTable 数据列表示例</div>
+              <p class="text-body-2 mb-4">
+                包含工具栏、选择列与自定义操作，演示静态数据渲染。
+              </p>
+              <jh-table
+                header-title="团队成员"
+                tooltip="演示 JhTable 基础能力"
+                :headers="tableHeaders"
+                :items="tableItems"
+                :toolbar="tableToolbar"
+                :show-select="true"
+                @selection-change="handleSelectionChange"
+              >
+                <template v-slot:toolbar-actions>
+                  <v-btn color="primary" small @click="refreshTable">
+                    <v-icon left small>mdi-refresh</v-icon>
+                    手动刷新
+                  </v-btn>
+                </template>
+                <template v-slot:action-column="{ item }">
+                  <v-btn text small color="primary" @click="openDrawerWithUser(item)">
+                    <v-icon left small>mdi-pencil</v-icon>
+                    编辑
+                  </v-btn>
+                </template>
+              </jh-table>
+            </v-card>
+
+            <v-card class="pa-6 section-card">
+              <div class="section-title">🧾 JhForm 表单示例</div>
+              <p class="text-body-2 mb-4">
+                通过字段配置渲染表单，包含基础验证和事件回调。
+              </p>
+              <jh-form
+                :fields="profileFields"
+                :initial-data="profileData"
+                layout="horizontal"
+                @submit="handleProfileSubmit"
+                @change="handleFieldChange"
+              >
+                <template v-slot:actions="{ validate, resetForm }">
+                  <v-btn outlined color="primary" class="mr-3" @click="resetForm">
+                    重置
+                  </v-btn>
+                  <v-btn color="primary" @click="validate">
+                    提交
+                  </v-btn>
+                </template>
+              </jh-form>
+            </v-card>
+
+            <v-card class="pa-6 section-card">
+              <div class="section-title">📂 JhDrawer 抽屉示例</div>
+              <p class="text-body-2">
+                演示如何在抽屉中结合 JhForm，适用于详情编辑场景。
+              </p>
+              <v-btn color="primary" class="mt-4" @click="drawer.visible = true">
+                打开抽屉
+              </v-btn>
+              <jh-drawer
+                v-model="drawer.visible"
+                title="编辑成员信息"
+                width="520px"
+                @confirm="submitDrawerForm"
+                @cancel="resetDrawerForm"
+              >
+                <div class="pa-4">
+                  <jh-form
+                    ref="drawerFormRef"
+                    :fields="drawer.fields"
+                    :initial-data="drawer.data"
+                    layout="vertical"
+                    @submit="submitDrawerForm"
+                  >
+                    <template v-slot:actions="{ validate, resetForm }">
+                      <v-btn text color="primary" class="mr-2" @click="resetForm">
+                        重置
+                      </v-btn>
+                      <v-btn color="primary" @click="validate">
+                        保存
+                      </v-btn>
+                    </template>
+                  </jh-form>
+                </div>
+              </jh-drawer>
+            </v-card>
+
+            <v-card class="pa-4">
+              <div class="section-title">📝 事件日志</div>
+              <v-list dense>
+                <v-list-item
+                  v-for="(log, index) in logs"
+                  :key="index"
+                  class="py-1"
+                >
+                  <v-list-item-content>
+                    <v-list-item-title class="text-body-2">
+                      {{ log }}
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item v-if="logs.length === 0">
+                  <v-list-item-content>
+                    <v-list-item-title class="text-body-2 grey--text">
+                      暂无操作，尝试点击上面的示例组件。
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
+            </v-card>
+          </v-container>
+        </v-main>
+      </v-app>
+    </div>
+
+    <script src="https://jianghujs.github.io/jianghu-ui/cdn/jianghu-ui.js"></script>
+    <script>
+      new Vue({
+        el: '#app',
+        vuetify: new Vuetify(),
+        data: {
+          logs: [],
+          tableToolbar: {
+            search: true,
+            refresh: true,
+            setting: true,
+            density: true,
+            fullscreen: true,
+          },
+          tableHeaders: [
+            { text: 'ID', value: 'id', width: 80 },
+            { text: '姓名', value: 'name', width: 140 },
+            { text: '邮箱', value: 'email' },
+            { text: '角色', value: 'role', width: 120 },
+            { text: '加入时间', value: 'joinDate', width: 140 },
+            {
+              text: '操作',
+              value: 'actions',
+              sortable: false,
+              width: 140,
+            },
+          ],
+          tableItems: [
+            { id: 1, name: '张无忌', email: 'wz@jianghujs.com', role: '平台管理员', joinDate: '2024-02-12' },
+            { id: 2, name: '赵敏', email: 'zm@jianghujs.com', role: '产品经理', joinDate: '2024-03-08' },
+            { id: 3, name: '周芷若', email: 'zzr@jianghujs.com', role: '前端开发', joinDate: '2024-05-15' },
+            { id: 4, name: '小昭', email: 'xz@jianghujs.com', role: '测试工程师', joinDate: '2024-07-02' },
+          ],
+          profileData: {
+            nickname: '',
+            city: null,
+            notify: true,
+            description: '',
+          },
+          profileFields: [
+            { key: 'nickname', label: '昵称', type: 'text', placeholder: '请输入昵称', required: true },
+            {
+              key: 'city',
+              label: '所在城市',
+              type: 'select',
+              options: [
+                { text: '杭州', value: 'hangzhou' },
+                { text: '成都', value: 'chengdu' },
+                { text: '北京', value: 'beijing' },
+              ],
+              placeholder: '请选择城市',
+              cols: { md: 6 },
+            },
+            {
+              key: 'notify',
+              label: '开启通知',
+              type: 'switch',
+              defaultValue: true,
+              cols: { md: 6 },
+            },
+            {
+              key: 'description',
+              label: '个人介绍',
+              type: 'textarea',
+              rows: 3,
+              placeholder: '填写简单介绍',
+              cols: { md: 12 },
+            },
+          ],
+          drawer: {
+            visible: false,
+            data: {
+              id: null,
+              name: '',
+              role: '',
+              email: '',
+              remark: '',
+            },
+            fields: [
+              { key: 'name', label: '姓名', type: 'text', required: true, placeholder: '请输入姓名' },
+              {
+                key: 'role',
+                label: '角色',
+                type: 'select',
+                options: [
+                  { text: '平台管理员', value: '平台管理员' },
+                  { text: '研发负责人', value: '研发负责人' },
+                  { text: '产品经理', value: '产品经理' },
+                  { text: '测试工程师', value: '测试工程师' },
+                ],
+                required: true,
+              },
+              {
+                key: 'email',
+                label: '邮箱',
+                type: 'text',
+                placeholder: '请输入邮箱',
+                rules: 'email',
+              },
+              {
+                key: 'remark',
+                label: '备注',
+                type: 'textarea',
+                rows: 3,
+              },
+            ],
+          },
+        },
+        methods: {
+          log(message) {
+            this.logs.unshift(`${new Date().toLocaleTimeString()} - ${message}`);
+            this.logs = this.logs.slice(0, 6);
+          },
+          refreshTable() {
+            this.log('触发手动刷新');
+          },
+          handleSelectionChange(selectedRows) {
+            this.log(`当前选择 ${selectedRows.length} 行`);
+          },
+          handleProfileSubmit(values) {
+            this.log(`JhForm 提交: ${JSON.stringify(values)}`);
+          },
+          handleFieldChange({ key, value }) {
+            this.log(`字段变化: ${key} => ${value}`);
+          },
+          openDrawerWithUser(user) {
+            this.drawer.data = { ...user };
+            this.drawer.visible = true;
+            this.log(`准备编辑 ${user.name}`);
+          },
+          submitDrawerForm(values) {
+            this.log(`抽屉保存: ${JSON.stringify(values || this.drawer.data)}`);
+            this.drawer.visible = false;
+          },
+          resetDrawerForm() {
+            this.log('抽屉取消编辑');
+            this.drawer.visible = false;
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
