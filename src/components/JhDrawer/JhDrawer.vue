@@ -1,6 +1,7 @@
 <template>
   <v-navigation-drawer
     v-model="isShownInternal"
+    :permanent="isShownInternal"
     fixed
     temporary
     :right="position === 'right'"
