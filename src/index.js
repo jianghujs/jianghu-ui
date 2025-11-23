@@ -17,7 +17,7 @@ import JhTreeSelect from './components/JhTreeSelect/JhTreeSelect.vue';
 import JhPageContainer from './components/JhPageContainer/JhPageContainer.vue';
 import JhLayout from './components/JhLayout/JhLayout.vue';
 import JhCard from './components/JhCard/JhCard.vue';
-import JhStatisticCard from './components/JhStatistic/JhStatisticCard.vue';
+import JhStatisticCard from './components/JhStatisticCard/JhStatisticCard.vue';
 import JhWaterMark from './components/JhWaterMark/JhWaterMark.vue';
 
 // Feedback Components
