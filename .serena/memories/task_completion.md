@@ -1,0 +1,4 @@
+- 功能开发完成后至少运行 `npm run storybook` 确保组件示例可正常渲染，或 `npm run build` 检查 webpack 构建无误；如涉及文档示例，执行 `npm run build-storybook` 验证静态站点。
+- 检查 Vue/Vuetify 依赖是否通过 CDN 正确引入（若输出示例 HTML），确认 `<v-app>` 包裹及 MDI/Roboto 字体可用。
+- 更新相关文档（README、Storybook stories、AI_KNOWLEDGE_BASE 等）并编写中文注释。
+- 复核 props/事件命名遵循 Jh 组件规范，并记录关键变更原因。

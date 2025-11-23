@@ -1,0 +1,7 @@
+- 安装依赖：`npm install`
+- 启动 Storybook 文档：`npm run storybook`（默认 http://localhost:6006）
+- 构建组件库：`npm run build`（使用 webpack 配置输出 dist）
+- 构建 Storybook 静态站：`npm run build-storybook`
+- 预览 Storybook 静态站：`npm run serve-storybook`
+- 发布到 gh-pages：`npm run deploy`（执行 build + build-storybook + gh-pages）
+- Windows 终端常用：`powershell` 中 `Get-ChildItem`/`ls` 查看目录，`rg` 搜索，`code`/`notepad` 打开文件。

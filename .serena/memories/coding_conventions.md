@@ -1,0 +1,4 @@
+- 语言规范：所有文档、注释与对话均使用中文；复杂逻辑需补充中文注释。
+- 组件规范（.cursorrules）：组件名采用 `Jh`+PascalCase；props 使用 camelCase（布尔类以 is/has/show 等前缀），事件与插槽名称使用 kebab-case；倾向通过封装的 Jh 组件完成表格/表单业务，而非手写底层 Vuetify 结构。
+- 业务实践：表单字段/表头配置抽离、API 请求封装、ref 命名语义化（如 `table`）；事件处理函数命名 `handleXxx`；响应式布局依赖 Vuetify 栅格；Vue 语法固定为 Vue2 + Options API。
+- 校验/可用性：组件包裹在 `<v-app>`，确保引入 Vuetify CSS/字体；内置验证规则 require/email/phone/number/integer，可按需追加数组。

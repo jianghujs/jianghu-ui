@@ -1,0 +1,3 @@
+- 目录结构：`src` 包含组件、样式、工具以及 Storybook 文档 (`Design.stories.mdx`, `Introduction.stories.mdx`)，`src/components` 目录下按组件名 (JhTable、JhForm 等) 组织；`doc`、`examples` 提供额外资料和示例。
+- 构建/文档：`.storybook` 配置 Storybook，`dist` 用于打包输出，`public` 为静态资源，`scripts` 放置工程化脚本。
+- 组件命名约定：所有组件以 `Jh` 前缀（PascalCase），props camelCase，事件及插槽使用 kebab-case。
