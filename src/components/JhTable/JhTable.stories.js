@@ -1229,3 +1229,87 @@ export const 完整CRUD示例 = {
     },
   }),
 };
+
+
+export const SelectionAlertRender = {
+  render: () => ({
+    components: { JhTable },
+    data() {
+      return {
+        headers: [
+          { text: '????', value: 'name' },
+          { text: '????', value: 'containers' },
+          { text: '????', value: 'calls' },
+          { text: '???', value: 'owner' },
+          { text: '????', value: 'createdAt' }
+        ],
+        items: [
+          { id: 1, name: 'AppName-0', containers: 8, calls: 1276, owner: '???', createdAt: '2025-11-23' },
+          { id: 2, name: 'AppName-1', containers: 12, calls: 938, owner: '???', createdAt: '2025-11-23' },
+          { id: 3, name: 'AppName-2', containers: 1, calls: 820, owner: '???', createdAt: '2025-11-23' },
+          { id: 4, name: 'AppName-3', containers: 5, calls: 1291, owner: '???', createdAt: '2025-11-23' },
+          { id: 5, name: 'AppName-4', containers: 17, calls: 1796, owner: '???', createdAt: '2025-11-23' }
+        ]
+      };
+    },
+    methods: {
+      renderAlert(h, { selectedRows, onCleanSelected }) {
+        const totalContainers = selectedRows.reduce((sum, row) => sum + row.containers, 0);
+        const totalCalls = selectedRows.reduce((sum, row) => sum + row.calls, 0);
+        return h(
+          'div',
+          { class: 'd-flex align-center flex-wrap', style: { gap: '12px' } },
+          [
+            h('span', { class: 'font-weight-medium' }, `?? ${selectedRows.length} ?`),
+            h(
+              'v-btn',
+              {
+                props: { text: true, xSmall: true, color: 'primary' },
+                on: { click: onCleanSelected }
+              },
+              '????'
+            ),
+            h('span', { class: 'grey--text text--darken-1' }, `?????${totalContainers} ?`),
+            h('span', { class: 'grey--text text--darken-1' }, `????${totalCalls} ?`)
+          ]
+        );
+      },
+      renderAlertActions(h, { selectedRows }) {
+        return h('div', { class: 'd-flex align-center', style: { gap: '8px' } }, [
+          h(
+            'v-btn',
+            {
+              props: { small: true, color: 'error' },
+              on: { click: () => this.handleBatchDelete(selectedRows) }
+            },
+            '????'
+          ),
+          h(
+            'v-btn',
+            {
+              props: { small: true, outlined: true, color: 'primary' },
+              on: { click: () => this.handleExport(selectedRows) }
+            },
+            '????'
+          )
+        ]);
+      },
+      handleBatchDelete(rows) {
+        alert(`???? ${rows.length} ?`);
+      },
+      handleExport(rows) {
+        alert(`?? ${rows.length} ?`);
+      }
+    },
+    template: `
+      <jh-table
+        :headers="headers"
+        :items="items"
+        show-select
+        :toolbar="false"
+        :table-alert-render="renderAlert"
+        :table-alert-option-render="renderAlertActions"
+      />
+    `
+  })
+};

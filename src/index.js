@@ -15,7 +15,10 @@ import JhTreeSelect from './components/JhTreeSelect/JhTreeSelect.vue';
 
 // Layout Components
 import JhPageContainer from './components/JhPageContainer/JhPageContainer.vue';
+import JhLayout from './components/JhLayout/JhLayout.vue';
 import JhCard from './components/JhCard/JhCard.vue';
+import JhStatisticCard from './components/JhStatistic/JhStatisticCard.vue';
+import JhWaterMark from './components/JhWaterMark/JhWaterMark.vue';
 
 // Feedback Components
 import JhMask from './components/JhMask/JhMask.vue';
@@ -48,7 +51,10 @@ const components = {
   JhTreeSelect,
   // Layout Components
   JhPageContainer,
+  JhLayout,
   JhCard,
+  JhStatisticCard,
+  JhWaterMark,
 
   // Pro Components
   JhForm,

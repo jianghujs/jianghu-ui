@@ -53,16 +53,31 @@
     </jh-query-filter>
 
     <!-- 批量操作提示栏 -->
-    <div v-if="showSelectComputed && selectedItems.length > 0" class="jh-pro-table-alert">
-      <div class="jh-pro-table-alert-info">
-        <slot name="alert" :selected-row-keys="selectedRowKeys" :selected-rows="selectedItems">
+    <div v-if="showSelectionAlertBar" class="jh-pro-table-alert">
+      <div v-if="hasAlertContent" class="jh-pro-table-alert-info">
+        <template v-if="$scopedSlots.alert">
+          <slot name="alert" :selected-row-keys="selectedRowKeys" :selected-rows="selectedItems"></slot>
+        </template>
+        <render-function
+          v-else-if="typeof tableAlertRender === 'function'"
+          :render="tableAlertRender"
+          :params="tableAlertScope"
+        />
+        <template v-else>
           <v-icon small class="mr-2" color="primary">mdi-checkbox-marked-circle</v-icon>
           <span>已选择 <strong class="primary--text">{{ selectedItems.length }}</strong> 项</span>
           <v-btn text x-small class="ml-2" @click="clearSelection">清空</v-btn>
-        </slot>
+        </template>
       </div>
-      <div class="jh-pro-table-alert-actions">
-        <slot name="alert-actions" :selected-row-keys="selectedRowKeys" :selected-rows="selectedItems"></slot>
+      <div v-if="hasAlertActionsContent" class="jh-pro-table-alert-actions">
+        <template v-if="$scopedSlots['alert-actions']">
+          <slot name="alert-actions" :selected-row-keys="selectedRowKeys" :selected-rows="selectedItems"></slot>
+        </template>
+        <render-function
+          v-else
+          :render="tableAlertOptionRender"
+          :params="tableAlertScope"
+        />
       </div>
     </div>
 
@@ -429,11 +444,38 @@
 <script>
 import JhQueryFilter from '../JhQueryFilter/JhQueryFilter.vue';
 
+const RenderFunction = {
+  name: 'JhTableRenderFunction',
+  functional: true,
+  props: {
+    render: {
+      type: Function,
+      default: null
+    },
+    params: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  render(h, context) {
+    const renderFn = context.props.render;
+    if (typeof renderFn !== 'function') {
+      return null;
+    }
+    const params = context.props.params || {};
+    if (renderFn.length >= 2) {
+      return renderFn(h, params);
+    }
+    return renderFn(params);
+  }
+};
+
 export default {
   name: 'JhTable',
   inheritAttrs: false,
   components: {
     JhQueryFilter,
+    RenderFunction
   },
   props: {
     // ========== 数据相关 ==========
@@ -617,6 +659,14 @@ export default {
       type: [Object, Boolean],
       default: null
     },
+    tableAlertRender: {
+      type: [Function, Boolean],
+      default: null
+    },
+    tableAlertOptionRender: {
+      type: [Function, Boolean],
+      default: null
+    },
     showSelect: {
       type: Boolean,
       default: false
@@ -731,6 +781,31 @@ export default {
     // 选中的行 keys
     selectedRowKeys() {
       return this.selectedItems.map(item => item[this.rowKey]);
+    },
+
+    tableAlertScope() {
+      return {
+        selectedRowKeys: this.selectedRowKeys,
+        selectedRows: this.selectedItems,
+        onCleanSelected: this.clearSelection
+      };
+    },
+    hasAlertContent() {
+      if (this.$scopedSlots.alert) {
+        return true;
+      }
+      if (typeof this.tableAlertRender === 'function') {
+        return true;
+      }
+      return this.tableAlertRender !== false;
+    },
+    hasAlertActionsContent() {
+      return !!this.$scopedSlots['alert-actions'] || typeof this.tableAlertOptionRender === 'function';
+    },
+    showSelectionAlertBar() {
+      if (!this.showSelectComputed) return false;
+      if (!this.selectedItems.length) return false;
+      return this.hasAlertContent || this.hasAlertActionsContent;
     },
     // 工具栏配置
     toolbarConfig() {
@@ -1372,7 +1447,7 @@ export default {
   background: #e6f7ff;
   border: 1px solid #91d5ff;
   border-radius: 4px;
-  margin: 16px 24px 0;
+  margin: 16px 0 0;
 }
 
 .jh-pro-table-alert-info {

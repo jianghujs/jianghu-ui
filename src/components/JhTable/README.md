@@ -555,6 +555,37 @@ export default {
 />
 ```
 
+### 5. 自定义批量操作提示（tableAlertRender）
+
+- `tableAlertRender`：函数或 `false`。函数签名为 `(h, { selectedRows, selectedRowKeys, onCleanSelected }) => VNode`，返回的内容会替换默认 “已选择 X 项” 提示；配置为 `false` 时隐藏默认提示。
+- `tableAlertOptionRender`：函数或 `false`。同样接受 `{ selectedRows, selectedRowKeys, onCleanSelected }`，可输出批量操作按钮；也可以直接使用 `#alert-actions` slot。
+- 插槽优先级高于 props，方便在单文件组件内直接书写模板；若同时设置 `tableAlertRender === false` 且无插槽，则整块提示区域不会出现。
+
+```vue
+<jh-table
+  :headers="headers"
+  :items="apps"
+  show-select
+  :table-alert-render="(h, { selectedRows, onCleanSelected }) => {
+    const totalPods = selectedRows.reduce((sum, row) => sum + row.podCount, 0);
+    const totalCalls = selectedRows.reduce((sum, row) => sum + row.callCount, 0);
+    return h('div', { class: 'd-flex align-center flex-wrap gap-4' }, [
+      h('span', { class: 'font-weight-medium' }, `已选 ${selectedRows.length} 项`),
+      h('v-btn', {
+        props: { text: true, xSmall: true, color: 'primary' },
+        on: { click: onCleanSelected }
+      }, '取消选择'),
+      h('span', `容器数量：${totalPods} 个`),
+      h('span', `调用量：${totalCalls} 次`)
+    ]);
+  }"
+  :table-alert-option-render="(h, { selectedRows }) => h('div', [
+    h('v-btn', { props: { small: true, color: 'error' } }, '批量删除'),
+    h('v-btn', { props: { small: true, outlined: true, color: 'primary' } }, '导出数据')
+  ])"
+/>
+```
+
 ## 📱 响应式设计
 
 组件针对移动端进行了全面优化：
