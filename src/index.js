@@ -15,10 +15,7 @@ import JhTreeSelect from './components/JhTreeSelect/JhTreeSelect.vue';
 
 // Layout Components
 import JhPageContainer from './components/JhPageContainer/JhPageContainer.vue';
-import JhLayout from './components/JhLayout/JhLayout.vue';
 import JhCard from './components/JhCard/JhCard.vue';
-import JhStatisticCard from './components/JhStatisticCard/JhStatisticCard.vue';
-import JhWaterMark from './components/JhWaterMark/JhWaterMark.vue';
 
 // Feedback Components
 import JhMask from './components/JhMask/JhMask.vue';
@@ -29,8 +26,6 @@ import JhConfirmDialog from './components/JhConfirmDialog/JhConfirmDialog.vue';
 import JhForm from './components/JhForm/JhForm.vue';
 import JhModalForm from './components/JhModalForm/JhModalForm.vue';
 import JhDrawerForm from './components/JhDrawerForm/JhDrawerForm.vue';
-import JhModal from './components/JhModal/JhModal.vue';
-import JhDrawer from './components/JhDrawer/JhDrawer.vue';
 import JhStepsForm from './components/JhStepsForm/JhStepsForm.vue';
 import JhFormList from './components/JhFormList/JhFormList.vue';
 
@@ -51,17 +46,12 @@ const components = {
   JhTreeSelect,
   // Layout Components
   JhPageContainer,
-  JhLayout,
   JhCard,
-  JhStatisticCard,
-  JhWaterMark,
 
   // Pro Components
   JhForm,
   JhModalForm,
   JhDrawerForm,
-  JhModal,
-  JhDrawer,
   JhStepsForm,
   JhFormList,
   // Advanced Components
@@ -114,8 +104,6 @@ export {
   JhForm,
   JhModalForm,
   JhDrawerForm,
-  JhModal,
-  JhDrawer,
   JhStepsForm,
   JhFormList,
   // Advanced Components

@@ -63,10 +63,9 @@ jobs:
             VERSION="${BASE_VERSION}-build-${SUFFIX}"
           fi
 
-          # 将所有空白字符替换为短横线，确保路径安全
-          # SANITIZED_VERSION=$(echo "$VERSION" | tr '[:space:]' '-')
-          echo "value=$SANITIZED_VERSION" >> "$GITHUB_OUTPUT"
-          echo "CDN version: $SANITIZED_VERSION"
+          # 使用原始版本号，不替换空白字符
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "CDN version: $VERSION"
 
       - name: Copy CDN files to Storybook static
         env:
