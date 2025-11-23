@@ -9,7 +9,7 @@ on:
   # 允许手动触发，便于指定版本号
   workflow_dispatch:
     inputs:
-      cdn_version:
+      cdn_version: 1.0.0
         description: "指定要发布的 CDN 版本（可选，示例：1.0.1 或 1.0.1-hotfix）"
         required: false
         type: string
