@@ -60,7 +60,7 @@ jobs:
           else
             BASE_VERSION=$(node -p "require('./package.json').version")
             SUFFIX=$(date -u +%Y%m%d%H%M%S)
-            VERSION="${BASE_VERSION}-build-${SUFFIX}"
+            VERSION="${BASE_VERSION}"
           fi
 
           # 使用原始版本号，不替换空白字符
