@@ -9,7 +9,7 @@ on:
   # 允许手动触发，便于指定版本号
   workflow_dispatch:
     inputs:
-      cdn_version: 1.0.0
+      cdn_version:
         description: "指定要发布的 CDN 版本（可选，示例：1.0.1 或 1.0.1-hotfix）"
         required: false
         type: string
@@ -51,7 +51,7 @@ jobs:
       - name: Determine CDN version
         id: cdn_version
         env:
-          INPUT_VERSION: ${{ github.event.inputs.cdn_version || '' }}
+          INPUT_VERSION: ${{ github.event.inputs.cdn_version || '1.0.0' }}
         run: |
           if [ -n "$INPUT_VERSION" ]; then
             VERSION="$INPUT_VERSION"
