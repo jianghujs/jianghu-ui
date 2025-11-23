@@ -51,7 +51,7 @@ jobs:
       - name: Determine CDN version
         id: cdn_version
         env:
-          INPUT_VERSION: ${{ github.event.inputs.cdn_version || '1.0.0' }}
+          INPUT_VERSION: ${{ github.event.inputs.cdn_version || '' }}
         run: |
           if [ -n "$INPUT_VERSION" ]; then
             VERSION="$INPUT_VERSION"
@@ -64,7 +64,7 @@ jobs:
           fi
 
           # 将所有空白字符替换为短横线，确保路径安全
-          SANITIZED_VERSION=$(echo "$VERSION" | tr '[:space:]' '-')
+          # SANITIZED_VERSION=$(echo "$VERSION" | tr '[:space:]' '-')
           echo "value=$SANITIZED_VERSION" >> "$GITHUB_OUTPUT"
           echo "CDN version: $SANITIZED_VERSION"
 
