@@ -71,6 +71,8 @@ npm run serve-storybook
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
   <!-- Roboto 字体 -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <!-- JianghuJS UI 核心样式（锁定具体版本号，如 1.0.0） -->
+  <link href="https://jianghujs.github.io/jianghu-ui/cdn/<版本号>/jianghu-ui.css" rel="stylesheet">
 </head>
 <body>
   <div id="app">
@@ -85,6 +87,8 @@ npm run serve-storybook
   <script src="https://cdn.jsdelivr.net/npm/vue@2.7/dist/vue.js"></script>
   <!-- Vuetify -->
   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+  <!-- JianghuJS UI 运行时代码 -->
+  <script src="https://jianghujs.github.io/jianghu-ui/cdn/<版本号>/jianghu-ui.js"></script>
 
   <script>
     Vue.component('jh-button', {
@@ -104,6 +108,8 @@ npm run serve-storybook
 </body>
 </html>
 ```
+
+> ✅ CDN 产物会被发布到 `https://jianghujs.github.io/jianghu-ui/cdn/<版本号>/` 目录中，示例：`cdn/1.0.0/jianghu-ui.js`。生产环境务必固定具体版本，若仅需查看最新构建可临时使用 `cdn/latest/`。
 
 ## 组件列表
 

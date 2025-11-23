@@ -129,6 +129,13 @@ module.exports = {
 - 依赖是否正确安装
 - Node.js 版本是否兼容（建议使用 Node.js 18+）
 
+### 5. CDN 版本管理
+
+- GitHub Actions 会将 `dist/` 产物发布到 `cdn/<版本号>/` 目录中，同时更新 `cdn/latest/` 指向最近一次构建。
+- `workflow_dispatch` 触发时可以在「Run workflow」面板中填写 `cdn_version`，从而精确控制要发布的版本号。
+- 推送到 `main` 而未提供版本号时，工作流会读取 `package.json` 的版本并附加时间戳（示例：`1.0.0-build-20250101123045`），避免覆盖线上生产所引用的旧版本。
+- 生产环境建议固定到具体版本路径，例如 `https://<USER>.github.io/jianghu-ui/cdn/1.0.0/jianghu-ui.js`，而 `cdn/latest/` 仅适合作为最新构建的临时预览。
+
 ## 🚀 本地预览构建结果
 
 在部署前，可以本地预览构建结果：

@@ -1,0 +1,3 @@
+- 为 `deploy-storybook` 工作流增加了 CDN 版本管理：支持 workflow_dispatch 输入 `cdn_version`，Tag 推送使用标签名，其余情况自动使用 `package.json` 版本附带时间戳。
+- 构建产物会发布到 `cdn/<版本>/` 目录并同步刷新 `cdn/latest/`，同时生成带版本说明的 `cdn-example.html`。
+- README 与 `doc/dev/DEPLOY.md` 已新增 CDN 版本引用说明，提示生产环境锁定具体版本路径。
