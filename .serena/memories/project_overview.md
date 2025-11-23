@@ -1,3 +1,0 @@
-- 项目：JianghuJS UI，是一个基于 Vue 2.7 + Vuetify 2 的企业级组件库，包含表格、表单、布局、弹窗等高频业务组件，目标是通过 CDN 引入即可使用。
-- 文档：使用 Storybook 7 提供交互式文档与在线预览，可在本地运行 storybook 或构建静态站点部署。
-- 发布：默认通过 `dist` 与 `storybook-static` 目录输出构建产物，并支持 gh-pages 发布。

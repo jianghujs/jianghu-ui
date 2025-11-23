@@ -1,1 +1,0 @@
-- `jianghu-ui-prompts.md` 在“使用须知”之后新增“离线调试 Demo”章节，提供 `examples/jianghu-ui-demo.html` 的完整 HTML 样例，可通过 CDN 直接验证 JhTable/JhForm/JhDrawer 等组件；包含运行步骤（npx http-server examples -p 4173）。
