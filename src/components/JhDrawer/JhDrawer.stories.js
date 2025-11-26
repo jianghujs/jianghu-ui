@@ -281,6 +281,7 @@ export const CustomActions = {
               ></v-text-field>
               <v-textarea
                 label="备注"
+                v-for="i in 10"
                 outlined
                 rows="3"
               ></v-textarea>
