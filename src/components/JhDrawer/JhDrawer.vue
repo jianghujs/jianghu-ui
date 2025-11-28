@@ -44,7 +44,7 @@
     <v-divider class="jh-divider"></v-divider>
 
     <!-- 抽屉内容 -->
-    <div class="px-4 pb-4">
+    <div class="pa-4">
       <!-- 完全自定义内容插槽 -->
       <slot></slot>
     </div>
