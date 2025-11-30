@@ -273,6 +273,105 @@ handleSelectionChange({ selectedRowKeys, selectedRows }) {
 <jh-table size="medium" />
 ```
 
+### 12. 列 Schema 渲染（ProTable 对齐）
+
+- 列可声明 `valueType`、`valueEnum`、`valueEnumStatusMap`、`valueFormatter`、`valueProps`，JhTable 会按类型自动格式化并保持 Tooltip / 复制 / hover 等体验。
+- 典型类型：`status`、`money`、`percent`、`progress`、`digit`、`date`/`dateTime`/`dateRange`、`avatar`、`json`、`code`、`index` 等。
+
+| 字段 | 说明 |
+| ---- | ---- |
+| `valueType` | 控制默认渲染器，例如 `status` 显示 chip、`progress` 显示进度条 |
+| `valueEnum` | 枚举映射 `{ value: { text, status, color, icon } }` |
+| `valueEnumStatusMap` | 按状态调整颜色/样式，覆盖内置的 success/warning/error/processing/default |
+| `valueFormatter(value, row, column)` | 最终展示前的格式化函数（返回值将直接显示） |
+| `valueProps` | 透传给默认渲染器的配置（进度条高度、金额精度、头像尺寸等） |
+
+```vue
+<jh-table
+  :headers="[
+    {
+      text: '状态',
+      value: 'status',
+      valueType: 'status',
+      valueEnumStatusMap: { warning: { color: 'orange darken-2' } },
+      valueEnum: {
+        pending: { text: '待审核', status: 'warning', icon: 'mdi-clock' },
+        online: { text: '可用', status: 'success' },
+        offline: { text: '禁用', status: 'error' },
+      },
+    },
+    {
+      text: '账单金额',
+      value: 'amount',
+      valueType: 'money',
+      valueFormatter: (value) => `${(value / 10000).toFixed(2)} 万`,
+      valueProps: { currencySymbol: '¥', precision: 2 },
+    },
+    {
+      text: '完成进度',
+      value: 'progress',
+      valueType: 'progress',
+      valueProps: { color: 'success', height: 8, showValue: true },
+    },
+    {
+      text: '任务 JSON',
+      value: 'payload',
+      valueType: 'json',
+      ellipsis: true,
+    },
+  ]"
+  :items="taskList"
+/>
+```
+
+### 13. 列驱动筛选（search schema → JhQueryFilter）
+
+- `show-filter` + `auto-filter-from-headers（默认 true）` 时，凡是列未声明 `search: false`，都会根据 schema 自动生成 JhQueryFilter 字段。
+- `search` 支持对象写法：`{ valueType, formItemProps, transform, initialValue, key, placeholder }`，可直接控制控件类型、初始值和后端映射。
+- `transform(value)` 用于把表单值拆分成后端期望的结构，例如日期区间拆成 `startDate/endDate`；也可通过 `valueEnumKey` 让 select 选项使用枚举中的其他字段。
+- 手动传入 `filter-fields` 且 key 重复时，组件会优先使用手动配置，保证可完全自定义。
+
+```vue
+const headers = [
+  {
+    text: '状态',
+    value: 'status',
+    valueType: 'status',
+    valueEnum: {
+      pending: { text: '待审核', status: 'warning', value: 'PENDING' },
+      approved: { text: '已通过', status: 'success', value: 'APPROVED' },
+    },
+    search: {
+      valueType: 'select',
+      valueEnumKey: 'value',
+      initialValue: 'PENDING',
+    },
+  },
+  {
+    text: '创建时间',
+    value: 'createdAt',
+    valueType: 'dateTime',
+    search: {
+      valueType: 'dateRange',
+      initialValue: ['2024-01-01', '2024-01-31'],
+      transform: (value) => ({
+        startDate: value?.[0],
+        endDate: value?.[1],
+      }),
+    },
+  },
+];
+
+<jh-table
+  :headers="headers"
+  :request="fetchData"
+  show-filter
+  @filter-search="filters => console.log(filters)"
+/>;
+```
+
+如需关闭自动注入，可设置 `:auto-filter-from-headers="false"`，或在列上声明 `search: false`。
+
 ## 📋 完整 Props
 
 | 参数 | 说明 | 类型 | 默认值 |
@@ -287,6 +386,8 @@ handleSelectionChange({ selectedRowKeys, selectedRows }) {
 | toolbar | 工具栏配置 | Object/Boolean | {...} |
 | showFilter | 是否显示筛选栏 | Boolean | false |
 | filterFields | 筛选字段配置 | Array | [] |
+| filterInitialValues | 筛选初始值 | Object | {} |
+| autoFilterFromHeaders | 是否根据列 schema 自动注入筛选字段 | Boolean | true |
 | filterCollapsible | 筛选栏是否可折叠 | Boolean | true |
 | filterDefaultCollapsed | 筛选栏默认是否折叠 | Boolean | true |
 | actionColumn | 操作列配置 | Object/Boolean | null |
@@ -309,7 +410,7 @@ handleSelectionChange({ selectedRowKeys, selectedRows }) {
 | alert | 自定义批量操作提示内容 | { selectedRowKeys, selectedRows } |
 | alert-actions | 批量操作按钮区 | { selectedRowKeys, selectedRows } |
 | table-extra | 表格额外内容区 | - |
-| item.{column} | 自定义列内容 | { item, value } |
+| item.{column} | 自定义列内容 | { item, value, index } |
 | header.{column} | 自定义表头 | { header } |
 
 ## 🔧 方法

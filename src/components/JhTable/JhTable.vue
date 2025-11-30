@@ -24,10 +24,10 @@
 
     <!-- 高级筛选栏 -->
     <jh-query-filter
-      v-if="showFilter && filterFields && filterFields.length > 0"
+      v-if="hasFilterFields"
       ref="queryFilterRef"
-      :fields="filterFields"
-      :initial-values="filterInitialValues"
+      :fields="filterFieldsResolved"
+      :initial-values="computedFilterInitialValues"
       :collapsible="filterCollapsible"
       :default-collapsed="filterDefaultCollapsed"
       :default-visible-count="filterDefaultVisibleCount"
@@ -42,7 +42,7 @@
       @reset="handleFilterReset"
     >
       <!-- 自定义字段插槽透传 -->
-      <template v-for="field in filterFields" v-slot:[`field-${field.key}`]="slotProps">
+      <template v-for="field in filterFieldsResolved" v-slot:[`field-${field.key}`]="slotProps">
         <slot :name="`filter-field-${field.key}`" v-bind="slotProps"></slot>
       </template>
 
@@ -268,7 +268,7 @@
       <!-- 自定义列插槽 -->
       <template
         v-for="header in visibleHeaders"
-        v-slot:[`item.${header.value}`]="{ item, value }"
+        v-slot:[`item.${header.value}`]="{ item, value, index }"
       >
         <!-- 操作列特殊处理 -->
         <template v-if="header.value === 'action'">
@@ -375,32 +375,98 @@
           <slot v-if="header.slot || $scopedSlots[`item.${header.value}`]" :name="`item.${header.value}`" :item="item" :value="value"></slot>
 
           <!-- 列配置渲染 -->
-          <div v-else class="d-flex align-center">
-            <!-- 省略号处理 -->
-            <v-tooltip v-if="header.ellipsis && value && value.length > 20" bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <span
-                  v-bind="attrs"
-                  v-on="on"
-                  class="text-truncate d-inline-block"
-                  style="max-width: 200px;"
-                >
-                  {{ value }}
-                </span>
-              </template>
-              <span>{{ value }}</span>
-            </v-tooltip>
+          <div v-else class="jh-table-schema-cell d-flex align-center flex-wrap">
+            <!-- 状态标签 -->
+            <template v-if="header.valueType === 'status'">
+              <v-chip
+                small
+                label
+                v-bind="getStatusChipProps(header, value, item)"
+                class="mr-2"
+              >
+                <v-icon v-if="getStatusChipProps(header, value, item).icon" left x-small>
+                  {{ getStatusChipProps(header, value, item).icon }}
+                </v-icon>
+                {{ getStatusText(header, value, item) }}
+              </v-chip>
+            </template>
 
-            <!-- 普通文本 -->
-            <span v-else>{{ value }}</span>
+            <!-- 进度类型 -->
+            <template v-else-if="header.valueType === 'progress'">
+              <div class="d-flex align-center w-100">
+                <v-progress-linear
+                  v-bind="getProgressProps(header)"
+                  :value="getProgressValue(value)"
+                  class="flex-grow-1"
+                ></v-progress-linear>
+                <span v-if="getProgressProps(header).showValue !== false" class="ml-2 text-caption">
+                  {{ formatPercentValue(getProgressValue(value), header.valueProps) }}
+                </span>
+              </div>
+            </template>
+
+            <!-- 头像类型 -->
+            <template v-else-if="header.valueType === 'avatar'">
+              <v-avatar v-bind="getAvatarProps(header)">
+                <img v-if="getAvatarSrc(value)" :src="getAvatarSrc(value)" :alt="formatColumnValue(header, item, value, index)">
+                <span v-else>{{ getAvatarInitials(formatColumnValue(header, item, value, index)) }}</span>
+              </v-avatar>
+              <span class="ml-2">{{ formatColumnValue(header, item, value, index) }}</span>
+            </template>
+
+            <!-- JSON 展示 -->
+            <pre v-else-if="header.valueType === 'json'" class="jh-table-json mr-2">
+{{ formatJsonValue(value) }}
+            </pre>
+
+            <!-- 索引类型 -->
+            <span v-else-if="header.valueType === 'index'">{{ getDisplayIndex(index) }}</span>
+
+            <!-- 代码块 -->
+            <code v-else-if="header.valueType === 'code'" class="jh-table-code">{{ formatColumnValue(header, item, value, index) }}</code>
+
+            <!-- 日期范围 -->
+            <span v-else-if="header.valueType === 'dateRange'">{{ formatDateRangeValue(value, header.valueProps) }}</span>
+
+            <!-- 日期/时间 -->
+            <span v-else-if="header.valueType === 'date' || header.valueType === 'dateTime' || header.valueType === 'time'">
+              {{ formatDateValue(value, header.valueType, header.valueProps) }}
+            </span>
+
+            <!-- 金额 -->
+            <span v-else-if="header.valueType === 'money'">{{ formatMoneyValue(value, header.valueProps) }}</span>
+
+            <!-- 百分比 -->
+            <span v-else-if="header.valueType === 'percent'">{{ formatPercentValue(value, header.valueProps) }}</span>
+
+            <!-- 数字 -->
+            <span v-else-if="header.valueType === 'digit'">{{ formatDigitValue(value, header.valueProps) }}</span>
+
+            <!-- 默认文本，包含省略逻辑 -->
+            <template v-else>
+              <v-tooltip v-if="shouldShowEllipsis(header, value, item, index)" bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <span
+                    v-bind="attrs"
+                    v-on="on"
+                    class="text-truncate d-inline-block"
+                    style="max-width: 200px;"
+                  >
+                    {{ formatColumnValue(header, item, value, index) }}
+                  </span>
+                </template>
+                <span>{{ formatColumnValue(header, item, value, index) }}</span>
+              </v-tooltip>
+              <span v-else>{{ formatColumnValue(header, item, value, index) }}</span>
+            </template>
 
             <!-- 复制按钮 -->
             <v-btn
-              v-if="header.copyable && value"
+              v-if="header.copyable && hasCopyValue(header, item, value)"
               icon
               x-small
               class="ml-1"
-              @click.stop="copyToClipboard(value)"
+              @click.stop="copyToClipboard(getCopyValue(header, item, value))"
             >
               <v-icon x-small>mdi-content-copy</v-icon>
             </v-btn>
@@ -443,6 +509,14 @@
 
 <script>
 import JhQueryFilter from '../JhQueryFilter/JhQueryFilter.vue';
+
+const DEFAULT_STATUS_COLOR_MAP = {
+  success: { color: 'success', textColor: 'white' },
+  warning: { color: 'warning', textColor: 'white' },
+  error: { color: 'error', textColor: 'white' },
+  processing: { color: 'info', textColor: 'white' },
+  default: { color: 'grey lighten-2', textColor: 'grey darken-2' }
+};
 
 const RenderFunction = {
   name: 'JhTableRenderFunction',
@@ -506,6 +580,11 @@ export default {
     filterFields: {
       type: Array,
       default: () => []
+    },
+    // 是否根据列配置自动生成筛选字段
+    autoFilterFromHeaders: {
+      type: Boolean,
+      default: true
     },
     // 筛选初始值
     filterInitialValues: {
@@ -790,6 +869,73 @@ export default {
         onCleanSelected: this.clearSelection
       };
     },
+    hasFilterFields() {
+      return this.showFilter && this.filterFieldsResolved.length > 0;
+    },
+    filterFieldsResolved() {
+      const manualFields = Array.isArray(this.filterFields) ? this.filterFields.map(field => ({ ...field })) : [];
+      const manualKeys = new Set(manualFields.map(field => field?.key).filter(Boolean));
+      const autoFields = this.autoFilterConfig.fields.filter(field => !manualKeys.has(field.key));
+      return [...manualFields, ...autoFields];
+    },
+    computedFilterInitialValues() {
+      const initialValues = {
+        ...this.autoFilterConfig.initialValues,
+        ...(this.filterInitialValues || {})
+      };
+      this.filterFieldsResolved.forEach(field => {
+        if (!field || !field.key) return;
+        if (initialValues[field.key] === undefined) {
+          if (field.initialValue !== undefined) {
+            initialValues[field.key] = field.initialValue;
+          } else if (field.defaultValue !== undefined) {
+            initialValues[field.key] = field.defaultValue;
+          }
+        }
+      });
+      return initialValues;
+    },
+    autoFilterConfig() {
+      const result = {
+        fields: [],
+        meta: {},
+        initialValues: {}
+      };
+      if (!this.autoFilterFromHeaders || !Array.isArray(this.internalColumns) || !this.internalColumns.length) {
+        return result;
+      }
+      this.internalColumns.forEach(column => {
+        const config = this.buildAutoFilterField(column);
+        if (config) {
+          result.fields.push(config.field);
+          result.meta[config.field.key] = { transform: config.transform };
+          if (config.initialValue !== undefined) {
+            result.initialValues[config.field.key] = config.initialValue;
+          }
+        }
+      });
+      return result;
+    },
+    filterFieldMetaMap() {
+      const meta = { ...this.autoFilterConfig.meta };
+      (this.filterFields || []).forEach(field => {
+        if (field && field.key) {
+          meta[field.key] = {
+            ...(meta[field.key] || {}),
+            transform: field.transform || (meta[field.key] && meta[field.key].transform)
+          };
+        }
+      });
+      this.filterFieldsResolved.forEach(field => {
+        if (field && field.key && field.transform) {
+          meta[field.key] = {
+            ...(meta[field.key] || {}),
+            transform: field.transform
+          };
+        }
+      });
+      return meta;
+    },
     hasAlertContent() {
       if (this.$scopedSlots.alert) {
         return true;
@@ -1022,6 +1168,238 @@ export default {
         };
       });
     },
+    getColumnRawValue(header, item, value) {
+      if (header && typeof header.valueGetter === 'function') {
+        return header.valueGetter(item, header);
+      }
+      if (value !== undefined) return value;
+      const key = header?.value;
+      if (!key) return undefined;
+      return item ? item[key] : value;
+    },
+    applyValueFormatter(header, rawValue, item, index = 0) {
+      if (header && typeof header.valueFormatter === 'function') {
+        const formatted = header.valueFormatter(rawValue, item, header, index);
+        if (formatted !== undefined && formatted !== null) {
+          return formatted;
+        }
+      }
+      return null;
+    },
+    getValueEnumOption(header, rawValue) {
+      const valueEnum = header?.valueEnum;
+      if (!valueEnum) return null;
+      if (Array.isArray(valueEnum)) {
+        return valueEnum.find(option => option?.value === rawValue) || null;
+      }
+      return valueEnum[rawValue] || null;
+    },
+    getStatusText(header, value, item) {
+      const rawValue = this.getColumnRawValue(header, item, value);
+      const formatted = this.applyValueFormatter(header, rawValue, item);
+      if (formatted !== null) return formatted;
+      const option = this.getValueEnumOption(header, rawValue);
+      if (option) {
+        if (typeof option === 'object') {
+          return option.text || option.label || rawValue || '--';
+        }
+        return option;
+      }
+      if (rawValue === null || rawValue === undefined || rawValue === '') return '--';
+      return rawValue;
+    },
+    getStatusChipProps(header, value, item) {
+      const rawValue = this.getColumnRawValue(header, item, value);
+      const option = this.getValueEnumOption(header, rawValue);
+      const statusKey = (option && option.status) || rawValue || 'default';
+      const defaultColor = DEFAULT_STATUS_COLOR_MAP[statusKey] || DEFAULT_STATUS_COLOR_MAP.default;
+      const overrides = header?.valueEnumStatusMap?.[statusKey] || {};
+      return {
+        color: overrides.color || option?.color || defaultColor.color,
+        textColor: overrides.textColor || option?.textColor || defaultColor.textColor,
+        outlined: overrides.outlined ?? option?.outlined ?? false,
+        dark: overrides.dark ?? option?.dark ?? false,
+        icon: option?.icon
+      };
+    },
+    getProgressProps(header) {
+      return {
+        height: 6,
+        color: 'primary',
+        rounded: true,
+        ...header?.valueProps
+      };
+    },
+    getProgressValue(value) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return 0;
+      if (num < 0) return 0;
+      if (num > 100) return 100;
+      return num;
+    },
+    formatMoneyValue(value, valueProps = {}) {
+      if (value === null || value === undefined || value === '') return '--';
+      const precision = typeof valueProps.precision === 'number' ? valueProps.precision : 2;
+      const currency = valueProps.currencySymbol || '¥';
+      const locale = valueProps.locale || 'zh-CN';
+      const amount = Number(value);
+      if (!Number.isFinite(amount)) return value;
+      return `${currency} ${amount.toLocaleString(locale, {
+        minimumFractionDigits: precision,
+        maximumFractionDigits: precision
+      })}`;
+    },
+    formatPercentValue(value, valueProps = {}) {
+      if (value === null || value === undefined || value === '') return '--';
+      const precision = typeof valueProps.precision === 'number' ? valueProps.precision : 0;
+      const numberValue = Number(value);
+      if (!Number.isFinite(numberValue)) return value;
+      const unit = valueProps.unit || '%';
+      return `${numberValue.toFixed(precision)}${unit}`;
+    },
+    formatDigitValue(value, valueProps = {}) {
+      if (value === null || value === undefined || value === '') return '--';
+      const locale = valueProps.locale || 'zh-CN';
+      const numberValue = Number(value);
+      if (!Number.isFinite(numberValue)) return value;
+      return numberValue.toLocaleString(locale);
+    },
+    formatDateValue(value, type = 'date', valueProps = {}) {
+      if (!value) return '--';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      const format = valueProps.format
+        || (type === 'dateTime' ? 'YYYY-MM-DD HH:mm:ss'
+          : type === 'time' ? 'HH:mm:ss'
+            : 'YYYY-MM-DD');
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return format
+        .replace('YYYY', year)
+        .replace('MM', month)
+        .replace('DD', day)
+        .replace('HH', hours)
+        .replace('mm', minutes)
+        .replace('ss', seconds);
+    },
+    formatDateRangeValue(value, valueProps = {}) {
+      if (!Array.isArray(value) || value.length === 0) {
+        return '--';
+      }
+      const [start, end] = value;
+      const separator = valueProps.separator || ' ~ ';
+      const type = valueProps.valueType || 'date';
+      return `${this.formatDateValue(start, type, valueProps)}${separator}${this.formatDateValue(end, type, valueProps)}`;
+    },
+    formatJsonValue(value) {
+      if (value === null || value === undefined || value === '') return '--';
+      if (typeof value === 'string') {
+        try {
+          const parsed = JSON.parse(value);
+          return JSON.stringify(parsed, null, 2);
+        } catch (error) {
+          return value;
+        }
+      }
+      if (typeof value === 'object') {
+        return JSON.stringify(value, null, 2);
+      }
+      return String(value);
+    },
+    shouldShowEllipsis(header, value, item, index = 0) {
+      if (!header?.ellipsis) return false;
+      const text = this.formatColumnValue(header, item, value, index);
+      if (text === null || text === undefined) return false;
+      const threshold = header.ellipsisLength || 20;
+      return String(text).length > threshold;
+    },
+    formatColumnValue(header, item, value, index = 0) {
+      const rawValue = this.getColumnRawValue(header, item, value);
+      const formatted = this.applyValueFormatter(header, rawValue, item, index);
+      if (formatted !== null) {
+        return formatted;
+      }
+      if (header?.valueType === 'money') {
+        return this.formatMoneyValue(rawValue, header.valueProps);
+      }
+      if (header?.valueType === 'percent' || header?.valueType === 'progress') {
+        return this.formatPercentValue(rawValue, header.valueProps);
+      }
+      if (header?.valueType === 'digit') {
+        return this.formatDigitValue(rawValue, header.valueProps);
+      }
+      if (header?.valueType === 'date' || header?.valueType === 'dateTime' || header?.valueType === 'time') {
+        return this.formatDateValue(rawValue, header.valueType, header.valueProps);
+      }
+      if (header?.valueType === 'dateRange') {
+        return this.formatDateRangeValue(rawValue, header.valueProps);
+      }
+      if (header?.valueType === 'json') {
+        return this.formatJsonValue(rawValue);
+      }
+      if (header?.valueType === 'index') {
+        return this.getDisplayIndex(index);
+      }
+      const option = this.getValueEnumOption(header, rawValue);
+      if (option) {
+        if (typeof option === 'object') {
+          return option.text || option.label || option.value || rawValue || '--';
+        }
+        return option;
+      }
+      if (rawValue === null || rawValue === undefined || rawValue === '') return '--';
+      return rawValue;
+    },
+    hasCopyValue(header, item, value) {
+      const rawValue = this.getColumnRawValue(header, item, value);
+      return rawValue !== undefined && rawValue !== null && rawValue !== '';
+    },
+    getCopyValue(header, item, value) {
+      const rawValue = this.getColumnRawValue(header, item, value);
+      if (rawValue === null || rawValue === undefined) return '';
+      if (typeof rawValue === 'object') {
+        try {
+          return JSON.stringify(rawValue);
+        } catch (error) {
+          return String(rawValue);
+        }
+      }
+      return String(rawValue);
+    },
+    getDisplayIndex(index) {
+      if (typeof index !== 'number') return '--';
+      if (this.request) {
+        return (this.currentPage - 1) * this.currentItemsPerPage + index + 1;
+      }
+      return index + 1;
+    },
+    getAvatarProps(header) {
+      return {
+        size: 32,
+        color: 'primary lighten-5',
+        ...header?.valueProps
+      };
+    },
+    getAvatarSrc(value) {
+      if (!value) return null;
+      if (typeof value === 'string') return value;
+      if (typeof value === 'object' && value.src) return value.src;
+      return null;
+    },
+    getAvatarInitials(text) {
+      if (!text) return '--';
+      const str = String(text).trim();
+      if (!str) return '--';
+      const segments = str.split(/\s+/);
+      if (segments.length === 1) {
+        return segments[0].charAt(0).toUpperCase();
+      }
+      return `${segments[0].charAt(0)}${segments[segments.length - 1].charAt(0)}`.toUpperCase();
+    },
     // 切换列显示
     toggleColumn(col) {
       col.visible = !col.visible;
@@ -1130,9 +1508,10 @@ export default {
     },
     // 高级筛选-查询
     handleFilterSearch(queryData) {
-      this.filterValues = queryData;
+      const filters = this.transformFilterValues(queryData);
+      this.filterValues = filters;
       this.currentPage = 1; // 重置到第一页
-      this.$emit('filter-search', queryData);
+      this.$emit('filter-search', filters);
       if (this.request) {
         this.reload();
       }
@@ -1145,6 +1524,142 @@ export default {
       if (this.request) {
         this.reload();
       }
+    },
+    transformFilterValues(queryData) {
+      const filters = {};
+      Object.keys(queryData || {}).forEach(key => {
+        const value = queryData[key];
+        const meta = this.filterFieldMetaMap[key];
+        if (meta && typeof meta.transform === 'function') {
+          const result = meta.transform(value, queryData);
+          if (result && typeof result === 'object' && !Array.isArray(result)) {
+            Object.assign(filters, result);
+            return;
+          }
+          if (result !== undefined) {
+            filters[key] = result;
+          }
+          return;
+        }
+        filters[key] = value;
+      });
+      return filters;
+    },
+    buildAutoFilterField(column) {
+      const searchConfig = this.normalizeSearchConfig(column);
+      if (!searchConfig) return null;
+      const fieldType = this.mapValueTypeToFilterType(searchConfig.valueType, column);
+      const field = {
+        key: searchConfig.key,
+        label: searchConfig.label,
+        type: fieldType,
+        placeholder: searchConfig.placeholder || this.formatAutoFieldPlaceholder(searchConfig.label, fieldType),
+        options: [],
+        props: {
+          clearable: true,
+          dense: true,
+          ...(searchConfig.formItemProps || {})
+        },
+        initialValue: searchConfig.initialValue,
+        defaultValue: searchConfig.initialValue,
+        hideDetails: true
+      };
+      if (fieldType === 'select') {
+        field.options = this.buildValueEnumOptions(column, searchConfig);
+      }
+      if (fieldType === 'date') {
+        field.pickerProps = {
+          range: searchConfig.valueType === 'dateRange',
+          ...(searchConfig.formItemProps?.pickerProps || {})
+        };
+      }
+      if (searchConfig.multiple) {
+        field.multiple = true;
+      }
+      if (searchConfig.fieldProps && typeof searchConfig.fieldProps === 'object') {
+        Object.assign(field, searchConfig.fieldProps);
+      }
+      return {
+        field,
+        transform: searchConfig.transform,
+        initialValue: searchConfig.initialValue
+      };
+    },
+    normalizeSearchConfig(column) {
+      if (!column || column.value === 'action') return null;
+      if (column.search === false) return null;
+      const search = typeof column.search === 'object' ? { ...column.search } : {};
+      const key = search.key || column.filterKey || column.value || column.dataIndex || column.key;
+      if (!key) return null;
+      return {
+        key,
+        label: search.label || column.searchLabel || column.text || column.title || key,
+        valueType: search.valueType || column.valueType || 'text',
+        placeholder: search.placeholder,
+        formItemProps: search.formItemProps || {},
+        transform: search.transform,
+        initialValue: search.initialValue,
+        valueEnumKey: search.valueEnumKey || column.valueEnumKey,
+        fieldProps: search.fieldProps || {},
+        multiple: search.multiple || search.formItemProps?.multiple,
+        search
+      };
+    },
+    mapValueTypeToFilterType(valueType, column) {
+      switch (valueType) {
+        case 'status':
+        case 'option':
+        case 'select':
+          return column?.valueEnum ? 'select' : 'text';
+        case 'date':
+        case 'dateTime':
+        case 'time':
+        case 'dateRange':
+          return 'date';
+        case 'digit':
+        case 'money':
+        case 'percent':
+          return 'text';
+        default:
+          return 'text';
+      }
+    },
+    buildValueEnumOptions(column, searchConfig) {
+      const valueEnum = column?.valueEnum;
+      if (!valueEnum) return [];
+      const options = [];
+      if (Array.isArray(valueEnum)) {
+        valueEnum.forEach(option => {
+          if (!option) return;
+          options.push({
+            text: option.text || option.label || option.value,
+            value: option.value
+          });
+        });
+        return options;
+      }
+      Object.keys(valueEnum).forEach(key => {
+        const option = valueEnum[key];
+        if (typeof option === 'object') {
+          const targetKey = searchConfig.valueEnumKey && option[searchConfig.valueEnumKey] !== undefined
+            ? option[searchConfig.valueEnumKey]
+            : option.value !== undefined ? option.value : key;
+          options.push({
+            text: option.text || option.label || key,
+            value: targetKey
+          });
+        } else {
+          options.push({
+            text: option,
+            value: key
+          });
+        }
+      });
+      return options;
+    },
+    formatAutoFieldPlaceholder(label, type) {
+      if (!label) return '';
+      return type === 'select' ? `请选择${label}` : `请输入${label}`;
     },
     // 重新加载数据（服务端分页）
     async reload() {
@@ -1612,6 +2127,26 @@ export default {
   text-align: center;
   padding: 40px 0;
   color: rgba(0, 0, 0, 0.45);
+}
+
+.jh-table-schema-cell {
+  min-width: 0;
+}
+
+.jh-table-json {
+  margin: 0;
+  font-family: 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.jh-table-code {
+  font-family: 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+  font-size: 12px;
+  background: #f4f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 @media (max-width: 600px) {

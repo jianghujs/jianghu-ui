@@ -36,6 +36,21 @@ const generateMockData = (count = 100) => {
 };
 
 const allMockData = generateMockData(100);
+const schemaMockData = Array.from({ length: 50 }, (_, index) => {
+  const statusPool = ['pending', 'approved', 'rejected'];
+  return {
+    id: 1000 + index,
+    username: `审批单-${index + 1}`,
+    status: statusPool[index % statusPool.length],
+    amount: 120000 + index * 413,
+    progress: (index * 7) % 100,
+    updatedAt: new Date(2024, 0, (index % 28) + 1, 12, index % 60).toISOString(),
+    payload: {
+      region: index % 2 === 0 ? '华北' : '华南',
+      owner: `owner-${index + 1}`,
+    },
+  };
+});
 
 export default {
   title: '数据展示/JhTable - 高级表格',
@@ -224,6 +239,119 @@ async fetchData(params) {
       },
     },
   },
+};
+
+export const 列Schema渲染与筛选 = {
+  render: () => ({
+    components: { JhTable },
+    data() {
+      return {
+        headers: [
+          { text: '序号', value: 'index', valueType: 'index', width: 80 },
+          {
+            text: '状态',
+            value: 'status',
+            valueType: 'status',
+            valueEnumStatusMap: {
+              warning: { color: 'orange darken-2' },
+              error: { color: 'red darken-1' },
+            },
+            valueEnum: {
+              pending: { text: '待审核', status: 'warning', value: 'PENDING', icon: 'mdi-clock-outline' },
+              approved: { text: '已通过', status: 'success', value: 'APPROVED' },
+              rejected: { text: '已拒绝', status: 'error', value: 'REJECTED' },
+            },
+            search: {
+              valueType: 'select',
+              initialValue: 'PENDING',
+              valueEnumKey: 'value',
+            },
+          },
+          {
+            text: '账单金额',
+            value: 'amount',
+            valueType: 'money',
+            copyable: true,
+            valueProps: { currencySymbol: '¥', precision: 2 },
+            valueFormatter: (value) => `${(value / 10000).toFixed(2)} 万`,
+            search: { valueType: 'digit', placeholder: '请输入最小金额' },
+          },
+          {
+            text: '完成进度',
+            value: 'progress',
+            valueType: 'progress',
+            valueProps: { color: 'success', height: 6, showValue: true },
+          },
+          {
+            text: '更新时间',
+            value: 'updatedAt',
+            valueType: 'dateTime',
+            search: {
+              valueType: 'dateRange',
+              transform: (value) => {
+                if (!value || value.length < 2) return {};
+                return {
+                  startDate: value[0],
+                  endDate: value[1],
+                };
+              },
+            },
+          },
+          {
+            text: '附加信息',
+            value: 'payload',
+            valueType: 'json',
+            ellipsis: true,
+            copyable: true,
+          },
+          { text: '操作', value: 'action', sortable: false, width: 160 },
+        ],
+      };
+    },
+    methods: {
+      async fetchSchemaTable(params) {
+        await new Promise(resolve => setTimeout(resolve, 400));
+        let list = [...schemaMockData];
+
+        if (params.filters?.status) {
+          const targetStatus = String(params.filters.status).toLowerCase();
+          list = list.filter(row => row.status === targetStatus);
+        }
+        if (params.filters?.startDate && params.filters?.endDate) {
+          const start = new Date(params.filters.startDate).getTime();
+          const end = new Date(params.filters.endDate).getTime();
+          list = list.filter(row => {
+            const time = new Date(row.updatedAt).getTime();
+            return time >= start && time <= end;
+          });
+        }
+        if (params.filters?.amount) {
+          list = list.filter(row => row.amount >= Number(params.filters.amount));
+        }
+
+        const total = list.length;
+        const startIndex = (params.page - 1) * params.pageSize;
+        const endIndex = startIndex + params.pageSize;
+
+        return {
+          data: list.slice(startIndex, endIndex),
+          total,
+          success: true,
+        };
+      },
+    },
+    template: `
+      <jh-table
+        header-title="列 Schema 渲染 & 自动筛选"
+        tooltip="valueType / valueEnum / search transform"
+        :headers="headers"
+        :request="fetchSchemaTable"
+        show-filter
+        :toolbar="{ search: true, refresh: true, setting: true, density: true }"
+        :pagination="{ current: 1, pageSize: 10 }"
+      />
+    `,
+  }),
 };
 
 // 基础示例
