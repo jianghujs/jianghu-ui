@@ -1,6 +1,6 @@
 <template>
   <v-form :ref="formRef" :lazy-validation="lazyValidation" :class="formClasses">
-    <v-row :class="rowClass">
+    <v-row :class="rowClass" v-bind="isGridLayout ? rowProps : {}">
       <!-- 表单分组 -->
       <template v-for="(field, index) in visibleFields">
         <!-- 分组标题 -->
@@ -16,11 +16,7 @@
         <v-col
           v-else
           :key="field.key"
-          :cols="getFieldCols(field)"
-          :sm="getFieldSm(field)"
-          :md="getFieldMd(field)"
-          :lg="getFieldLg(field)"
-          :xl="getFieldXl(field)"
+          v-bind="getColBindings(field)"
           :class="getFieldColClass(field)"
         >
           <!-- 水平布局容器 -->
@@ -305,10 +301,17 @@
           </div>
         </v-col>
       </template>
+
+      <!-- Grid 布局下操作区占满整行 -->
+      <v-col v-if="isGridLayout" :cols="12" class="jh-form-actions-col">
+        <slot name="actions" :formData="formData" :validate="validate" :resetForm="resetForm"></slot>
+      </v-col>
     </v-row>
 
-    <!-- 表单底部插槽 -->
-    <slot name="actions" :formData="formData" :validate="validate" :resetForm="resetForm"></slot>
+    <!-- 非 Grid 布局保持原有操作区位置 -->
+    <template v-if="!isGridLayout">
+      <slot name="actions" :formData="formData" :validate="validate" :resetForm="resetForm"></slot>
+    </template>
   </v-form>
 </template>
 
@@ -496,6 +499,12 @@ export default {
       type: Object,
       default: () => ({}),
     },
+
+    // Grid 行配置
+    rowProps: {
+      type: Object,
+      default: () => ({}),
+    },
   },
 
   data() {
@@ -531,6 +540,11 @@ export default {
         // 默认显示
         return true;
       });
+    },
+
+    // 是否启用 Grid 布局
+    isGridLayout() {
+      return this.grid || this.layout === 'grid';
     },
   },
 
@@ -600,6 +614,51 @@ export default {
         return field.cols.xl || field.cols.md || this.defaultColsMd;
       }
       return field.cols || this.defaultColsMd;
+    },
+
+    // Grid 模式下合并列配置
+    getColBindings(field) {
+      if (!this.isGridLayout) {
+        return {
+          cols: this.getFieldCols(field),
+          sm: this.getFieldSm(field),
+          md: this.getFieldMd(field),
+          lg: this.getFieldLg(field),
+          xl: this.getFieldXl(field),
+        };
+      }
+
+      const bindings = { ...(this.colProps || {}), ...(field.colProps || {}) };
+
+      // 兼容字段 cols 写法
+      if (field.cols) {
+        if (typeof field.cols === 'object') {
+          Object.assign(bindings, field.cols);
+        } else {
+          bindings.cols = field.cols;
+        }
+      }
+
+      const span = field.colSpan !== undefined ? field.colSpan : bindings.span;
+      const mappedCols = span !== undefined ? this.mapGridSpan(span) : null;
+
+      if (mappedCols !== null && !('cols' in bindings || 'sm' in bindings || 'md' in bindings || 'lg' in bindings || 'xl' in bindings)) {
+        bindings.md = mappedCols;
+      }
+
+      delete bindings.span;
+
+      if (!('cols' in bindings || 'sm' in bindings || 'md' in bindings || 'lg' in bindings || 'xl' in bindings)) {
+        bindings.md = this.mapGridSpan(this.colProps.span || 8);
+      }
+
+      return bindings;
+    },
+
+    mapGridSpan(span) {
+      const safeSpan = Number(span) || 0;
+      const mapped = Math.round((safeSpan / 24) * 12);
+      return Math.max(1, Math.min(12, mapped || 1));
     },
 
     // 获取字段列样式类

@@ -99,6 +99,7 @@ export default {
 | omitNil | 忽略 null/undefined 值 | `Boolean` | `true` |
 | grid | Grid 模式 | `Boolean` | `false` |
 | colProps | Grid 列配置 | `Object` | `{}` |
+| rowProps | Grid 行配置（透传 `v-row`） | `Object` | `{}` |
 
 ### FieldConfig 字段配置
 
@@ -112,6 +113,8 @@ export default {
 | rules | 验证规则 | `Array \| String` | - |
 | defaultValue | 默认值 | `Any` | - |
 | cols | 响应式列宽配置 | `Number \| Object` | - |
+| colSpan | Grid 模式 24 栏列宽 | `Number` | - |
+| colProps | 字段级列配置（优先级高于全局） | `Object` | - |
 | visible | 是否可见 | `Boolean \| Function` | `true` |
 | disabled | 是否禁用 | `Boolean \| Function` | `false` |
 | readonly | 是否只读 | `Boolean \| Function` | `false` |
@@ -196,6 +199,30 @@ export default {
   </template>
 </JhForm>
 ```
+
+### Grid 栅格布局
+```vue
+<JhForm
+  layout="grid"
+  :grid="true"
+  :col-props="{ span: 8, lg: 6 }"
+  :row-props="{ dense: true }"
+  :fields="[
+    { type: 'group', title: '项目信息' },
+    { key: 'projectCode', label: '编号', type: 'text', colSpan: 6 },
+    { key: 'projectName', label: '名称', type: 'text', colSpan: 12 },
+    { key: 'owner', label: '负责人', type: 'text' },
+    { key: 'status', label: '状态', type: 'select', colProps: { md: 3 }, options: statusOptions }
+  ]"
+>
+  <template #actions="{ validate, resetForm }">
+    <v-btn text @click="resetForm">重置</v-btn>
+    <v-btn color="primary" @click="validate">提交</v-btn>
+  </template>
+</JhForm>
+```
+- `colSpan` 采用 24 栏语义（8=三等分、12=半行），JhForm 会自动映射到 Vuetify 12 栅格。
+- `colProps` 与 `rowProps` 可继续覆盖断点与 `v-row` 属性，actions 会在 Grid 模式下占满最后一行保持对齐。
 
 ### 3. 字段分组
 

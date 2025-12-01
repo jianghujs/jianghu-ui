@@ -32,6 +32,9 @@
 | `disabled` | Boolean | 禁用模式 | `false` |
 | `labelWidth` | Number/String | 标签宽度 | `'auto'` |
 | `defaultColsMd` | Number | 默认列宽 | `6` |
+| `grid` | Boolean | 启用 24 栏自动栅格（等价 `layout="grid"`） | `false` |
+| `colProps` | Object | Grid 模式列配置（支持 `span`、`cols`、`md/lg/xl`） | `{}` |
+| `rowProps` | Object | Grid 模式行属性（透传给 `v-row`，可设置 `dense/align`） | `{}` |
 
 ## 🎨 字段类型 (type)
 
@@ -224,11 +227,26 @@ fields: [
 ### 4. 栅格布局
 ```vue
 <jh-form 
-  :fields="fields" 
   layout="grid"
-  :defaultColsMd="6"
-/>
+  :grid="true"
+  :col-props="{ span: 8, lg: 6 }"
+  :row-props="{ dense: true, align: 'center' }"
+  :fields="[
+    { type: 'group', title: '基本信息' },
+    { key: 'code', label: '项目编号', type: 'text', colSpan: 6 },
+    { key: 'name', label: '项目名称', type: 'text', colSpan: 12 },
+    { key: 'owner', label: '负责人', type: 'text' },
+    { key: 'status', label: '状态', type: 'select', options: statusOptions, colProps: { md: 3 } }
+  ]"
+>
+  <template #actions="{ validate, resetForm }">
+    <v-btn text @click="resetForm">重置</v-btn>
+    <v-btn color="primary" @click="validate">提交</v-btn>
+  </template>
+</jh-form>
 ```
+- `colSpan` 采用 24 栏语义，组件会自动映射到 Vuetify 12 栏。
+- `colProps`/`rowProps` 可覆盖断点列宽与 `v-row` 属性，操作区在 Grid 模式下会占满最后一行保持对齐。
 
 ## 🔨 常用方法
 

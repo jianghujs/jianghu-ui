@@ -239,6 +239,76 @@ export const 完整示例 = {
   }),
 };
 
+// Grid 自动布局
+export const Grid栅格布局 = {
+  args: {
+    layout: 'grid',
+    grid: true,
+    colProps: { span: 8, lg: 6 },
+    rowProps: { dense: true },
+    fields: [
+      { type: 'group', title: '项目信息' },
+      {
+        key: 'projectCode',
+        label: '项目编号',
+        type: 'text',
+        placeholder: '请输入编号',
+        colSpan: 6,
+      },
+      {
+        key: 'projectName',
+        label: '项目名称',
+        type: 'text',
+        placeholder: '请输入名称',
+        colSpan: 12,
+        required: true,
+      },
+      {
+        key: 'owner',
+        label: '负责人',
+        type: 'text',
+        placeholder: '请输入负责人',
+        colProps: { md: 4 },
+      },
+      {
+        key: 'status',
+        label: '状态',
+        type: 'select',
+        options: [
+          { text: '未开始', value: 'todo' },
+          { text: '进行中', value: 'doing' },
+          { text: '已完成', value: 'done' },
+        ],
+        colProps: { md: 4 },
+      },
+      {
+        key: 'publish',
+        label: '发布时间',
+        type: 'date',
+        colProps: { md: 4 },
+      },
+    ],
+    initialData: {
+      projectCode: 'PRJ-2024-001',
+      status: 'doing',
+    },
+  },
+  render: (args) => ({
+    components: { JhForm },
+    setup() {
+      return { args };
+    },
+    template: `
+      <JhForm v-bind="args">
+        <template #actions="{ validate, resetForm }">
+          <v-btn class="mr-2" text @click="resetForm">重置</v-btn>
+          <v-btn color="primary" @click="validate">提交</v-btn>
+        </template>
+      </JhForm>
+    `,
+  }),
+};
+
 // 三列布局
 export const 三列布局 = {
   args: {

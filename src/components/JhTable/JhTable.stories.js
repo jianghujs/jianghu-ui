@@ -241,7 +241,56 @@ async fetchData(params) {
   },
 };
 
-export const 列Schema渲染与筛选 = {
+
+// 基础示例
+export const 基础示例 = {
+  args: {
+    headers: sampleHeaders,
+    items: sampleItems,
+    loading: false,
+    showSearch: true,
+    showCreateButton: true,
+    showUpdateAction: true,
+    showDeleteAction: true,
+    showSelect: false,
+    size: 'default',
+  },
+  render: (args) => ({
+    components: { JhTable },
+    data() {
+      return { args };
+    },
+    template: `
+      <div>
+        <jh-table
+          v-bind="args"
+          @create-click="handleCreate"
+          @update-click="handleUpdate"
+          @delete-click="handleDelete"
+          @row-click="handleRowClick"
+        />
+      </div>
+    `,
+    methods: {
+      handleCreate() {
+        alert('点击了新增按钮');
+      },
+      handleUpdate(item) {
+        alert('详情：' + item.username);
+      },
+      handleDelete(item) {
+        if (confirm('确认删除 ' + item.username + '？')) {
+          console.log('删除', item);
+        }
+      },
+      handleRowClick(item) {
+        console.log('行点击:', item);
+      },
+    },
+  }),
+};
+
+export const 值类型示例 = {
   render: () => ({
     components: { JhTable },
     data() {
@@ -351,54 +400,6 @@ export const 列Schema渲染与筛选 = {
         :pagination="{ current: 1, pageSize: 10 }"
       />
     `,
-  }),
-};
-
-// 基础示例
-export const 基础示例 = {
-  args: {
-    headers: sampleHeaders,
-    items: sampleItems,
-    loading: false,
-    showSearch: true,
-    showCreateButton: true,
-    showUpdateAction: true,
-    showDeleteAction: true,
-    showSelect: false,
-    size: 'default',
-  },
-  render: (args) => ({
-    components: { JhTable },
-    data() {
-      return { args };
-    },
-    template: `
-      <div>
-        <jh-table
-          v-bind="args"
-          @create-click="handleCreate"
-          @update-click="handleUpdate"
-          @delete-click="handleDelete"
-          @row-click="handleRowClick"
-        />
-      </div>
-    `,
-    methods: {
-      handleCreate() {
-        alert('点击了新增按钮');
-      },
-      handleUpdate(item) {
-        alert('详情：' + item.username);
-      },
-      handleDelete(item) {
-        if (confirm('确认删除 ' + item.username + '？')) {
-          console.log('删除', item);
-        }
-      },
-      handleRowClick(item) {
-        console.log('行点击:', item);
-      },
-    },
   }),
 };
 
