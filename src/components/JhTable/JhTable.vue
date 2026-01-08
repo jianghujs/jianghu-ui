@@ -1,7 +1,7 @@
 <template>
   <div :class="wrapperClass" :style="wrapperStyle">
     <!-- 表格标题区 -->
-    <div v-if="headerTitle || $slots['header-title'] || $slots['toolbar-actions'] || $slots['toolbar-extra']" class="jh-pro-table-header">
+    <div v-if="headerTitle || $slots['header-title'] || $slots['toolbar-extra']" class="jh-pro-table-header">
       <div class="jh-pro-table-header-left">
         <!-- 标题 -->
         <div v-if="headerTitle || $slots['header-title']" class="jh-pro-table-title">
@@ -1587,8 +1587,13 @@ export default {
     },
     normalizeSearchConfig(column) {
       if (!column || column.value === 'action') return null;
-      if (column.search === false) return null;
-      const search = typeof column.search === 'object' ? { ...column.search } : {};
+      const searchProp = column.search;
+      if (searchProp === undefined || searchProp === null || searchProp === false) return null;
+      const search = searchProp === true
+        ? {}
+        : typeof searchProp === 'object'
+          ? { ...searchProp }
+          : {};
       const key = search.key || column.filterKey || column.value || column.dataIndex || column.key;
       if (!key) return null;
       return {

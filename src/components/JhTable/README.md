@@ -326,7 +326,8 @@ handleSelectionChange({ selectedRowKeys, selectedRows }) {
 
 ### 13. 列驱动筛选（search schema → JhQueryFilter）
 
-- `show-filter` + `auto-filter-from-headers（默认 true）` 时，凡是列未声明 `search: false`，都会根据 schema 自动生成 JhQueryFilter 字段。
+- `show-filter` + `auto-filter-from-headers（默认 true）` 开启后，只有在 `headers` 中显式声明了 `search`（`true` 或配置对象）的列才会自动生成 JhQueryFilter 字段，默认不会把所有列都展示出来。
+- `search: true` 代表采用默认的文本输入筛选；设置为对象时可进一步控制输入类型、占位、初始值等；`search: false` 仍可用于兼容旧配置的“强制关闭”场景。
 - `search` 支持对象写法：`{ valueType, formItemProps, transform, initialValue, key, placeholder }`，可直接控制控件类型、初始值和后端映射。
 - `transform(value)` 用于把表单值拆分成后端期望的结构，例如日期区间拆成 `startDate/endDate`；也可通过 `valueEnumKey` 让 select 选项使用枚举中的其他字段。
 - 手动传入 `filter-fields` 且 key 重复时，组件会优先使用手动配置，保证可完全自定义。
@@ -370,7 +371,7 @@ const headers = [
 />;
 ```
 
-如需关闭自动注入，可设置 `:auto-filter-from-headers="false"`，或在列上声明 `search: false`。
+如需关闭自动注入，可设置 `:auto-filter-from-headers="false"`，或直接移除列的 `search` 配置（保留 `search: false` 写法也兼容）。
 
 ## 📋 完整 Props
 
