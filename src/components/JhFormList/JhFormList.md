@@ -298,6 +298,6 @@ methods: {
 
 ## 相关组件
 
-- [JhForm](../JhForm/README.md) - 表单组件
-- [JhFormFields](../JhFormFields/README.md) - 表单字段组件
-- [JhEditableTable](../JhEditableTable/README.md) - 可编辑表格组件
+- [JhForm](../JhForm/JhForm.md) - 表单组件
+- [JhFormFields](../JhFormFields/JhFormFields.md) - 表单字段组件
+- [JhEditableTable](../JhEditableTable/JhEditableTable.md) - 可编辑表格组件

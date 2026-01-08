@@ -502,6 +502,6 @@ export default {
 
 ## 相关组件
 
-- [JhFormList](../JhFormList/README.md) - 动态表单列表组件
-- [JhTable](../JhTable/README.md) - 高级表格组件
-- [JhForm](../JhForm/README.md) - 表单组件
+- [JhFormList](../JhFormList/JhFormList.md) - 动态表单列表组件
+- [JhTable](../JhTable/JhTable.md) - 高级表格组件
+- [JhForm](../JhForm/JhForm.md) - 表单组件

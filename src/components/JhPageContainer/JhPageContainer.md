@@ -403,7 +403,7 @@ export default {
 
 ## 参考资料
 
-- [JhLayout - 页面布局组件](../JhLayout/README.md)
-- [JhTable - 数据表格组件](../JhTable/README.md)
+- [JhLayout - 页面布局组件](../JhLayout/JhLayout.md)
+- [JhTable - 数据表格组件](../JhTable/JhTable.md)
 - [JhQueryFilter - 查询过滤组件](../JhQueryFilter/README.md)
 - [Vuetify - Application](https://vuetifyjs.com/en/components/application/)

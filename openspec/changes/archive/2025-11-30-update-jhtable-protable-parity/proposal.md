@@ -1,7 +1,7 @@
 # 方案：补齐 JhTable 与 ProComponents Table 的关键特性
 
 ## 背景
-- `JhTable` 已提供 headerTitle、列状态（`columnsState`）、批量操作提示、轮询、防抖、工具栏、`JhQueryFilter` 等能力（参考 `src/components/JhTable/README.md`），可覆盖江湖平台常见的 CRUD 列表场景。
+- `JhTable` 已提供 headerTitle、列状态（`columnsState`）、批量操作提示、轮询、防抖、工具栏、`JhQueryFilter` 等能力（参考 `src/components/JhTable/JhTable.md`），可覆盖江湖平台常见的 CRUD 列表场景。
 - 但对照参考实现 [Ant Design ProComponents Table](https://procomponents.ant.design/components/table)，仍缺少若干高级能力：列配置缺乏 `valueType/valueEnum` 等 schema 语义、表格无法内联编辑、也没有内置的拖拽排序。上述能力在平台中已有落地需求（如动态签批表、配置项拖拽、列表的一键修订），目前只能通过额外封装或手写代码解决，体验割裂。
 
 ## 目标
@@ -12,7 +12,7 @@
 ## 范围与交付
 - 交付新的 schema、editable、drag-sort 相关 API 与文档示例，保持向后兼容。
 - Storybook 中新增对应 demo，用于验证 UI/交互。
-- 文档更新：`src/components/JhTable/README.md`、`doc/jianghu-ui/…` 的 JhTable 章节。
+- 文档更新：`src/components/JhTable/JhTable.md`、`doc/jianghu-ui/…` 的 JhTable 章节。
 - 发布前执行 `npm run storybook` 与 `npm run build`.
 
 ## 非目标
