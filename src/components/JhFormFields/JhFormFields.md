@@ -90,6 +90,7 @@ export default {
 | dense | 紧凑模式 | `Boolean` | `false` |
 | bordered | 显示边框 | `Boolean` | `false` |
 | dependencies | 依赖字段数组 | `Array<String>` | `[]` |
+| rowProps | 传递给内部 `v-row` 的属性 | `Object` | `{}` |
 
 ### FieldConfig 字段配置
 
@@ -124,6 +125,9 @@ export default {
 - **autocomplete** - 自动完成
 - **date** - 日期选择器
 - **time** - 时间选择器
+- **color** - 颜色选择器
+- **slider** - 数值滑块
+- **range-slider** - 区间滑块
 - **switch** - 开关
 - **checkbox** - 复选框
 - **radio** - 单选按钮组
@@ -158,6 +162,40 @@ export default {
 | title | 自定义标题 | - |
 | footer | 底部内容 | `{ values }` |
 | field-{key} | 自定义字段(type='slot') | `{ field, value, values, updateField }` |
+
+## 🎨 拓展字段类型示例
+
+```js
+fields: [
+  {
+    key: 'themeColor',
+    label: '主题色',
+    type: 'color',
+    defaultValue: '#4caf50',
+    pickerProps: { mode: 'hexa' }, // 透传到 v-color-picker
+  },
+  {
+    key: 'opacity',
+    label: '透明度',
+    type: 'slider',
+    min: 0,
+    max: 100,
+    step: 5,
+    thumbLabel: true,
+  },
+  {
+    key: 'priceRange',
+    label: '价格区间',
+    type: 'range-slider',
+    min: 0,
+    max: 1000,
+    step: 10,
+    defaultValue: [100, 600],
+  },
+];
+```
+
+> 📌 `type='color'` 会自动在文本框内显示颜色块，可用 `pickerProps` 调整 `v-color-picker`。滑块类字段支持 `min/max/step/thumbLabel/ticks` 等常用参数，也可通过 `field.props` 继续透传到对应 Vuetify 组件。
 
 ## 🎯 核心特性详解
 

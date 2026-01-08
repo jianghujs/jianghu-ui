@@ -237,7 +237,7 @@ export const 基础示例 = {
         keywordFieldList: ['username', 'email'],
         headers: [
           { text: 'ID', value: 'id', dataIndex: 'id', width: '80px' },
-          { text: '用户名', value: 'username', dataIndex: 'username' },
+          { text: '用户名', value: 'username', dataIndex: 'username', search: true },
           { text: '邮箱', value: 'email', dataIndex: 'email' },
           { text: '角色', value: 'role', dataIndex: 'role' },
           { text: '状态', value: 'status', dataIndex: 'status', width: '100px' },
@@ -272,7 +272,7 @@ export const 基础示例 = {
               class="pa-0"
               :keyword.sync="keyword"
               :keywordFieldList.sync="keywordFieldList"
-              :headers="headers"
+              :fields="headers"
               @search="handleSearch"
             />
           </template>

@@ -116,7 +116,7 @@
       </v-row>
 
       <!-- 垂直布局 -->
-      <v-row v-else :dense="size === 'small'">
+      <v-row v-else-if="layout === 'vertical' || layout === 'simple'" :dense="size === 'small'">
         <v-col
           v-for="(item, index) in visibleColumns"
           :key="index"
@@ -185,6 +185,84 @@
           </div>
         </v-col>
       </v-row>
+
+      <!-- 行内布局 -->
+      <div
+        v-else
+        class="jh-descriptions-inline"
+        :class="{
+          'jh-descriptions-inline--small': size === 'small',
+          'jh-descriptions-inline--bordered': bordered,
+        }"
+      >
+        <div
+          v-for="(item, index) in visibleColumns"
+          :key="index"
+          class="jh-descriptions-inline-item"
+          :style="getInlineItemStyle(item)"
+        >
+          <div :class="['jh-descriptions-inline-label', { 'jh-descriptions-item-label--colon': colon }]">
+            <span class="jh-descriptions-item-label-text">{{ item.label || item.title }}</span>
+            <v-tooltip v-if="item.tooltip" bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon x-small class="ml-1" v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+              </template>
+              <span>{{ item.tooltip }}</span>
+            </v-tooltip>
+          </div>
+          <div class="jh-descriptions-inline-value">
+            <!-- 编辑模式 -->
+            <template v-if="isEditing && item.editable !== false">
+              <component
+                :is="getFieldComponent(item)"
+                v-model="formData[item.dataIndex || item.key]"
+                v-bind="getFieldProps(item)"
+                :disabled="item.disabled"
+                :readonly="item.readonly"
+                dense
+                outlined
+                hide-details="auto"
+                @change="handleFieldChange(item, $event)"
+              />
+            </template>
+
+            <!-- 显示模式 -->
+            <template v-else>
+              <div class="jh-descriptions-item-value">
+                <!-- 自定义插槽 -->
+                <slot
+                  v-if="$slots[`item-${item.dataIndex || item.key}`]"
+                  :name="`item-${item.dataIndex || item.key}`"
+                  :value="getValue(item)"
+                  :record="dataSource"
+                  :item="item"
+                ></slot>
+
+                <!-- 自定义 render -->
+                <template v-else-if="item.render">
+                  <span v-html="renderValue(item)"></span>
+                </template>
+
+                <!-- 默认渲染 -->
+                <template v-else>
+                  {{ formatValue(item) }}
+                </template>
+
+                <!-- 复制按钮 -->
+                <v-btn
+                  v-if="item.copyable && getValue(item)"
+                  icon
+                  x-small
+                  class="ml-2"
+                  @click="copyToClipboard(getValue(item), item)"
+                >
+                  <v-icon x-small>mdi-content-copy</v-icon>
+                </v-btn>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
     </div>
   </jh-card>
 </template>
@@ -243,11 +321,11 @@ export default {
       default: 3,
     },
 
-    // 布局方式 horizontal | vertical
+    // 布局方式 horizontal | vertical | inline | simple
     layout: {
       type: String,
       default: 'horizontal',
-      validator: (value) => ['horizontal', 'vertical'].includes(value),
+      validator: (value) => ['horizontal', 'vertical', 'inline', 'simple'].includes(value),
     },
 
     // 是否显示边框
@@ -416,6 +494,17 @@ export default {
     getItemCols(item) {
       const span = item.span || 1;
       return 12 / this.getColumnCount() * span;
+    },
+
+    // 行内布局宽度
+    getInlineItemStyle(item) {
+      const span = item.span || 1;
+      const columns = this.getColumnCount() || 1;
+      const percent = Math.min(100, (span / columns) * 100);
+      return {
+        flexBasis: `${percent}%`,
+        maxWidth: `${percent}%`,
+      };
     },
 
     // 获取列数
@@ -723,6 +812,71 @@ export default {
   padding: 12px 0;
   color: rgba(0, 0, 0, 0.65);
   min-height: 40px;
+}
+
+/* 简洁布局 */
+.jh-descriptions-content--simple .jh-descriptions-item-vertical {
+  border: none;
+  padding: 0;
+}
+
+.jh-descriptions-content--simple .jh-descriptions-item-label {
+  padding: 4px 0;
+  border: none;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.jh-descriptions-content--simple .jh-descriptions-item-content {
+  padding: 4px 0 12px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.jh-descriptions-content--simple .jh-descriptions-item-content:last-child {
+  border-bottom: none;
+}
+
+/* 行内布局 */
+.jh-descriptions-inline {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.jh-descriptions-inline--bordered {
+  border-top: 1px solid #f0f0f0;
+  border-left: 1px solid #f0f0f0;
+}
+
+.jh-descriptions-inline-item {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  min-width: 200px;
+}
+
+.jh-descriptions-inline--bordered .jh-descriptions-inline-item {
+  border-right: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.jh-descriptions-inline-label {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.65);
+  margin-right: 12px;
+  min-width: 80px;
+}
+
+.jh-descriptions-inline-value {
+  flex: 1;
+  min-width: 0;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.jh-descriptions-inline--small .jh-descriptions-inline-item {
+  padding: 8px 12px;
 }
 
 /* 标签冒号 */

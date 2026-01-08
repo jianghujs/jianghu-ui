@@ -17,7 +17,7 @@
     </div>
 
     <!-- 字段内容区域 -->
-    <v-row :class="rowClass" :dense="dense">
+    <v-row :class="rowClass" :dense="dense" v-bind="rowProps">
       <template v-for="(field, index) in visibleFields">
         <!-- 分组标题 -->
         <v-col v-if="field.type === 'group'" :key="`group-${index}`" cols="12">
@@ -261,6 +261,87 @@
                   ></v-time-picker>
                 </v-menu>
 
+                <!-- 颜色选择器 -->
+                <v-menu
+                  v-else-if="field.type === 'color'"
+                  v-model="colorMenus[field.key]"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="320px"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      :class="inputClass"
+                      :dense="getDense(field)"
+                      :filled="getFilled(field)"
+                      :outlined="getOutlined(field)"
+                      :value="getFieldValue(field.key)"
+                      :rules="getRules(field)"
+                      :disabled="getFieldDisabled(field)"
+                      :placeholder="field.placeholder"
+                      :hide-details="field.hideDetails || hideDetails"
+                      readonly
+                      v-on="on"
+                      v-bind="field.props"
+                    >
+                      <template v-slot:append>
+                        <span
+                          class="jh-color-preview"
+                          :style="{ backgroundColor: getFieldValue(field.key) || field.defaultValue || '#ffffff' }"
+                        ></span>
+                      </template>
+                    </v-text-field>
+                  </template>
+                  <v-color-picker
+                    :value="getFieldValue(field.key) || field.defaultValue || '#000000'"
+                    flat
+                    :hide-mode-switch="field.hideModeSwitch !== false"
+                    @input="handleColorInput(field, $event)"
+                    v-bind="field.pickerProps"
+                  ></v-color-picker>
+                </v-menu>
+
+                <!-- 滑块 -->
+                <v-slider
+                  v-else-if="field.type === 'slider'"
+                  :class="inputClass"
+                  :value="getFieldValue(field.key)"
+                  @input="handleInput(field.key, $event)"
+                  :rules="getRules(field)"
+                  :disabled="getFieldDisabled(field)"
+                  :readonly="field.readonly"
+                  :min="field.min !== undefined ? field.min : 0"
+                  :max="field.max !== undefined ? field.max : 100"
+                  :step="field.step !== undefined ? field.step : 1"
+                  :thumb-label="field.thumbLabel"
+                  :ticks="field.ticks"
+                  :tick-size="field.tickSize"
+                  :color="field.color || 'primary'"
+                  :hide-details="field.hideDetails || hideDetails"
+                  v-bind="field.props"
+                ></v-slider>
+
+                <!-- 区间滑块 -->
+                <v-range-slider
+                  v-else-if="field.type === 'range-slider'"
+                  :class="inputClass"
+                  :value="getFieldValue(field.key)"
+                  @input="handleInput(field.key, $event)"
+                  :rules="getRules(field)"
+                  :disabled="getFieldDisabled(field)"
+                  :readonly="field.readonly"
+                  :min="field.min !== undefined ? field.min : 0"
+                  :max="field.max !== undefined ? field.max : 100"
+                  :step="field.step !== undefined ? field.step : 1"
+                  :thumb-label="field.thumbLabel"
+                  :ticks="field.ticks"
+                  :tick-size="field.tickSize"
+                  :color="field.color || 'primary'"
+                  :hide-details="field.hideDetails || hideDetails"
+                  v-bind="field.props"
+                ></v-range-slider>
+
                 <!-- 开关 -->
                 <v-switch
                   v-else-if="field.type === 'switch'"
@@ -441,6 +522,11 @@ export default {
       type: String,
       default: ''
     },
+    // 行参数配置
+    rowProps: {
+      type: Object,
+      default: () => ({})
+    },
     // 通用校验规则
     validationRules: {
       type: Object,
@@ -474,6 +560,7 @@ export default {
       values: {},
       dateMenus: {},
       timeMenus: {},
+      colorMenus: {},
       dependencyWatchers: [],
     };
   },
@@ -712,6 +799,10 @@ export default {
         return value ? '是' : '否';
       }
 
+      if (field.type === 'range-slider' && Array.isArray(value)) {
+        return value.join(' ~ ');
+      }
+
       return value || '-';
     },
 
@@ -765,6 +856,13 @@ export default {
       this.$set(this.values, key, value);
       this.$emit('input', this.values);
       this.$emit('field-change', { key, value, values: this.values });
+    },
+
+    handleColorInput(field, value) {
+      this.handleInput(field.key, value);
+      if (field.closeOnSelect !== false) {
+        this.$set(this.colorMenus, field.key, false);
+      }
     },
 
     handleBlur(key, value) {
@@ -888,5 +986,13 @@ export default {
 .jh-field-extra {
   margin-top: -8px;
   line-height: 1.5;
+}
+
+.jh-color-preview {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
 }
 </style>

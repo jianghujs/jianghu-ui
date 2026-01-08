@@ -4,7 +4,7 @@
 
 ## 功能特性
 
-- 📋 **多种布局** - 支持水平和垂直两种布局方式
+- 📋 **多种布局** - 支持水平、垂直、行内与简洁四种布局方式
 - ✏️ **可编辑模式** - 支持行内编辑，快速修改数据
 - 🎨 **丰富的 ValueType** - 内置多种数据类型格式化
 - 📱 **响应式列数** - 支持不同屏幕尺寸自适应列数
@@ -95,6 +95,50 @@ export default {
         productName: 'iPhone 15 Pro',
         price: 7999,
         stock: 1234,
+      },
+    };
+  },
+};
+</script>
+```
+
+## 行内 / 简洁布局
+
+```vue
+<template>
+  <div class="space-y-6">
+    <jh-descriptions
+      title="行内展示（紧凑左右）"
+      layout="inline"
+      :columns="columns"
+      :data-source="dataSource"
+      :column="{ default: 3, md: 2, sm: 1 }"
+    />
+
+    <jh-descriptions
+      title="简洁展示（上下堆叠）"
+      layout="simple"
+      :columns="columns"
+      :data-source="dataSource"
+      :column="2"
+      :bordered="false"
+    />
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      columns: [
+        { title: '负责人', dataIndex: 'owner' },
+        { title: '创建时间', dataIndex: 'createdAt', valueType: 'dateTime' },
+        { title: '状态', dataIndex: 'status', valueType: 'option', valueEnum: { enabled: '启用', disabled: '禁用' } },
+      ],
+      dataSource: {
+        owner: '陈小明',
+        createdAt: '2024-01-20 09:00:00',
+        status: 'enabled',
       },
     };
   },

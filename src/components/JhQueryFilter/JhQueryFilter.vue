@@ -266,6 +266,7 @@ export default {
         // 查询过滤器字段默认可清空
         props: {
           clearable: true,
+          placeholder: field.placeholder || `请输入${field.text}`,
           ...field.props,
         },
       }));
