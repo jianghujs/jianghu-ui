@@ -10,7 +10,7 @@
     class="elevation-24"
   >
     <!-- 抽屉标题 -->
-    <v-row class="jh-drawer-header px-4 bg-white sticky top-0 z-10" no-gutters align="center">
+    <v-row v-if="title" class="jh-drawer-header px-4 bg-white sticky top-0 z-10" no-gutters align="center">
       <span class="text-h7 font-weight-bold py-4">{{ title }}</span>
       <v-spacer></v-spacer>
 
@@ -82,7 +82,7 @@ export default {
     // 抽屉标题
     title: {
       type: String,
-      default: '抽屉'
+      default: ''
     },
 
     // 抽屉位置
