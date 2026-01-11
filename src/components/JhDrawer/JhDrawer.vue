@@ -7,6 +7,7 @@
     :right="position === 'right'"
     :left="position === 'left'"
     :width="width"
+    v-bind="mergedDrawerProps"
     class="elevation-24"
   >
     <!-- 抽屉标题 -->
@@ -118,13 +119,29 @@ export default {
     cancelText: {
       type: String,
       default: '取消'
-    }
+    },
   },
 
   data() {
     return {
       isShownInternal: this.value,
     };
+  },
+  computed: {
+    // 合并透传属性，排除已处理的属性
+    mergedDrawerProps() {
+      const excludedAttrs = ['value', 'modelValue', 'permanent', 'fixed', 'temporary', 'right', 'left', 'width'];
+      const { class: cls, style, ...rest } = this.$attrs || {};
+      const filteredAttrs = {};
+      
+      Object.keys(rest).forEach(key => {
+        if (!excludedAttrs.includes(key) && !excludedAttrs.includes(key.replace(/([A-Z])/g, '-$1').toLowerCase())) {
+          filteredAttrs[key] = rest[key];
+        }
+      });
+      
+      return filteredAttrs;
+    }
   },
 
   watch: {

@@ -396,7 +396,7 @@ export default {
       this.handleFieldChange({ key, value });
     },
 
-    // 获取表单引用(供父组件调用)
+    // 获取表单引用(供父组件调用) - 与 v-form 保持一致
     getForm() {
       return this.$refs[this.formRef];
     },
@@ -416,8 +416,8 @@ export default {
       this.$set(this.formData, key, value);
     },
 
-    // 重置表单
-    resetForm() {
+    // 重置表单 - 与 v-form 的 reset() 方法保持一致
+    reset() {
       const form = this.$refs[this.formRef];
       if (form) {
         form.reset();
@@ -425,8 +425,13 @@ export default {
       this.initFormData();
       this.$emit('reset', this.formData);
     },
+    
+    // 重置表单（别名，保持向后兼容）
+    resetForm() {
+      this.reset();
+    },
 
-    // 重置表单验证
+    // 重置表单验证 - 与 v-form 的 resetValidation() 方法保持一致
     resetValidation() {
       const form = this.$refs[this.formRef];
       if (form) {
@@ -434,13 +439,25 @@ export default {
       }
     },
 
-    // 验证表单
+    // 验证表单 - 与 v-form 的 validate() 方法保持一致
     async validate() {
       const form = this.$refs[this.formRef];
       if (form) {
         const isValid = await form.validate();
         this.$emit('validate', isValid, this.formData);
         return isValid;
+      }
+      return true;
+    },
+    
+    // 验证单个字段 - 与 v-form 的 validate() 方法保持一致
+    async validateField(fieldName) {
+      const form = this.$refs[this.formRef];
+      if (form && form.$refs && form.$refs[fieldName]) {
+        const field = form.$refs[fieldName];
+        if (field && typeof field.validate === 'function') {
+          return await field.validate();
+        }
       }
       return true;
     },

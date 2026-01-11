@@ -256,6 +256,7 @@
       @update:items-per-page="handleItemsPerPageChange"
       @update:sort-by="handleSortByUpdate"
       @update:sort-desc="handleSortDescUpdate"
+      @update:options="handleOptionsUpdate"
     >
       <!-- 自定义表头插槽 -->
       <template
@@ -278,7 +279,7 @@
               <!-- 配置的操作按钮 -->
               <template v-if="actionColumn && actionColumn.buttons">
                 <template v-for="(btn, idx) in getVisibleButtons(item)">
-                  <v-tooltip v-if="btn.tooltip" bottom :key="idx">
+                  <v-tooltip v-if="btn.tooltip" :key="`tooltip-${idx}`" bottom>
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
                         x-small
@@ -297,7 +298,7 @@
                   </v-tooltip>
                   <v-btn
                     v-else
-                    :key="idx"
+                    :key="`btn-${idx}`"
                     x-small
                     :text="btn.type === 'link'"
                     :icon="btn.type === 'icon'"
@@ -499,7 +500,7 @@
       </template>
 
       <!-- 分页文本 -->
-      <template v-slot:footer.page-text="pagination">
+      <template v-slot:[`footer.page-text`]="pagination">
         <span>{{ pagination.pageStart }}-{{ pagination.pageStop }}</span>
         <span class="ml-1">共{{ pagination.itemsLength }}条</span>
       </template>
@@ -1040,23 +1041,51 @@ export default {
       return this.$attrs.style || null;
     },
     mergedDataTableProps() {
+      // 排除已经在组件内部处理的属性，避免重复
+      const excludedAttrs = [
+        'class', 'style', 'headers', 'items', 'search', 'footer-props',
+        'items-per-page', 'page', 'server-items-length', 'mobile-breakpoint',
+        'loading', 'checkbox-color', 'fixed-header', 'show-select',
+        'single-select', 'value', 'item-key', 'dense', 'multi-sort',
+        'must-sort', 'sort-by', 'sort-desc'
+      ];
+      
       const { class: cls, style, ...rest } = this.$attrs || {};
+      const filteredAttrs = {};
+      
+      Object.keys(rest).forEach(key => {
+        // 排除已处理的属性，但允许通过 dataTableProps 覆盖
+        if (!excludedAttrs.includes(key) && !excludedAttrs.includes(key.replace(/([A-Z])/g, '-$1').toLowerCase())) {
+          filteredAttrs[key] = rest[key];
+        }
+      });
+      
+      // dataTableProps 优先级最高，可以覆盖任何属性
       return {
-        ...rest,
+        ...filteredAttrs,
         ...this.dataTableProps
       };
     },
     dataTableListeners() {
-      const {
-        'click:row': clickRow,
-        input,
-        'update:page': updatePage,
-        'update:items-per-page': updateItemsPerPage,
-        'update:sort-by': updateSortBy,
-        'update:sort-desc': updateSortDesc,
-        ...rest
-      } = this.$listeners || {};
-      return rest;
+      // 排除已经在组件内部处理的事件，避免重复触发
+      const excludedEvents = [
+        'click:row', 'input', 'update:page', 'update:items-per-page',
+        'update:sort-by', 'update:sort-desc', 'update:options',
+        'create-click', 'update-click', 'delete-click', 'row-click',
+        'selection-change', 'refresh', 'copy-success', 'request-error',
+        'filter-search', 'filter-reset', 'columns-state-change', 'sort-change'
+      ];
+      
+      const listeners = { ...this.$listeners || {} };
+      const filteredListeners = {};
+      
+      Object.keys(listeners).forEach(key => {
+        if (!excludedEvents.includes(key)) {
+          filteredListeners[key] = listeners[key];
+        }
+      });
+      
+      return filteredListeners;
     }
   },
   watch: {
@@ -1505,6 +1534,24 @@ export default {
       if (this.request) {
         this.reload();
       }
+    },
+    // 处理 v-data-table 的 options 更新事件（Vuetify 2.4+）
+    handleOptionsUpdate(options) {
+      if (options && typeof options === 'object') {
+        if (options.page !== undefined && options.page !== this.currentPage) {
+          this.handlePageChange(options.page);
+        }
+        if (options.itemsPerPage !== undefined && options.itemsPerPage !== this.currentItemsPerPage) {
+          this.handleItemsPerPageChange(options.itemsPerPage);
+        }
+        if (options.sortBy !== undefined) {
+          this.handleSortByUpdate(options.sortBy);
+        }
+        if (options.sortDesc !== undefined) {
+          this.handleSortDescUpdate(options.sortDesc);
+        }
+      }
+      this.$emit('update:options', options);
     },
     // 高级筛选-查询
     handleFilterSearch(queryData) {

@@ -4,6 +4,7 @@
     :max-width="width"
     :persistent="persistent"
     :fullscreen="fullscreen"
+    v-bind="mergedDialogProps"
     @keydown.esc="handleCancel"
   >
     <v-card>
@@ -127,6 +128,22 @@ export default {
     return {
       isShownInternal: this.value,
     };
+  },
+  computed: {
+    // 合并透传属性，排除已处理的属性
+    mergedDialogProps() {
+      const excludedAttrs = ['value', 'modelValue', 'max-width', 'maxWidth', 'persistent', 'fullscreen'];
+      const { class: cls, style, ...rest } = this.$attrs || {};
+      const filteredAttrs = {};
+      
+      Object.keys(rest).forEach(key => {
+        if (!excludedAttrs.includes(key) && !excludedAttrs.includes(key.replace(/([A-Z])/g, '-$1').toLowerCase())) {
+          filteredAttrs[key] = rest[key];
+        }
+      });
+      
+      return filteredAttrs;
+    }
   },
 
   watch: {
