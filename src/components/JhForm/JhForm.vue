@@ -1,5 +1,11 @@
 <template>
-  <v-form :ref="formRef" :lazy-validation="lazyValidation" :class="formClasses">
+  <v-form
+    :ref="formRef"
+    :lazy-validation="lazyValidation"
+    :class="formClasses"
+    v-bind="mergedFormProps"
+    v-on="formListeners"
+  >
     <jh-form-fields
       v-model="formData"
       :fields="normalizedFields"
@@ -48,6 +54,7 @@ import JhFormFields from '../JhFormFields/JhFormFields.vue';
 
 export default {
   name: 'JhForm',
+  inheritAttrs: false,
 
   components: {
     JhFormFields,
@@ -309,6 +316,55 @@ export default {
     gridRowProps() {
       return this.isGridLayout ? (this.rowProps || {}) : {};
     },
+    // 合并透传属性，只排除组件内部明确处理的属性
+    mergedFormProps() {
+      // 只排除组件内部明确处理的属性，其他所有属性都透传给 v-form
+      const excludedAttrs = [
+        'class', 'style',
+        // 这些属性在组件内部有特殊处理
+        'lazy-validation', 'lazyValidation',
+        // JhForm 特有的 props（不在 v-form 中）
+        'fields', 'initialData', 'formRef', 'layout', 'showLabels',
+        'labelPosition', 'labelWidth', 'labelAlign', 'showRequiredMark',
+        'readonly', 'disabled', 'defaultDense', 'defaultFilled', 'defaultOutlined',
+        'defaultSingleLine', 'defaultColsMd', 'hideDetails', 'labelClass',
+        'inputClass', 'rowClass', 'validationRules', 'submitter', 'onFinish',
+        'onFinishFailed', 'dateFormatter', 'omitNil', 'grid', 'colProps', 'rowProps'
+      ];
+      
+      const { class: cls, style, ...rest } = this.$attrs || {};
+      const filteredAttrs = {};
+      
+      Object.keys(rest).forEach(key => {
+        const keyKebab = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+        // 只排除明确处理的属性，其他都透传
+        if (!excludedAttrs.includes(key) && !excludedAttrs.includes(keyKebab)) {
+          filteredAttrs[key] = rest[key];
+        }
+      });
+      
+      return filteredAttrs;
+    },
+    // 透传所有事件，只排除组件内部明确处理的事件
+    formListeners() {
+      // 只排除组件内部明确处理的事件，其他所有事件都透传给 v-form
+      const excludedEvents = [
+        // JhForm 特有的事件（不在 v-form 中）
+        'submit', 'reset', 'validate', 'input', 'change', 'blur', 'field-change'
+      ];
+      
+      const listeners = { ...this.$listeners || {} };
+      const filteredListeners = {};
+      
+      Object.keys(listeners).forEach(key => {
+        // 只排除明确处理的事件，其他都透传
+        if (!excludedEvents.includes(key)) {
+          filteredListeners[key] = listeners[key];
+        }
+      });
+      
+      return filteredListeners;
+    }
   },
 
   watch: {

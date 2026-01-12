@@ -5,6 +5,7 @@
     :persistent="persistent"
     :fullscreen="fullscreen"
     v-bind="mergedDialogProps"
+    v-on="dialogListeners"
     @keydown.esc="handleCancel"
   >
     <v-card>
@@ -61,6 +62,7 @@
 <script>
 export default {
   name: 'JhModal',
+  inheritAttrs: false,
 
   props: {
     // v-model 控制显示/隐藏
@@ -130,19 +132,50 @@ export default {
     };
   },
   computed: {
-    // 合并透传属性，排除已处理的属性
+    // 合并透传属性，只排除组件内部明确处理的属性
     mergedDialogProps() {
-      const excludedAttrs = ['value', 'modelValue', 'max-width', 'maxWidth', 'persistent', 'fullscreen'];
+      // 只排除组件内部明确处理的属性，其他所有属性都透传给 v-dialog
+      const excludedAttrs = [
+        'class', 'style',
+        // 这些属性在组件内部有特殊处理
+        'value', 'modelValue', 'max-width', 'maxWidth', 'persistent', 'fullscreen',
+        // JhModal 特有的 props（不在 v-dialog 中）
+        'title', 'width', 'closable', 'showActions', 'showConfirmButton',
+        'showCancelButton', 'confirmText', 'cancelText'
+      ];
+      
       const { class: cls, style, ...rest } = this.$attrs || {};
       const filteredAttrs = {};
       
       Object.keys(rest).forEach(key => {
-        if (!excludedAttrs.includes(key) && !excludedAttrs.includes(key.replace(/([A-Z])/g, '-$1').toLowerCase())) {
+        const keyKebab = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+        // 只排除明确处理的属性，其他都透传
+        if (!excludedAttrs.includes(key) && !excludedAttrs.includes(keyKebab)) {
           filteredAttrs[key] = rest[key];
         }
       });
       
       return filteredAttrs;
+    },
+    // 透传所有事件，只排除组件内部明确处理的事件
+    dialogListeners() {
+      // 只排除组件内部明确处理的事件，其他所有事件都透传给 v-dialog
+      const excludedEvents = [
+        // JhModal 特有的事件（不在 v-dialog 中）
+        'open', 'close', 'confirm', 'cancel'
+      ];
+      
+      const listeners = { ...this.$listeners || {} };
+      const filteredListeners = {};
+      
+      Object.keys(listeners).forEach(key => {
+        // 只排除明确处理的事件，其他都透传
+        if (!excludedEvents.includes(key)) {
+          filteredListeners[key] = listeners[key];
+        }
+      });
+      
+      return filteredListeners;
     }
   },
 

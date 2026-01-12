@@ -8,7 +8,9 @@
     :left="position === 'left'"
     :width="width"
     v-bind="mergedDrawerProps"
-    class="elevation-24"
+    v-on="drawerListeners"
+    :class="['elevation-24', $attrs.class]"
+    :style="$attrs.style"
   >
     <!-- 抽屉标题 -->
     <v-row v-if="title" class="jh-drawer-header px-4 bg-white sticky top-0 z-10" no-gutters align="center">
@@ -72,6 +74,7 @@
 <script>
 export default {
   name: 'JhDrawer',
+  inheritAttrs: false,
 
   props: {
     // 抽屉显示状态
@@ -128,19 +131,50 @@ export default {
     };
   },
   computed: {
-    // 合并透传属性，排除已处理的属性
+    // 合并透传属性，只排除组件内部明确处理的属性
     mergedDrawerProps() {
-      const excludedAttrs = ['value', 'modelValue', 'permanent', 'fixed', 'temporary', 'right', 'left', 'width'];
+      // 只排除组件内部明确处理的属性，其他所有属性都透传给 v-navigation-drawer
+      const excludedAttrs = [
+        'class', 'style',
+        // 这些属性在组件内部有特殊处理
+        'value', 'modelValue', 'permanent', 'fixed', 'temporary', 'right', 'left', 'width',
+        // JhDrawer 特有的 props（不在 v-navigation-drawer 中）
+        'title', 'position', 'showConfirmButton', 'showCancelButton', 'showCloseButton',
+        'confirmText', 'cancelText'
+      ];
+      
       const { class: cls, style, ...rest } = this.$attrs || {};
       const filteredAttrs = {};
       
       Object.keys(rest).forEach(key => {
-        if (!excludedAttrs.includes(key) && !excludedAttrs.includes(key.replace(/([A-Z])/g, '-$1').toLowerCase())) {
+        const keyKebab = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+        // 只排除明确处理的属性，其他都透传
+        if (!excludedAttrs.includes(key) && !excludedAttrs.includes(keyKebab)) {
           filteredAttrs[key] = rest[key];
         }
       });
       
       return filteredAttrs;
+    },
+    // 透传所有事件，只排除组件内部明确处理的事件
+    drawerListeners() {
+      // 只排除组件内部明确处理的事件，其他所有事件都透传给 v-navigation-drawer
+      const excludedEvents = [
+        // JhDrawer 特有的事件（不在 v-navigation-drawer 中）
+        'open', 'close', 'confirm', 'cancel'
+      ];
+      
+      const listeners = { ...this.$listeners || {} };
+      const filteredListeners = {};
+      
+      Object.keys(listeners).forEach(key => {
+        // 只排除明确处理的事件，其他都透传
+        if (!excludedEvents.includes(key)) {
+          filteredListeners[key] = listeners[key];
+        }
+      });
+      
+      return filteredListeners;
     }
   },
 

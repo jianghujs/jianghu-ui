@@ -1041,45 +1041,64 @@ export default {
       return this.$attrs.style || null;
     },
     mergedDataTableProps() {
-      // 排除已经在组件内部处理的属性，避免重复
+      // 只排除组件内部明确处理的属性，其他所有属性都透传给 v-data-table
+      // 这些属性在组件内部有特殊处理逻辑，需要排除避免冲突
       const excludedAttrs = [
-        'class', 'style', 'headers', 'items', 'search', 'footer-props',
+        'class', 'style', 
+        // 这些属性在组件内部有特殊处理
+        'headers', 'items', 'search', 'footer-props',
         'items-per-page', 'page', 'server-items-length', 'mobile-breakpoint',
         'loading', 'checkbox-color', 'fixed-header', 'show-select',
         'single-select', 'value', 'item-key', 'dense', 'multi-sort',
-        'must-sort', 'sort-by', 'sort-desc'
+        'must-sort', 'sort-by', 'sort-desc',
+        // JhTable 特有的 props（不在 v-data-table 中）
+        'request', 'headerTitle', 'tooltip', 'cardBordered', 'ghost',
+        'toolbar', 'showSearch', 'searchInput', 'showFilter', 'filterFields',
+        'filterInitialValues', 'autoFilterFromHeaders', 'filterCollapsible',
+        'filterDefaultCollapsed', 'filterDefaultVisibleCount', 'filterColSpan',
+        'filterSearchText', 'filterResetText', 'showCreateButton', 'showUpdateAction',
+        'showDeleteAction', 'actionColumn', 'columnsState', 'pagination',
+        'itemsPerPage', 'rowSelection', 'tableAlertRender', 'tableAlertOptionRender',
+        'showSelect', 'singleSelect', 'rowKey', 'size', 'footerProps',
+        'tableClass', 'polling', 'debounceTime', 'dataTableProps'
       ];
       
       const { class: cls, style, ...rest } = this.$attrs || {};
       const filteredAttrs = {};
       
       Object.keys(rest).forEach(key => {
-        // 排除已处理的属性，但允许通过 dataTableProps 覆盖
-        if (!excludedAttrs.includes(key) && !excludedAttrs.includes(key.replace(/([A-Z])/g, '-$1').toLowerCase())) {
+        const keyKebab = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+        // 只排除明确处理的属性，其他都透传
+        if (!excludedAttrs.includes(key) && !excludedAttrs.includes(keyKebab)) {
           filteredAttrs[key] = rest[key];
         }
       });
       
-      // dataTableProps 优先级最高，可以覆盖任何属性
+      // dataTableProps 优先级最高，可以覆盖任何属性（包括透传的属性）
       return {
         ...filteredAttrs,
         ...this.dataTableProps
       };
     },
     dataTableListeners() {
-      // 排除已经在组件内部处理的事件，避免重复触发
+      // 只排除组件内部明确处理的事件，其他所有事件都透传给 v-data-table
+      // 这样用户可以使用 v-data-table 的所有原生事件
       const excludedEvents = [
+        // 这些事件在组件内部有特殊处理逻辑
         'click:row', 'input', 'update:page', 'update:items-per-page',
         'update:sort-by', 'update:sort-desc', 'update:options',
+        // JhTable 特有的事件（不在 v-data-table 中）
         'create-click', 'update-click', 'delete-click', 'row-click',
         'selection-change', 'refresh', 'copy-success', 'request-error',
-        'filter-search', 'filter-reset', 'columns-state-change', 'sort-change'
+        'filter-search', 'filter-reset', 'columns-state-change', 'sort-change',
+        'update:searchInput'
       ];
       
       const listeners = { ...this.$listeners || {} };
       const filteredListeners = {};
       
       Object.keys(listeners).forEach(key => {
+        // 只排除明确处理的事件，其他都透传
         if (!excludedEvents.includes(key)) {
           filteredListeners[key] = listeners[key];
         }
