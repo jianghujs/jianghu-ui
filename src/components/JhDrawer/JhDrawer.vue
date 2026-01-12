@@ -6,11 +6,13 @@
     temporary
     :right="position === 'right'"
     :left="position === 'left'"
-    :width="width"
+    :bottom="isBottomPosition"
+    :width="drawerWidth"
+    :height="drawerHeight"
     v-bind="mergedDrawerProps"
     v-on="drawerListeners"
-    :class="['elevation-24', $attrs.class]"
-    :style="$attrs.style"
+    :class="drawerClasses"
+    :style="drawerStyles"
   >
     <!-- 抽屉标题 -->
     <v-row v-if="title" class="jh-drawer-header px-4 bg-white sticky top-0 z-10" no-gutters align="center">
@@ -54,7 +56,7 @@
 
     <!-- 抽屉关闭按钮 -->
     <v-btn
-      v-if="showCloseButton"
+      v-if="shouldRenderCloseButton"
       elevation="0"
       color="success"
       fab
@@ -93,13 +95,19 @@ export default {
     position: {
       type: String,
       default: 'right',
-      validator: (v) => ['left', 'right'].includes(v)
+      validator: (v) => ['left', 'right', 'bottom'].includes(v)
     },
 
     // 抽屉宽度
     width: {
-      type: String,
+      type: [String, Number],
       default: '90%'
+    },
+
+    // 底部抽屉高度
+    height: {
+      type: [String, Number],
+      default: '60vh'
     },
 
     // 按钮配置
@@ -131,13 +139,47 @@ export default {
     };
   },
   computed: {
+    isBottomPosition() {
+      return this.position === 'bottom';
+    },
+    drawerWidth() {
+      return this.isBottomPosition ? '100%' : this.width;
+    },
+    drawerHeight() {
+      return this.isBottomPosition ? this.height : undefined;
+    },
+    shouldRenderCloseButton() {
+      return this.showCloseButton && !this.isBottomPosition;
+    },
+    drawerClasses() {
+      return [
+        'elevation-24',
+        { 'jh-drawer-bottom': this.isBottomPosition },
+        this.$attrs.class
+      ];
+    },
+    drawerStyles() {
+      const attrsStyle = this.$attrs ? this.$attrs.style : null;
+      if (!this.isBottomPosition) {
+        return attrsStyle || null;
+      }
+      const baseStyle = {
+        borderTopLeftRadius: '16px',
+        borderTopRightRadius: '16px',
+        top: 'auto',
+        bottom: '0',
+        left: '0',
+        right: '0'
+      };
+      return attrsStyle ? [baseStyle, attrsStyle] : baseStyle;
+    },
     // 合并透传属性，只排除组件内部明确处理的属性
     mergedDrawerProps() {
       // 只排除组件内部明确处理的属性，其他所有属性都透传给 v-navigation-drawer
       const excludedAttrs = [
         'class', 'style',
         // 这些属性在组件内部有特殊处理
-        'value', 'modelValue', 'permanent', 'fixed', 'temporary', 'right', 'left', 'width',
+        'value', 'modelValue', 'permanent', 'fixed', 'temporary', 'right', 'left', 'bottom', 'width', 'height',
         // JhDrawer 特有的 props（不在 v-navigation-drawer 中）
         'title', 'position', 'showConfirmButton', 'showCancelButton', 'showCloseButton',
         'confirmText', 'cancelText'
@@ -226,6 +268,11 @@ export default {
 .jh-drawer-action-btn-group {
   display: flex;
   align-items: center;
+}
+
+.jh-drawer-bottom {
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
 }
 
 .drawer-close-float-btn {

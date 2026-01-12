@@ -1,10 +1,10 @@
 # JhDrawer - 抽屉面板组件
 
-JhDrawer 提供左右滑出的信息面板，包含统一的头部、操作按钮和默认内容区域，适合在列表页展示详情、表单或设置。
+JhDrawer 提供左右或底部滑出的信息面板，包含统一的头部、操作按钮和默认内容区域，适合在列表页展示详情、表单或设置。
 
 ## 功能特性
 
-- 📐 **左右滑出**：通过 `position` 快速切换左/右抽屉
+- 📐 **多方向弹出**：通过 `position` 快速切换左/右/底部抽屉
 - 🎯 **受控显示**：`v-model` 控制开关，自动派发 open/close 事件
 - 🧩 **插槽扩展**：`actions` 插槽可自定义按钮组，默认提供确定/取消
 - 📏 **自定义尺寸**：支持百分比或像素宽度，满足不同布局
@@ -34,8 +34,9 @@ JhDrawer 提供左右滑出的信息面板，包含统一的头部、操作按�
 | --- | --- | --- | --- |
 | value | v-model，抽屉显隐 | boolean | false |
 | title | 标题文本 | string | `抽屉` |
-| position | 抽屉位置 `left/right` | string | `right` |
-| width | 抽屉宽度，支持百分比或像素 | string | `90%` |
+| position | 抽屉位置 `left/right/bottom` | string | `right` |
+| width | 抽屉宽度，支持百分比或像素 | string / number | `90%` |
+| height | 底部抽屉高度，支持百分比、像素或 `vh` | string / number | `60vh` |
 | showConfirmButton | 是否显示确认按钮 | boolean | true |
 | showCancelButton | 是否显示取消按钮 | boolean | true |
 | showCloseButton | 是否显示浮动关闭按钮 | boolean | true |
@@ -63,4 +64,5 @@ JhDrawer 提供左右滑出的信息面板，包含统一的头部、操作按�
 
 - 当抽屉内容需要滚动时，可自行在插槽内部包裹滚动容器
 - 通过监听 `confirm/cancel` 事件，在外部控制提交或关闭逻辑
+- 底部抽屉默认隐藏浮动关闭按钮，可在内容区自行提供操作区
 - 配合 `JhDrawerForm` 可以快速构建配置中心、复杂筛选面板

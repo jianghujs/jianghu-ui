@@ -14,6 +14,7 @@ export default {
 ## 特性
 
 - 🎨 **自定义内容**: 通过默认插槽完全自定义抽屉内容
+- 📐 **多方向弹出**: 支持左/右及移动端常见的底部弹出
 - 🎛️ **灵活配置**: 支持左右位置、宽度、按钮显示等配置
 - 🔧 **操作按钮**: 支持自定义操作按钮或使用默认按钮
 - 📱 **响应式**: 适配移动端和桌面端
@@ -33,8 +34,9 @@ export default {
 |------|------|------|--------|
 | value | 抽屉显示状态 (v-model) | Boolean | false |
 | title | 抽屉标题 | String | '抽屉' |
-| position | 抽屉位置 | String | 'right' |
-| width | 抽屉宽度 | String | '90%' |
+| position | 抽屉位置 (left/right/bottom) | String | 'right' |
+| width | 抽屉宽度 | String/Number | '90%' |
+| height | 底部抽屉高度 | String/Number | '60vh' |
 | showConfirmButton | 是否显示确认按钮 | Boolean | true |
 | showCancelButton | 是否显示取消按钮 | Boolean | true |
 | showCloseButton | 是否显示浮动关闭按钮 | Boolean | true |
@@ -78,12 +80,16 @@ export default {
     },
     position: {
       control: { type: 'select' },
-      options: ['left', 'right'],
+      options: ['left', 'right', 'bottom'],
       description: '抽屉位置'
     },
     width: {
       control: { type: 'text' },
       description: '抽屉宽度'
+    },
+    height: {
+      control: { type: 'text' },
+      description: '底部抽屉高度'
     },
     showConfirmButton: {
       control: { type: 'boolean' },
@@ -126,6 +132,7 @@ export const Basic = {
           :title="title"
           :position="position"
           :width="width"
+          :height="height"
           :show-confirm-button="showConfirmButton"
           :show-cancel-button="showCancelButton"
           :show-close-button="showCloseButton"
@@ -171,6 +178,7 @@ export const Basic = {
     title: '基础抽屉',
     position: 'right',
     width: '90%',
+    height: '60vh',
     showConfirmButton: true,
     showCancelButton: true,
     showCloseButton: true,
@@ -218,6 +226,58 @@ export const LeftDrawer = {
     title: '左侧抽屉',
     position: 'left',
     width: '400px'
+  }
+};
+
+// 底部抽屉
+export const BottomDrawer = {
+  render: (args) => ({
+    components: { JhDrawer },
+    data() {
+      return {
+        showDrawer: false,
+        ...args
+      };
+    },
+    template: `
+      <div>
+        <v-btn color="primary" @click="showDrawer = true">底部抽屉</v-btn>
+        <jh-drawer
+          v-model="showDrawer"
+          :title="title"
+          :position="position"
+          :height="height"
+          :width="width"
+          :show-confirm-button="showConfirmButton"
+          :show-cancel-button="showCancelButton"
+        >
+          <div class="pa-4">
+            <h3>底部弹出内容</h3>
+            <p>适合移动端选择器、说明信息等。</p>
+            <v-divider class="my-4"></v-divider>
+            <v-list dense>
+              <v-list-item v-for="item in 3" :key="item">
+                <v-list-item-content>
+                  <v-list-item-title>选项 {{ item }}</v-list-item-title>
+                  <v-list-item-subtitle>附加描述信息</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+            <div class="text-center mt-4">
+              <v-btn color="success" @click="showDrawer = false">完成</v-btn>
+            </div>
+          </div>
+        </jh-drawer>
+      </div>
+    `
+  }),
+  args: {
+    title: '底部抽屉',
+    position: 'bottom',
+    height: '50vh',
+    width: '100%',
+    showConfirmButton: false,
+    showCancelButton: false
   }
 };
 

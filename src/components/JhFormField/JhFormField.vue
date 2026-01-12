@@ -15,6 +15,7 @@
         :filled="filled"
         :outlined="outlined"
         :disabled="disabled"
+        :single-line="singleLine"
         :placeholder="placeholder"
         :hide-details="hideDetails"
         :rules="rules"
@@ -115,17 +116,6 @@
     v-bind="componentProps"
     v-on="componentListeners"
   >
-    <!-- 单选按钮组选项 -->
-    <v-radio
-      v-if="type === 'radio'"
-      v-for="item in items"
-      :key="item[itemValue]"
-      :label="item[itemText]"
-      :value="item[itemValue]"
-      :color="color"
-      class="jh-v-input"
-    ></v-radio>
-    
     <slot></slot>
   </component>
 </template>
@@ -139,7 +129,7 @@ export default {
       type: String,
       default: 'text',
       validator: (v) => [
-        'text', 'textarea', 'number', 'select', 'autocomplete', 
+        'text', 'number', 'password', 'textarea', 'number', 'select', 'autocomplete', 
         'date', 'time', 'color', 'slider', 'range-slider',
         'switch', 'checkbox', 'radio'
       ].includes(v)
@@ -159,7 +149,11 @@ export default {
     },
     outlined: {
       type: Boolean,
-      default: true
+      default: false
+    },
+    singleLine: {
+      type: Boolean,
+      default: false
     },
     disabled: {
       type: Boolean,
@@ -325,6 +319,7 @@ export default {
       switch (this.type) {
         case 'text':
         case 'number':
+        case 'password':
         case 'textarea':
           props.singleLine = this.singleLine;
           props.prefix = this.prefix;

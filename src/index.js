@@ -33,7 +33,6 @@ import JhModal from './components/JhModal/JhModal.vue';
 import JhDrawer from './components/JhDrawer/JhDrawer.vue';
 import JhStepsForm from './components/JhStepsForm/JhStepsForm.vue';
 import JhFormList from './components/JhFormList/JhFormList.vue';
-import JhFormField from './components/JhFormField/JhFormField.vue';
 
 // Advanced Components
 import JhFileInput from './components/JhFileInput/JhFileInput.vue';
@@ -65,7 +64,6 @@ const components = {
   JhDrawer,
   JhStepsForm,
   JhFormList,
-  JhFormField,
   // Advanced Components
   JhFileInput,
   JhJsonEditor,
@@ -120,7 +118,6 @@ export {
   JhDrawer,
   JhStepsForm,
   JhFormList,
-  JhFormField,
   // Advanced Components
   JhFileInput,
   JhJsonEditor,

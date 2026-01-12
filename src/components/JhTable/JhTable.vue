@@ -33,7 +33,7 @@
       :default-visible-count="filterDefaultVisibleCount"
       :col-span="filterColSpan"
       :dense="true"
-      :outlined="true"
+      :outlined="false"
       :show-labels="false"
       :search-text="filterSearchText"
       :reset-text="filterResetText"
