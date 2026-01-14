@@ -1,0 +1,549 @@
+{% block htmlHead %}
+<!-- 引入页面容器组件 -->
+{% include 'component/ui/jhPageContainer.html' %}
+<!-- 引入表格组件 -->
+{% include 'component/ui/jhTable.html' %}
+<!-- 引入筛选组件 -->
+{% include 'component/ui/jhQueryFilter.html' %}
+<!-- 引入抽屉表单组件 -->
+{% include 'component/ui/jhDrawerForm.html' %}
+{% endblock %}
+
+{% extends 'template/jhTemplateV4.html'%}
+{% block vueTemplate %}
+<script type="text/html" id="app-template">
+<jh-page-container
+  :page-name="'<$ ctx.packagePage.pageName $>'"
+  :show-help-button="true"
+  @help-click="isHelpPageDrawerShown = true"
+>
+  <!-- 搜索栏插槽 -->
+  <template v-slot:search-bar>
+    <jh-query-filter
+      :keyword.sync="keyword"
+      :keyword-field-list.sync="keywordFieldList"
+      :headers="headers"
+      keyword-label="标题"
+      @search="doUiAction('getTableData')"
+    >
+      <!-- 自定义筛选字段 -->
+      <template v-slot:filter-fields>
+        <v-col cols="12" sm="4" md="3" xl="2" class="pl-md-2 pt-2 pt-sm-0">
+          <v-text-field
+            prefix="班级"
+            class="jh-v-input"
+            dense
+            single-line
+            filled
+            v-model="serverSearchWhereLike.className"
+          ></v-text-field>
+        </v-col>
+      </template>
+    </jh-query-filter>
+  </template>
+
+  <!-- 内容区域插槽 -->
+  <template v-slot:content>
+    <jh-table
+      :headers="headers"
+      :items="tableDataComputed"
+      :loading="isTableLoading"
+      :search-input.sync="searchInput"
+      :show-search="true"
+      :show-create-button="true"
+      :show-update-action="true"
+      :show-delete-action="true"
+      @create-click="doUiAction('startCreateItem')"
+      @update-click="doUiAction('startUpdateItem', $event)"
+      @delete-click="doUiAction('deleteItem', $event)"
+    >
+    </jh-table>
+  </template>
+
+  <!-- 抽屉插槽 -->
+  <template>
+    <!-- 新增 >>>>>>>>>>>>> -->
+    <jh-drawer-form
+      :is-shown.sync="isCreateDrawerShown"
+      title="新增"
+      form-ref="createForm"
+      confirm-text="新增"
+      :fields="formFields"
+      v-model="createItem"
+      :validation-rules="validationRules"
+      @cancel="closeCreateDrawerCheck"
+      @confirm="doUiAction('createItem')"
+    >
+    </jh-drawer-form>
+    <!-- <<<<<<<<<<<<< 新增 -->
+    <!-- 详情 >>>>>>>>>>>>> -->
+    <jh-drawer-form
+      :is-shown.sync="isUpdateDrawerShown"
+      title="详情"
+      form-ref="updateForm"
+      confirm-text="保存"
+      :fields="formFields"
+      v-model="updateItem"
+      :validation-rules="validationRules"
+      @cancel="closeUpdateDrawerCheck"
+      @confirm="doUiAction('updateItem')"
+    >
+    </jh-drawer-form>
+    <!-- <<<<<<<<<<<<< 详情 -->
+  </template>
+</jh-page-container>
+</script>
+<div id="app"></div>
+{% endblock %}
+
+{% block vueScript %}
+{% include 'common/jianghuJs/fixedTableHeightV4.html' %}
+
+<script type="module">
+
+new Vue({
+  el: '#app',
+  template: '#app-template',
+  vuetify: new Vuetify(),
+  data: () => ({
+
+    isMobile: window.innerWidth < 500,
+    // ================================ 表格相关 ================================
+    headers: [
+      { text: "学生ID", value: "studentId", width: 80, sortable: true },
+      { text: "学生名字", value: "name", width: 80, sortable: true },
+      { text: "性别", value: "gender", width: 80, sortable: true },
+      { text: "出生日期", value: "dateOfBirth", width: 80, sortable: true },
+      { text: "班级ID", value: "classId", width: 80, sortable: true },
+      { text: "年级", value: "level", width: 80, sortable: true },
+      { text: "身高", value: "bodyHeight", width: 80, sortable: true },
+      { text: "学生状态", value: "studentStatus", width: 80, sortable: true },
+      { text: "备注", value: "remarks", width: 80, sortable: true },
+      { text: "操作", value: "action", type: "action", width:window.innerWidth < 500 ? 70 : 120, align: "center", class: "fixed", cellClass: "fixed" },
+    ],
+    tableData: [],
+    tableParams: {},
+    tableDataFromBackend: [],
+    isTableLoading: false,
+    searchInput: null,
+    columnSettingGroup: {},
+    selectedColumnGroup: null,
+    // ============================== 服务端搜索 ===============================
+    serverSearchWhere: {},
+    serverSearchWhereIn: {},
+    serverSearchWhereLike: {},
+    maxSearchDisplay: 5,
+    keyword: '',
+    keywordFieldList: ['name', 'className'],
+    
+    // ================================ 新建抽屉 ================================
+    isCreateDrawerShown: false,
+    createItem: {},
+    createItemOrigin: {},
+    createActionData: {},
+    // ================================ 编辑抽屉 ================================
+    isUpdateDrawerShown: false,
+    updateItem: {},
+    updateItemOrigin: {},
+    updateItemId: null,
+    updateActionData: {},
+    // ================================ 删除 ================================
+    deleteItem: {},
+    deleteItemId: null,
+
+    // ================================ common ================================
+    constantObj: {},
+    validationRules: {
+      require: [v => !!v || '必填'],
+      requireRules: [v => !!v || '必填']
+    },
+    filterMap: {},
+
+    // ================================ 表单字段配置 ================================
+    formFields: [
+      {
+        label: '学生ID',
+        key: 'studentId',
+        type: 'text',
+        cols: { xs: 12, sm: 12, md: 3 },
+        rules: 'require'
+      },
+      {
+        label: '学生名字',
+        key: 'name',
+        type: 'text',
+        cols: { xs: 12, sm: 12, md: 3 },
+        rules: 'require'
+      },
+      {
+        label: '性别',
+        key: 'gender',
+        type: 'select',
+        cols: { xs: 12, sm: 12, md: 3 },
+        rules: 'require',
+        options: [
+          { text: '男', value: '男' },
+          { text: '女', value: '女' }
+        ]
+      },
+      {
+        label: '出生日期',
+        key: 'dateOfBirth',
+        type: 'date',
+        cols: { xs: 12, sm: 12, md: 3 },
+        rules: 'require'
+      },
+      {
+        label: '班级ID',
+        key: 'classId',
+        type: 'text',
+        cols: { xs: 12, sm: 12, md: 3 },
+        rules: 'require'
+      },
+      {
+        label: '年级',
+        key: 'level',
+        type: 'text',
+        cols: { xs: 12, sm: 12, md: 3 },
+        rules: 'require'
+      },
+      {
+        label: '身高',
+        key: 'bodyHeight',
+        type: 'number',
+        cols: { xs: 12, sm: 12, md: 3 },
+        rules: 'require',
+        suffix: 'cm'
+      },
+      {
+        label: '学生状态',
+        key: 'studentStatus',
+        type: 'select',
+        cols: { xs: 12, sm: 12, md: 3 },
+        rules: 'require',
+        options: [
+          { text: '在校', value: '在校' },
+          { text: '休学', value: '休学' },
+          { text: '退学', value: '退学' }
+        ]
+      },
+      {
+        label: '备注',
+        key: 'remarks',
+        type: 'textarea',
+        cols: { xs: 12, sm: 12, md: 6 },
+        rows: 3
+      }
+    ],
+
+    // ================================ 其他抽屉列表 ================================
+
+    
+
+
+  }),
+  watch: {
+    isHelpPageDrawerShown(val) {
+      if (val && !this.isHelpPageDrawerLoaded) {
+        this.isHelpPageDrawerLoaded = true;
+      }
+    },
+  },
+  computed: {
+    tableDataComputed() {
+      if(this.filterMap) {
+        return this.tableData.filter(row => {
+          for (const key in this.filterMap) {
+            if (this.filterMap[key] && row[key] !== this.filterMap[key]) {
+              return false;
+            }
+          }
+          return true;
+        });
+      } else {
+        return this.tableData;
+      }
+    },
+  },
+  async created() {
+        await this.doUiAction('getTableData');
+      },
+  methods: {
+    async doUiAction(uiActionId, uiActionData) {
+      try {
+        switch (uiActionId) {
+          case 'getTableData':
+            await this.prepareTableParamsDefault(uiActionData);
+            await this.prepareTableParams(uiActionData);
+            await this.getTableData(uiActionData);
+            await this.formatTableData(uiActionData);
+            break;
+          case 'startCreateItem':
+            await this.prepareCreateFormData(uiActionData);
+            await this.openCreateDrawer(uiActionData);
+            break;
+          case 'createItem':
+            await this.confirmCreateItemDialog(uiActionData);
+            await this.prepareDoCreateItem(uiActionData);
+            await this.doCreateItem(uiActionData);
+            await this.closeCreateDrawer(uiActionData);
+            await this.doUiAction('getTableData', uiActionData);
+            break;
+          case 'startUpdateItem':
+            await this.prepareUpdateFormData(uiActionData);
+            await this.openUpdateDrawer(uiActionData);
+            break;
+          case 'updateItem':
+            await this.confirmUpdateItemDialog(uiActionData);
+            await this.prepareDoUpdateItem(uiActionData);
+            await this.doUpdateItem(uiActionData);
+            await this.closeUpdateDrawer(uiActionData);
+            await this.doUiAction('getTableData', uiActionData);
+            break;
+          case 'deleteItem':
+            await this.prepareDeleteFormData(uiActionData);
+            await this.confirmDeleteItemDialog(uiActionData);
+            await this.prepareDoDeleteItem(uiActionData);
+            await this.doDeleteItem(uiActionData);
+            await this.doUiAction('getTableData', uiActionData);
+            break;
+          default:
+            console.error("[doUiAction] uiActionId not find", {uiActionId});
+            break;
+        }
+      } catch (error) {
+        window.jhMask && window.jhMask.hide();
+        throw error;
+      } finally {
+        window.jhMask && window.jhMask.hide();
+      }
+    },
+    async prepareTableParamsDefault() {
+      const where = {};
+      const whereLike = {};
+      const whereIn = {};
+      const serverSearchWhere = _.cloneDeep(this.serverSearchWhere || {});
+      const serverSearchWhereIn = _.cloneDeep(this.serverSearchWhereIn || {});
+      const serverSearchWhereLike = _.cloneDeep(this.serverSearchWhereLike || {});
+
+      for (const fieldKey in serverSearchWhere) {
+        const fieldValue = serverSearchWhere[fieldKey];
+        if(!!fieldValue && fieldValue != '全部') {
+          if (_.isString(fieldValue)) {
+            where[fieldKey] = fieldValue.trim();
+          } else {
+            where[fieldKey] = fieldValue;
+          }
+        }
+      }
+      for (const fieldKey in serverSearchWhereLike) {
+        const fieldValue = serverSearchWhereLike[fieldKey];
+        if(!!fieldValue && fieldValue != '全部') {
+          if (_.isString(fieldValue)) {
+            whereLike[fieldKey] = '%' + fieldValue.trim() + '%';
+          } else {
+            whereLike[fieldKey] = '%' + fieldValue + '%';
+          }
+        }
+      }
+      for (const fieldKey in serverSearchWhereIn) {
+        const fieldValue = serverSearchWhereIn[fieldKey];
+        if(!!fieldValue && _.isArray(fieldValue) && fieldValue.length > 0) {
+          whereIn[fieldKey] = fieldValue;
+        }
+      }
+
+      let whereOrOptions = [];
+      if (this.keyword) {
+        if (!this.keywordFieldList || this.keywordFieldList.length === 0) {
+          console.warn('keywordFieldList is empty');
+        }
+        this.keywordFieldList.forEach(fieldKey => {
+          whereOrOptions.push([fieldKey, 'like', '%' + this.keyword.trim() + '%']);
+        });
+      }
+      let orderBy = [{column: 'operationAt', order: 'desc'}];
+
+      let limit = null;
+      let offset = null;
+      this.tableParams = { where, whereLike, whereIn, limit, offset, orderBy, whereOrOptions };
+    },
+    // 准备请求参数-自定义
+    prepareTableParams() {
+      // TODO 增加自定义复杂判断条件
+    },
+    // 获取表格数据
+    async getTableData() {
+      this.isTableLoading = true;
+
+      const result = await window.jianghuAxios({
+        data: {
+          appData: {
+            pageId: 'studentManagement',
+            actionId: "selectItemList",
+            actionData: {},
+            ...this.tableParams
+          }
+        }
+      });
+      const { rows, count } = result.data.appData.resultData;
+      
+      this.tableDataFromBackend = rows;
+      this.isTableLoading = false;
+    },
+    formatTableData() {
+      let tableData = this.tableDataFromBackend.map(row => {
+        row.operationAt = row.operationAt ? dayjs(row.operationAt).format('YYYY-MM-DD HH:mm:ss') : '';
+        return row;
+      });
+      this.tableData = tableData;
+    },
+    // ---------- <<<<<<<<<<< 获取表格数据 uiAction ---------
+    // ---------- 新增数据 uiAction >>>>>>>>>> --------
+    async prepareCreateFormData() {
+      this.createItem = {
+      };
+      this.createItemOrigin = _.cloneDeep(this.createItem);
+    },
+    async openCreateDrawer() {
+      this.isCreateDrawerShown = true;
+    },
+    async confirmCreateItemDialog() {
+      if (await window.confirmDialog({title: "新增", content: "确定新增吗？"}) === false) {
+        throw new Error("[confirmCreateFormDialog] 否");
+      }
+    },
+    prepareDoCreateItem() {
+      const {id, ...data} = this.createItem;
+      this.createActionData = {
+        studentId: data.studentId,
+        name: data.name,
+        gender: data.gender,
+        dateOfBirth: data.dateOfBirth,
+        classId: data.classId,
+        level: data.level,
+        bodyHeight: data.bodyHeight,
+        studentStatus: data.studentStatus,
+        remarks: data.remarks,
+      };
+    },
+    async doCreateItem() {
+      await window.jhMask.show();
+      await window.vtoast.loading("新增数据");
+      await window.jianghuAxios({
+        data: {
+          appData: {
+            pageId: 'studentManagement',
+            actionId: 'insertItem',
+            actionData: this.createActionData
+          }
+        }
+      })
+      await window.jhMask.hide();
+      await window.vtoast.success("新增数据成功");
+    },
+    async closeCreateDrawerCheck() {
+      await this.closeCreateDrawer();
+    },
+    async closeCreateDrawer() {
+      this.isCreateDrawerShown = false;
+      this.createItem = {};
+      this.createActionData = null;
+    },
+    // ---------- <<<<<<<<<<< 新增数据 uiAction ---------
+    // ---------- 修改数据 uiAction >>>>>>>>>>>> --------
+    async prepareUpdateFormData(funObj) {
+      this.updateItem = _.cloneDeep(funObj);
+    },
+    async openUpdateDrawer() {
+      this.isUpdateDrawerShown = true;
+    },
+    async confirmUpdateItemDialog() {
+      if (await window.confirmDialog({title: "修改", content: "确定修改吗？"}) === false) {
+        throw new Error("[confirmUpdateItemDialog] 否");
+      }
+    },
+    async prepareDoUpdateItem() {
+      const {id, ...data} = this.updateItem;
+      this.updateItemId = id;
+      this.updateActionData = {
+        studentId: data.studentId,
+        name: data.name,
+        gender: data.gender,
+        dateOfBirth: data.dateOfBirth,
+        classId: data.classId,
+        level: data.level,
+        bodyHeight: data.bodyHeight,
+        studentStatus: data.studentStatus,
+        remarks: data.remarks,
+      };
+    },
+    async doUpdateItem() {
+      await window.jhMask.show();
+      await window.vtoast.loading("修改数据");
+      await window.jianghuAxios({
+        data: {
+          appData: {
+            pageId: 'studentManagement',
+            actionId: 'updateItem',
+            actionData: this.updateActionData,
+            where: {id: this.updateItemId}
+          }
+        }
+      })
+      await window.jhMask.hide();
+      await window.vtoast.success("修改数据成功");
+    },
+    async closeUpdateDrawerCheck() {
+      await this.closeUpdateDrawer();
+    },
+    async closeUpdateDrawer() {
+      this.isUpdateDrawerShown = false;
+      this.updateItem = {};
+      this.updateActionData = null;
+      this.updateItemId = null;
+    },
+    // ---------- <<<<<<<<<<< 修改数据 uiAction ---------
+    // ---------- 删除数据 uiAction >>>>>>>>>>>> --------
+    async prepareDeleteFormData(funObj) {
+      this.deleteItem = _.cloneDeep(funObj);
+    },
+    async confirmDeleteItemDialog() {
+      if (await window.confirmDialog({title: "删除", content: "确定删除吗？"}) === false) {
+        throw new Error("[confirmDeleteItemDialog] 否");
+      }
+    },
+    async prepareDoDeleteItem() {
+      const {id} = this.deleteItem;
+      this.deleteItemId = id;
+    },
+    async doDeleteItem() {
+      await window.vtoast.loading("删除数据");
+      await window.jianghuAxios({
+        data: {
+          appData: {
+            pageId: 'studentManagement',
+            actionId: 'deleteItem',
+            actionData: {},
+            where: {id: this.deleteItemId}
+          }
+        }
+      });
+      await window.vtoast.success("删除数据成功");
+    },
+    async clearDeleteItem() {
+      this.deleteItem = {};
+      this.deleteItemId = null;
+    },
+    // ---------- <<<<<<<<<<< 删除数据 uiAction ---------
+
+    // ---------- 抽屉列表 uiAction >>>>>>>>>>>> --------
+    // ---------- Custom uiAction >>>>>>>>>>>> --------
+    // ---------- <<<<<<<<<<< Custom uiAction ---------
+
+  }
+})
+</script>
+
+<style scoped>
+</style>{% endblock %}

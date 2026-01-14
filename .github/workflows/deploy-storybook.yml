@@ -1,0 +1,175 @@
+name: Deploy Storybook and Build CDN Package
+
+on:
+  # 当推送到 main 分支时触发
+  push:
+    branches:
+      - main
+
+  # 允许手动触发，便于指定版本号
+  workflow_dispatch:
+    inputs:
+      cdn_version:
+        description: "指定要发布的 CDN 版本（可选，示例：1.0.1 或 1.0.1-hotfix）"
+        required: false
+        type: string
+
+# 设置 GitHub Pages 部署权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 只允许一个并发部署
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # 构建 Storybook 和 CDN 包
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install  # 改为 npm install
+
+      - name: Build CDN Package
+        run: npm run build
+
+      - name: Build Storybook
+        run: npm run build-storybook
+
+      - name: Determine CDN version
+        id: cdn_version
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.cdn_version || '' }}
+        run: |
+          if [ -n "$INPUT_VERSION" ]; then
+            VERSION="$INPUT_VERSION"
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
+          else
+            BASE_VERSION=$(node -p "require('./package.json').version")
+            SUFFIX=$(date -u +%Y%m%d%H%M%S)
+            VERSION="${BASE_VERSION}"
+          fi
+
+          # 使用原始版本号，不替换空白字符
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "CDN version: $VERSION"
+
+      - name: Copy CDN files to Storybook static
+        env:
+          CDN_VERSION: ${{ steps.cdn_version.outputs.value }}
+        run: |
+          set -euo pipefail
+          TARGET_DIR="storybook-static/cdn/${CDN_VERSION}"
+          mkdir -p "$TARGET_DIR"
+          cp -r dist/* "$TARGET_DIR/"
+
+          # latest 目录始终指向最近一次构建
+          rm -rf storybook-static/cdn/latest
+          mkdir -p storybook-static/cdn/latest
+          cp -r dist/* storybook-static/cdn/latest/
+          echo "$CDN_VERSION" > storybook-static/cdn/latest/version.txt
+          
+      - name: Create CDN usage example
+        env:
+          CDN_VERSION: ${{ steps.cdn_version.outputs.value }}
+        run: |
+          VERSION="$CDN_VERSION"
+          cat > storybook-static/cdn-example.html <<EOF
+          <!DOCTYPE html>
+          <html lang="zh-CN">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1.0">
+            <title>JianghuJS UI - CDN 使用示例</title>
+            
+            <!-- Vuetify CSS -->
+            <link href="https://cdn.jsdelivr.net/npm/vuetify@2.7.0/dist/vuetify.min.css" rel="stylesheet">
+            <!-- Material Design Icons -->
+            <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.x/css/materialdesignicons.min.css" rel="stylesheet">
+            <!-- JianghuJS UI CSS -->
+            <link href="./cdn/${VERSION}/jianghu-ui.css" rel="stylesheet">
+          </head>
+          <body>
+            <div id="app">
+              <v-app>
+                <v-main>
+                  <v-container>
+                    <h1>JianghuJS UI CDN 示例</h1>
+                    <p>CDN 文件地址：</p>
+                    <ul>
+                      <li>指定版本：<code>https://你的用户名.github.io/jianghu-ui/cdn/${VERSION}/jianghu-ui.(js|css)</code></li>
+                      <li>最新版本：<code>https://你的用户名.github.io/jianghu-ui/cdn/latest/jianghu-ui.(js|css)</code></li>
+                    </ul>
+                    
+                    <!-- 使用 JhTable 组件示例 -->
+                    <v-card class="mt-4">
+                      <v-card-title>JhTable 组件示例</v-card-title>
+                      <v-card-text>
+                        <jh-table
+                          :headers="headers"
+                          :items="items"
+                        ></jh-table>
+                      </v-card-text>
+                    </v-card>
+                  </v-container>
+                </v-main>
+              </v-app>
+            </div>
+
+            <!-- 依赖库 -->
+            <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/vuetify@2.7.0/dist/vuetify.min.js"></script>
+            
+            <!-- JianghuJS UI -->
+            <script src="./cdn/${VERSION}/jianghu-ui.js"></script>
+
+            <script>
+              new Vue({
+                el: '#app',
+                vuetify: new Vuetify(),
+                data: {
+                  headers: [
+                    { text: 'ID', value: 'id' },
+                    { text: '名称', value: 'name' },
+                    { text: '状态', value: 'status' }
+                  ],
+                  items: [
+                    { id: 1, name: '项目A', status: '进行中' },
+                    { id: 2, name: '项目B', status: '已完成' }
+                  ]
+                }
+              });
+            </script>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./storybook-static
+
+  # 部署到 GitHub Pages
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

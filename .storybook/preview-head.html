@@ -1,0 +1,69 @@
+<!-- Roboto Font from Google -->
+<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+
+<!-- JSONEditor for JhJsonEditor component -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsoneditor@9.10.0/dist/jsoneditor.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jsoneditor@9.10.0/dist/jsoneditor.min.js"></script>
+
+<!-- Sortable.js for JhDraggable component -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuedraggable@2.24.3/dist/vuedraggable.umd.min.js"></script>
+
+<!-- Editor.md for JhMarkdownEditor component -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/editor.md@1.5.0/css/editormd.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/editor.md@1.5.0/editormd.min.js"></script>
+
+<!-- ECharts for JhStatisticCard component -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-echarts@8.0.1/dist/style.min.css">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-echarts@8.0.1/dist/index.min.js"></script>
+<style>
+  /* 确保 Vuetify 样式正确应用 */
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  #storybook-root {
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  .v-application {
+    font-family: Roboto, sans-serif;
+  }
+
+  /* 优化 Docs 预览区域的显示 */
+  .sbdocs-preview {
+    padding: 0 !important;
+  }
+
+  .sbdocs-preview > div {
+    padding: 0 !important;
+  }
+
+  /* 移除 Docs Canvas 的默认 padding */
+  .docs-story {
+    padding: 0 !important;
+  }
+
+  /* 确保预览容器占满宽度 */
+  .sbdocs .sbdocs-preview,
+  .sbdocs .docs-story > div {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* 移除内部容器的 padding */
+  #storybook-root .v-application--wrap {
+    min-height: auto !important;
+  }
+
+  /* 优化小屏幕显示 */
+  @media (max-width: 768px) {
+    .sbdocs-preview {
+      margin: 0 !important;
+    }
+  }
+</style>
