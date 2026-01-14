@@ -1,6 +1,6 @@
 {
   "name": "@jianghujs/jianghu-ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JianghuJS UI Component Library with Storybook, Vue 2, and Vuetify 2",
   "main": "src/index.js",
   "scripts": {
