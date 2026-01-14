@@ -2,7 +2,7 @@ import JhAddressSelect from './JhAddressSelect.vue';
 import { ref, watch } from 'vue';
 
 export default {
-  title: '表单/JhAddressSelect - 省市区选择',
+  title: '数据录入/JhAddressSelect - 省市区选择',
   component: JhAddressSelect,
   tags: ['autodocs'],
   parameters: {
