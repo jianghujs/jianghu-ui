@@ -12,6 +12,7 @@ import JhDateRangePicker from './components/JhDateRangePicker/JhDateRangePicker.
 import JhQueryFilter from './components/JhQueryFilter/JhQueryFilter.vue';
 import JhTable from './components/JhTable/JhTable.vue';
 import JhTreeSelect from './components/JhTreeSelect/JhTreeSelect.vue';
+import JhAddressSelect from './components/JhAddressSelect/JhAddressSelect.vue';
 
 // Layout Components
 import JhPageContainer from './components/JhPageContainer/JhPageContainer.vue';
@@ -49,6 +50,7 @@ const components = {
   JhQueryFilter,
   JhTable,
   JhTreeSelect,
+  JhAddressSelect,
   // Layout Components
   JhPageContainer,
   JhLayout,
