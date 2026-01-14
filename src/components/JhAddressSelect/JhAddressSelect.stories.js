@@ -8,7 +8,8 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: '省市区三级联动选择组件，支持自定义显示层级、标签文本和数据源。这是一个封装了多个 `v-select` 的便利组件，用于快速构建地址输入功能。',
+        component: '省市区三级联动选择组件，支持自定义显示层级、标签文本和数据源。这是一个封装了多个 `v-select` 的便利组件，用于快速构建地址输入功能。<br/>' +
+                   '在 https://github.com/modood/Administrative-divisions-of-China 中获取省市区数据。',
       },
     },
   },
