@@ -55,6 +55,8 @@ npm run serve-storybook
 
 ## CDN 使用方式
 
+### 快速引入
+
 在你的 HTML 文件中引入必要的资源：
 
 ```html
@@ -66,50 +68,78 @@ npm run serve-storybook
   <title>JianghuJS UI Demo</title>
 
   <!-- Vuetify CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.7.0/dist/vuetify.min.css" rel="stylesheet">
   <!-- Material Design Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-  <!-- Roboto 字体 -->
-  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
-  <!-- JianghuJS UI 核心样式（锁定具体版本号，如 1.0.0） -->
-  <link href="https://jianghujs.github.io/jianghu-ui/cdn/<版本号>/jianghu-ui.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
+  <!-- JianghuJS UI 核心样式（使用具体版本号，如 1.0.1） -->
+  <link href="https://cdn.jsdelivr.net/npm/jianghu-ui@1.0.1/dist/jianghu-ui.css" rel="stylesheet">
 </head>
 <body>
   <div id="app">
     <v-app>
       <v-container>
-        <jh-button label="点击我" color="primary" @click="handleClick" />
+        <jh-card title="示例卡片" bordered>
+          <div style="padding: 20px;">
+            <p>这是卡片内容</p>
+          </div>
+        </jh-card>
       </v-container>
     </v-app>
   </div>
 
   <!-- Vue 2 -->
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.7/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
   <!-- Vuetify -->
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.7.0/dist/vuetify.js"></script>
   <!-- JianghuJS UI 运行时代码 -->
-  <script src="https://jianghujs.github.io/jianghu-ui/cdn/<版本号>/jianghu-ui.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jianghu-ui@1.0.1/dist/jianghu-ui.js"></script>
 
   <script>
-    Vue.component('jh-button', {
-      // 引入你的组件定义
-    });
-
     new Vue({
       el: '#app',
       vuetify: new Vuetify(),
-      methods: {
-        handleClick() {
-          alert('按钮被点击了！');
-        }
-      }
+      data: () => ({
+        // 你的数据
+      })
     });
   </script>
 </body>
 </html>
 ```
 
-> ✅ CDN 产物会被发布到 `https://jianghujs.github.io/jianghu-ui/cdn/<版本号>/` 目录中，示例：`cdn/1.0.0/jianghu-ui.js`。生产环境务必固定具体版本，若仅需查看最新构建可临时使用 `cdn/latest/`。
+### CDN 版本选择
+
+#### 使用最新版本
+```html
+<link href="https://cdn.jsdelivr.net/npm/jianghu-ui@latest/dist/jianghu-ui.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/jianghu-ui@latest/dist/jianghu-ui.js"></script>
+```
+
+#### 使用指定版本（推荐生产环境）
+```html
+<link href="https://cdn.jsdelivr.net/npm/jianghu-ui@1.0.1/dist/jianghu-ui.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/jianghu-ui@1.0.1/dist/jianghu-ui.js"></script>
+```
+
+### 可用 CDN 源
+
+#### jsDelivr（推荐）
+```html
+<link href="https://cdn.jsdelivr.net/npm/jianghu-ui@1.0.1/dist/jianghu-ui.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/jianghu-ui@1.0.1/dist/jianghu-ui.js"></script>
+```
+
+#### unpkg
+```html
+<link href="https://unpkg.com/jianghu-ui@1.0.1/dist/jianghu-ui.css" rel="stylesheet">
+<script src="https://unpkg.com/jianghu-ui@1.0.1/dist/jianghu-ui.js"></script>
+```
+
+### 查看完整示例
+
+查看 [examples/cdn-demo.html](examples/cdn-demo.html) 获取完整的使用示例和更多组件演示。
+
+> ✅ CDN 产物会被发布到 npm，通过 jsDelivr/unpkg 提供 CDN 加速。生产环境务必固定具体版本，避免 `@latest` 导致的意外更新。
 
 ## 组件列表
 
