@@ -31,6 +31,23 @@ export default {
         defaultValue: { summary: '3' },
       },
     },
+    type: {
+      control: { type: 'select' },
+      options: ['select', 'cascader'],
+      description: '显示模式：select-普通联动，cascader-级联选择',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: 'select' },
+      },
+    },
+    label: {
+      control: 'text',
+      description: '级联模式下的输入框标签',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: '请选择地区' },
+      },
+    },
     outlined: {
       control: 'boolean',
       description: '是否使用 `outlined` 样式',
@@ -105,6 +122,8 @@ const Template = (args) => ({
       <jh-address-select
         v-model="value"
         :level="args.level"
+        :type="args.type"
+        :label="args.label"
         :outlined="args.outlined"
         :dense="args.dense"
         :loading="args.loading"
@@ -123,6 +142,8 @@ const Template = (args) => ({
 const baseArgs = {
   value: { province: null, city: null, district: null, town: null },
   level: 3,
+  type: 'select',
+  label: '请选择地区',
   outlined: true,
   dense: true,
   loading: false,
@@ -144,6 +165,21 @@ Default.parameters = {
   },
 };
 
+export const CascaderMode = Template.bind({});
+CascaderMode.storyName = "级联选择模式";
+CascaderMode.args = {
+  ...baseArgs,
+  type: 'cascader',
+  label: '请选择收货地址',
+};
+CascaderMode.parameters = {
+  docs: {
+    description: {
+      story: '使用 `type="cascader"` 开启级联选择模式，在一个下拉菜单中完成多级选择。',
+    },
+  },
+};
+
 export const WithInitialValue = Template.bind({});
 WithInitialValue.storyName = "带初始值";
 WithInitialValue.args = {
@@ -157,7 +193,7 @@ WithInitialValue.args = {
 WithInitialValue.parameters = {
   docs: {
     description: {
-      story: '设置 `v-model` 的初始值可以使组件在加载时就显示已选定的地址。返回值包含 `code` 和 `name` 两个字段。',
+      story: '设置 `v-model` 的初始值可以使组件在加载时就显示已选定的地址。返回值包含 `code` 和 `name` ���个字段。',
     },
   },
 };
@@ -279,4 +315,3 @@ Level4WithInitialValue.parameters = {
     },
   },
 };
-

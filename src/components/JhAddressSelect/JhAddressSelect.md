@@ -10,7 +10,8 @@
 - ✅ **双向绑定**: 支持 v-model 双向数据绑定
 - ✅ **事件触发**: change 事件在值变化时触发
 - ✅ **清除功能**: 支持清除已选值
-- ✅ **返回完整信息**: 事件返回包含 code 和 name 的完整对象
+- ✅ **返回完整信息**: 事件返回包�� code 和 name 的完整对象
+- ✅ **多种模式**: 支持普通联动选择 (select) 和级联选择 (cascader) 两种模式
 
 ## 基本用法
 
@@ -54,6 +55,8 @@ export default {
 | --- | --- | --- | --- |
 | value / v-model | 绑定值，返回包含 code 和 name 的对象 | object | { province: null, city: null, district: null } |
 | level | 显示层级：1-仅省份，2-省市，3-省市区，4-省市区镇 | number | 3 |
+| type | 显示模式：'select' (默认) 或 'cascader' | string | 'select' |
+| label | 级联模式下的输入框标签 | string | '请选择地区' |
 | outlined | 是否使用 outlined 样式 | boolean | true |
 | dense | 是否使用紧凑模式 | boolean | false |
 | loading | 是否显示加载状态 | boolean | false |
@@ -114,6 +117,19 @@ data 属性需要符合以下格式：
 ```vue
 <jh-address-select
   v-model="address"
+  :data="addressData"
+></jh-address-select>
+```
+
+### 级联选择模式
+
+使用 `type="cascader"` 开启级联选择模式。
+
+```vue
+<jh-address-select
+  v-model="address"
+  type="cascader"
+  label="收货地址"
   :data="addressData"
 ></jh-address-select>
 ```
@@ -243,6 +259,7 @@ export default {
 4. **禁用状态**: 未选择上级时，下级选择器会自动禁用
 5. **响应式布局**: 组件会根据 level 自动调整栅格布局（level=1 时占 12 列，level=2 时占 6 列，level=3 时占 4 列，level=4 时占 3 列）
 6. **返回值格式**: v-model 和事件返回的值包含 code 和 name 两个字段，方便获取编码和名称
+7. **级联模式**: 在 cascader 模式下，点击省份/城市/区县会展示下一级列表，直到选择完指定 level 级数后自动收起菜单
 
 ## 相关链接
 

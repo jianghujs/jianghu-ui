@@ -1,86 +1,158 @@
 <template>
-  <v-row dense>
-    <v-col cols="12" :md="gridCol">
-      <v-autocomplete
-        class="jh-v-input"
-        v-model="internalValue.province"
-        :items="provinces"
-        :label="labels.province"
-        :outlined="outlined"
-        :dense="dense"
-        :filled="filled"
-        :single-line="singleLine"
-        :loading="loading"
-        item-text="name"
-        item-value="code"
-        clearable
-        hide-details
-        hide-no-data
-        prepend-inner-icon="mdi-map-outline"
-        @change="handleProvinceChange"
-      ></v-autocomplete>
-    </v-col>
-    
-    <v-col v-if="level >= 2" cols="12" :md="gridCol">
-      <v-autocomplete
-        class="jh-v-input"
-        v-model="internalValue.city"
-        :items="cities"
-        :label="labels.city"
-        :disabled="!internalValue.province"
-        :outlined="outlined"
-        :dense="dense"
-        :filled="filled"
-        :single-line="singleLine"
-        :loading="loading"
-        item-text="name"
-        item-value="code"
-        clearable
-        prepend-inner-icon="mdi-city-variant-outline"
-        @change="handleCityChange"
-      ></v-autocomplete>
-    </v-col>
+  <div class="jh-address-select">
+    <template v-if="type === 'select'">
+      <v-row dense>
+        <v-col cols="12" :md="gridCol">
+          <v-autocomplete
+            class="jh-v-input"
+            v-model="internalValue.province"
+            :items="provinces"
+            :label="labels.province"
+            :outlined="outlined"
+            :dense="dense"
+            :filled="filled"
+            :single-line="singleLine"
+            :loading="loading"
+            item-text="name"
+            item-value="code"
+            clearable
+            hide-details
+            hide-no-data
+            prepend-inner-icon="mdi-map-outline"
+            @change="handleProvinceChange"
+          ></v-autocomplete>
+        </v-col>
+        
+        <v-col v-if="level >= 2" cols="12" :md="gridCol">
+          <v-autocomplete
+            class="jh-v-input"
+            v-model="internalValue.city"
+            :items="cities"
+            :label="labels.city"
+            :disabled="!internalValue.province"
+            :outlined="outlined"
+            :dense="dense"
+            :filled="filled"
+            :single-line="singleLine"
+            :loading="loading"
+            item-text="name"
+            item-value="code"
+            clearable
+            prepend-inner-icon="mdi-city-variant-outline"
+            @change="handleCityChange"
+          ></v-autocomplete>
+        </v-col>
 
-    <v-col v-if="level >= 3" cols="12" :md="gridCol">
-      <v-autocomplete
-        class="jh-v-input"
-        v-model="internalValue.district"
-        :items="districts"
-        :label="labels.district"
-        :disabled="!internalValue.city"
-        :outlined="outlined"
-        :dense="dense"
-        :filled="filled"
-        :single-line="singleLine"
-        :loading="loading"
-        item-text="name"
-        item-value="code"
-        clearable
-        prepend-inner-icon="mdi-home-city-outline"
-        @change="handleDistrictChange"
-      ></v-autocomplete>
-    </v-col>
+        <v-col v-if="level >= 3" cols="12" :md="gridCol">
+          <v-autocomplete
+            class="jh-v-input"
+            v-model="internalValue.district"
+            :items="districts"
+            :label="labels.district"
+            :disabled="!internalValue.city"
+            :outlined="outlined"
+            :dense="dense"
+            :filled="filled"
+            :single-line="singleLine"
+            :loading="loading"
+            item-text="name"
+            item-value="code"
+            clearable
+            prepend-inner-icon="mdi-home-city-outline"
+            @change="handleDistrictChange"
+          ></v-autocomplete>
+        </v-col>
 
-    <v-col v-if="level >= 4" cols="12" :md="gridCol">
-      <v-autocomplete
-        class="jh-v-input"
-        v-model="internalValue.town"
-        :items="towns"
-        :label="labels.town"
-        :disabled="!internalValue.district"
-        :outlined="outlined"
-        :dense="dense"
-        :filled="filled"
-        :single-line="singleLine"
-        :loading="loading"
-        item-text="name"
-        item-value="code"
-        clearable
-        prepend-inner-icon="mdi-home-variant-outline"
-        @change="emitChange"
-      ></v-autocomplete>
-    </v-col>
-  </v-row>
+        <v-col v-if="level >= 4" cols="12" :md="gridCol">
+          <v-autocomplete
+            class="jh-v-input"
+            v-model="internalValue.town"
+            :items="towns"
+            :label="labels.town"
+            :disabled="!internalValue.district"
+            :outlined="outlined"
+            :dense="dense"
+            :filled="filled"
+            :single-line="singleLine"
+            :loading="loading"
+            item-text="name"
+            item-value="code"
+            clearable
+            prepend-inner-icon="mdi-home-variant-outline"
+            @change="emitChange"
+          ></v-autocomplete>
+        </v-col>
+      </v-row>
+    </template>
+
+    <template v-else-if="type === 'cascader'">
+      <v-menu
+        v-model="menuVisible"
+        :close-on-content-click="false"
+        offset-y
+        max-width="100%"
+        transition="scale-transition"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-text-field
+            class="jh-v-input"
+            v-bind="attrs"
+            v-on="on"
+            :value="displayText"
+            :label="label"
+            :outlined="outlined"
+            :dense="dense"
+            :filled="filled"
+            :single-line="singleLine"
+            :loading="loading"
+            readonly
+            append-icon="mdi-menu-down"
+            clearable
+            hide-details
+            @click:clear="clearValue"
+          ></v-text-field>
+        </template>
+        <v-card class="jh-cascader-card">
+          <div class="jh-cascader-container">
+             <div class="jh-cascader-column" v-if="provinces.length">
+                <v-list dense class="pa-0">
+                   <v-list-item v-for="item in provinces" :key="item.code" @click="onProvinceClick(item)" :class="{'v-item--active v-list-item--active primary--text': internalValue.province === item.code}">
+                      <v-list-item-content><v-list-item-title :title="item.name">{{ item.name }}</v-list-item-title></v-list-item-content>
+                      <v-list-item-action v-if="level > 1"><v-icon small>mdi-chevron-right</v-icon></v-list-item-action>
+                   </v-list-item>
+                </v-list>
+             </div>
+
+             <div v-if="level >= 2" class="jh-cascader-column">
+                 <v-list dense class="pa-0" v-if="cities.length">
+                   <v-list-item v-for="item in cities" :key="item.code" @click="onCityClick(item)" :class="{'v-item--active v-list-item--active primary--text': internalValue.city === item.code}">
+                      <v-list-item-content><v-list-item-title :title="item.name">{{ item.name }}</v-list-item-title></v-list-item-content>
+                      <v-list-item-action v-if="level > 2"><v-icon small>mdi-chevron-right</v-icon></v-list-item-action>
+                   </v-list-item>
+                </v-list>
+             </div>
+
+             <div v-if="level >= 3" class="jh-cascader-column">
+                 <v-list dense class="pa-0" v-if="districts.length">
+                   <v-list-item v-for="item in districts" :key="item.code" @click="onDistrictClick(item)" :class="{'v-item--active v-list-item--active primary--text': internalValue.district === item.code}">
+                      <v-list-item-content><v-list-item-title :title="item.name">{{ item.name }}</v-list-item-title></v-list-item-content>
+                      <v-list-item-action v-if="level > 3"><v-icon small>mdi-chevron-right</v-icon></v-list-item-action>
+                   </v-list-item>
+                </v-list>
+             </div>
+
+             <div v-if="level >= 4" class="jh-cascader-column">
+                 <v-list dense class="pa-0" v-if="towns.length">
+                   <v-list-item v-for="item in towns" :key="item.code" @click="onTownClick(item)" :class="{'v-item--active v-list-item--active primary--text': internalValue.town === item.code}">
+                      <v-list-item-content><v-list-item-title :title="item.name">{{ item.name }}</v-list-item-title></v-list-item-content>
+                   </v-list-item>
+                </v-list>
+             </div>
+          </div>
+        </v-card>
+      </v-menu>
+    </template>
+  </div>
 </template>
 
 <script>
@@ -96,6 +168,8 @@ export default {
     dense: { type: Boolean, default: true },
     filled: { type: Boolean, default: true },
     singleLine: { type: Boolean, default: true },
+    type: { type: String, default: 'select' }, // select | cascader
+    label: { type: String, default: '请选择地区' },
 
     loading: { type: Boolean, default: false },
     labels: {
@@ -121,7 +195,8 @@ export default {
       internalValue: { ...this.value },
       cities: [],
       districts: [],
-      towns: []
+      towns: [],
+      menuVisible: false,
     };
   },
   computed: {
@@ -133,6 +208,28 @@ export default {
       if (this.level === 2) return 6;
       if (this.level === 3) return 4;
       return 3;
+    },
+    displayText() {
+      if (!this.internalValue.province) return '';
+      const p = this.provinces.find(x => x.code === this.internalValue.province);
+      let text = p ? p.name : '';
+      
+      if (this.level >= 2 && this.internalValue.city) {
+        const c = this.cities.find(x => x.code === this.internalValue.city);
+        if (c) text += ` / ${c.name}`;
+      }
+
+      if (this.level >= 3 && this.internalValue.district) {
+        const d = this.districts.find(x => x.code === this.internalValue.district);
+        if (d) text += ` / ${d.name}`;
+      }
+
+      if (this.level >= 4 && this.internalValue.town) {
+        const t = this.towns.find(x => x.code === this.internalValue.town);
+        if (t) text += ` / ${t.name}`;
+      }
+      
+      return text;
     },
     fullValue() {
       const result = {
@@ -252,10 +349,61 @@ export default {
     emitChange() {
       this.$emit('input', { ...this.fullValue });
       this.$emit('change', { ...this.fullValue });
+    },
+    onProvinceClick(item) {
+      this.internalValue.province = item.code;
+      this.handleProvinceChange(item.code);
+      if (this.level === 1) this.menuVisible = false;
+    },
+    onCityClick(item) {
+      this.internalValue.city = item.code;
+      this.handleCityChange(item.code);
+      if (this.level === 2) this.menuVisible = false;
+    },
+    onDistrictClick(item) {
+      this.internalValue.district = item.code;
+      this.handleDistrictChange(item.code);
+      if (this.level === 3) this.menuVisible = false;
+    },
+    onTownClick(item) {
+      this.internalValue.town = item.code;
+      this.emitChange();
+      if (this.level === 4) this.menuVisible = false;
+    },
+    clearValue() {
+      this.internalValue = { province: null, city: null, district: null, town: null };
+      this.cities = [];
+      this.districts = [];
+      this.towns = [];
+      this.emitChange();
     }
   }
 };
 </script>
 
 <style scoped>
+.jh-cascader-container {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.jh-cascader-column {
+  min-width: 180px;
+  max-width: 250px;
+  max-height: 400px;
+  overflow-y: auto;
+  border-right: 1px solid #eee;
+}
+.jh-cascader-column:last-child {
+  border-right: none;
+}
+/* 优化列表项内容防止过早截断 */
+.jh-cascader-column .v-list-item__content {
+  overflow: visible;
+}
+.jh-cascader-column .v-list-item__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>
