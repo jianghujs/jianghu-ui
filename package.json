@@ -10,7 +10,9 @@
     "build:watch": "webpack --config webpack.config.js --watch",
     "serve-storybook": "npx http-server storybook-static",
     "deploy": "npm run build && npm run build-storybook && npx gh-pages -d storybook-static",
-    "publish": "npm run build && npm publish"
+    "release:patch": "npm version patch && npm run build && npm publish",
+    "release:minor": "npm version minor && npm run build && npm publish",
+    "release:major": "npm version major && npm run build && npm publish"
   },
   "keywords": [
     "jianghujs",

@@ -844,6 +844,10 @@ export default {
     dense: {
       type: Boolean,
       default: false
+    },
+    context: {
+      type: Object,
+      default: null
     }
   },
   data() {
@@ -1267,7 +1271,7 @@ export default {
     },
     getColumnRawValue(header, item, value) {
       if (header && typeof header.valueGetter === 'function') {
-        return header.valueGetter(item, header);
+        return header.valueGetter.call(this.context, item, header);
       }
       if (value !== undefined) return value;
       const key = header?.value;
@@ -1276,7 +1280,7 @@ export default {
     },
     applyValueFormatter(header, rawValue, item, index = 0) {
       if (header && typeof header.valueFormatter === 'function') {
-        const formatted = header.valueFormatter(rawValue, item, header, index);
+        const formatted = header.valueFormatter.call(this.context, rawValue, item, header, index);
         if (formatted !== undefined && formatted !== null) {
           return formatted;
         }
@@ -1537,7 +1541,7 @@ export default {
       if (!this.actionColumn || !this.actionColumn.buttons) return [];
       return this.actionColumn.buttons.filter(btn => {
         if (typeof btn.visible === 'function') {
-          return btn.visible(row);
+          return btn.visible.call(this.context, row);
         }
         return btn.visible !== false;
       });
@@ -1549,7 +1553,7 @@ export default {
         if (!confirmed) return;
       }
       if (btn.onClick) {
-        await btn.onClick(row);
+        await btn.onClick.call(this.context, row);
       }
     },
     // 复制到剪贴板
@@ -1587,7 +1591,7 @@ export default {
       this.$emit('selection-change', payload);
       this.$emit('input', selectedItems);
       if (this.rowSelection && typeof this.rowSelection.onChange === 'function') {
-        this.rowSelection.onChange(payload.selectedRowKeys, selectedItems);
+        this.rowSelection.onChange.call(this.context, payload.selectedRowKeys, selectedItems);
       }
     },
     // 页码改变
@@ -1650,7 +1654,7 @@ export default {
         const value = queryData[key];
         const meta = this.filterFieldMetaMap[key];
         if (meta && typeof meta.transform === 'function') {
-          const result = meta.transform(value, queryData);
+          const result = meta.transform.call(this.context, value, queryData);
           if (result && typeof result === 'object' && !Array.isArray(result)) {
             Object.assign(filters, result);
             return;
@@ -1874,7 +1878,7 @@ export default {
       const snapshot = this.getColumnStateSnapshot();
       this.$emit('columns-state-change', snapshot);
       if (this.columnsState && typeof this.columnsState.onChange === 'function') {
-        this.columnsState.onChange(snapshot);
+        this.columnsState.onChange.call(this.context, snapshot);
       }
       this.persistColumnState(snapshot);
     },
