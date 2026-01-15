@@ -1178,6 +1178,12 @@ export default {
         this.$nextTick(() => this.applySelectionState());
       }
     },
+    actionColumn: {
+      handler() {
+        this.initColumns(this.headers);
+      },
+      deep: true
+    },
     columnsState: {
       deep: true,
       handler(newVal) {
@@ -1216,10 +1222,31 @@ export default {
   methods: {
     // 初始化列配置
     initColumns(headers) {
+      const processedHeaders = [...(headers || [])];
+
+      if (this.actionColumn) {
+        const hasActionColumn = processedHeaders.some(h => h.value === 'action');
+
+        if (!hasActionColumn) {
+          const actionColumnConfig = {
+            text: '操作', value: 'action', sortable: false, width: 120, align: 'center', class: 'fixed', cellClass: 'fixed'
+          };
+
+          if (typeof this.actionColumn === 'object' && this.actionColumn !== null) {
+            const { title, ...restOfActionColumn } = this.actionColumn;
+            Object.assign(actionColumnConfig, restOfActionColumn);
+            if (title) {
+              actionColumnConfig.text = title;
+            }
+          }
+          processedHeaders.push(actionColumnConfig);
+        }
+      }
+
       const persistedState = this.getPersistedColumnState();
       const externalState = this.columnsState?.value;
       const defaultVisible = this.columnsState?.defaultVisible;
-      this.internalColumns = headers.map(h => {
+      this.internalColumns = processedHeaders.map(h => {
         const value = h.value || h.dataIndex || h.key;
         const baseVisible = h.visible !== false;
         const visible = this.resolveColumnVisible({

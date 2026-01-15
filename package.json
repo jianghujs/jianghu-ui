@@ -1,6 +1,6 @@
 {
   "name": "jianghu-ui",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "JianghuJS UI Component Library with Storybook, Vue 2, and Vuetify 2",
   "main": "src/index.js",
   "scripts": {
@@ -9,7 +9,8 @@
     "build": "webpack --config webpack.config.js",
     "build:watch": "webpack --config webpack.config.js --watch",
     "serve-storybook": "npx http-server storybook-static",
-    "deploy": "npm run build && npm run build-storybook && npx gh-pages -d storybook-static"
+    "deploy": "npm run build && npm run build-storybook && npx gh-pages -d storybook-static",
+    "publish": "npm run build && npm publish"
   },
   "keywords": [
     "jianghujs",
