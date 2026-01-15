@@ -117,6 +117,17 @@
           clearable
         ></v-text-field>
 
+        <!-- 导出按钮 -->
+        <v-btn
+          v-if="toolbarConfig.export"
+          icon
+          small
+          @click="handleExport"
+          title="导出"
+        >
+          <v-icon>mdi-export-variant</v-icon>
+        </v-btn>
+
         <!-- 刷新按钮 -->
         <v-btn
           v-if="toolbarConfig.refresh"
@@ -244,7 +255,7 @@
       :single-select="singleSelectComputed"
       :value="selectedItems"
       :item-key="rowKey"
-      :dense="dense"
+      :dense="tableDense"
       :multi-sort="multiSort"
       :must-sort="mustSort"
       :sort-by="internalSortBy"
@@ -964,6 +975,7 @@ export default {
           setting: true,
           density: true,
           fullscreen: false,
+          export: false, // Default to false, can be enabled via prop
           ...this.toolbar
         };
       }
@@ -972,7 +984,8 @@ export default {
         refresh: true,
         setting: true,
         density: true,
-        fullscreen: false
+        fullscreen: false,
+        export: false // Default to false
       };
     },
     // 可见的表头
@@ -992,6 +1005,15 @@ export default {
         }
       ];
     },
+    tableDense() {
+      if (this.currentDensity === 'compact') {
+        return true;
+      }
+      // For 'medium' and 'default', we don't use the dense prop, but a custom class.
+      // But we still respect the component's `dense` prop as a baseline.
+      return this.dense;
+    },
+
     // 密度样式类
     densityClass() {
       return {
@@ -1462,6 +1484,10 @@ export default {
       this.clearPersistedColumnState();
       this.emitColumnStateChange();
       this.$forceUpdate();
+    },
+    // 导出表格
+    handleExport() {
+      this.$emit('export');
     },
     // 刷新表格
     async handleRefresh() {
@@ -1999,6 +2025,16 @@ export default {
   gap: 16px;
   flex: 1;
 }
+
+/* --- 密度调整 --- */
+/* 中等密度 */
+.jh-pro-table ::v-deep .jh-table-medium.v-data-table > .v-data-table__wrapper > table > thead > tr > th {
+  height: 40px;
+}
+.jh-pro-table ::v-deep .jh-table-medium.v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
+  height: 40px;
+}
+
 
 .jh-pro-table-header-right {
   display: flex;
