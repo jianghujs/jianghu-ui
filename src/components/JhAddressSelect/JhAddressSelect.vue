@@ -123,8 +123,8 @@
                 </v-list>
              </div>
 
-             <div v-if="level >= 2" class="jh-cascader-column">
-                 <v-list dense class="pa-0" v-if="cities.length">
+             <div v-if="level >= 2 && internalValue.province && cities.length" class="jh-cascader-column">
+                 <v-list dense class="pa-0">
                    <v-list-item v-for="item in cities" :key="item.code" @click="onCityClick(item)" :class="{'v-item--active v-list-item--active primary--text': internalValue.city === item.code}">
                       <v-list-item-content><v-list-item-title :title="item.name">{{ item.name }}</v-list-item-title></v-list-item-content>
                       <v-list-item-action v-if="level > 2"><v-icon small>mdi-chevron-right</v-icon></v-list-item-action>
@@ -132,8 +132,8 @@
                 </v-list>
              </div>
 
-             <div v-if="level >= 3" class="jh-cascader-column">
-                 <v-list dense class="pa-0" v-if="districts.length">
+             <div v-if="level >= 3 && internalValue.city && districts.length" class="jh-cascader-column">
+                 <v-list dense class="pa-0">
                    <v-list-item v-for="item in districts" :key="item.code" @click="onDistrictClick(item)" :class="{'v-item--active v-list-item--active primary--text': internalValue.district === item.code}">
                       <v-list-item-content><v-list-item-title :title="item.name">{{ item.name }}</v-list-item-title></v-list-item-content>
                       <v-list-item-action v-if="level > 3"><v-icon small>mdi-chevron-right</v-icon></v-list-item-action>
@@ -141,8 +141,8 @@
                 </v-list>
              </div>
 
-             <div v-if="level >= 4" class="jh-cascader-column">
-                 <v-list dense class="pa-0" v-if="towns.length">
+             <div v-if="level >= 4 && internalValue.district && towns.length" class="jh-cascader-column">
+                 <v-list dense class="pa-0">
                    <v-list-item v-for="item in towns" :key="item.code" @click="onTownClick(item)" :class="{'v-item--active v-list-item--active primary--text': internalValue.town === item.code}">
                       <v-list-item-content><v-list-item-title :title="item.name">{{ item.name }}</v-list-item-title></v-list-item-content>
                    </v-list-item>
