@@ -1442,3 +1442,74 @@ export const SelectionAlertRender = {
     `
   })
 };
+
+// 受控服务端分页 (完全由父组件控制)
+export const 受控服务端分页 = {
+  render: () => ({
+    components: { JhTable },
+    data() {
+      return {
+        headers: sampleHeaders,
+        items: [],
+        loading: false,
+        page: 1,
+        itemsPerPage: 10,
+        serverItemsLength: 0,
+      };
+    },
+    mounted() {
+      this.loadData();
+    },
+    watch: {
+      page() {
+        console.log('Page changed to:', this.page);
+        this.loadData();
+      },
+      itemsPerPage() {
+        console.log('Items per page changed to:', this.itemsPerPage);
+        // 通常改变每页大小时建议重置到第一页，但这里取决于业务逻辑
+        // 注意：v-data-table 可能会自动触发 update:page 为 1
+        this.loadData();
+      },
+    },
+    methods: {
+      async loadData() {
+        this.loading = true;
+        console.log(`Loading data: page=${this.page}, size=${this.itemsPerPage}`);
+        
+        // 模拟 API 延迟
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        const total = allMockData.length;
+        const start = (this.page - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        
+        this.items = allMockData.slice(start, end);
+        this.serverItemsLength = total;
+        this.loading = false;
+      },
+    },
+    template: `
+      <div>
+        <div class="mb-4 pa-4 orange lighten-5 rounded">
+          <strong>受控服务端分页示例 (无 request 函数)</strong>
+          <p class="mb-0 mt-2">完全由父组件控制 page 和 itemsPerPage，模拟传统的 v-data-table 服务端分页用法。</p>
+          <div class="mt-2">
+            Page: {{ page }} | ItemsPerPage: {{ itemsPerPage }} | Total: {{ serverItemsLength }}
+          </div>
+        </div>
+        <jh-table
+          :headers="headers"
+          :items="items"
+          :loading="loading"
+          :page.sync="page"
+          :items-per-page.sync="itemsPerPage"
+          :server-items-length="serverItemsLength"
+          :footer-props="{
+            'items-per-page-options': [5, 10, 20]
+          }"
+        />
+      </div>
+    `,
+  }),
+};

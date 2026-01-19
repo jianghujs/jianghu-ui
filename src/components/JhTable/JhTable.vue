@@ -845,6 +845,19 @@ export default {
       type: Boolean,
       default: false
     },
+    // ========== v-data-table 透传 Props (补充) ==========
+    page: {
+      type: Number,
+      default: undefined
+    },
+    serverItemsLength: {
+      type: Number,
+      default: undefined
+    },
+    value: {
+      type: Array,
+      default: undefined
+    },
     context: {
       type: Object,
       default: null
@@ -856,13 +869,13 @@ export default {
       searchInputInternal: this.searchInput,
       currentLoading: this.loading,
       currentItems: this.items || [],
-      currentPage: this.pagination ? this.pagination.current || 1 : 1,
+      currentPage: this.page !== undefined ? this.page : (this.pagination ? this.pagination.current || 1 : 1),
       currentItemsPerPage: this.itemsPerPage,
-      serverItemsLength: -1,
+      serverItemsLength: this.serverItemsLength !== undefined ? this.serverItemsLength : -1,
       internalColumns: [],
       currentDensity: this.size,
       isFullscreen: false,
-      selectedItems: [],
+      selectedItems: this.value || [],
       filterValues: {},
       pollingTimer: null,
       searchDebounceTimer: null,
@@ -1134,6 +1147,26 @@ export default {
     }
   },
   watch: {
+    page(val) {
+      if (val !== undefined && val !== this.currentPage) {
+        this.currentPage = val;
+      }
+    },
+    serverItemsLength(val) {
+      if (val !== undefined) {
+        this.serverItemsLength = val;
+      }
+    },
+    value(val) {
+      if (val !== undefined) {
+        this.selectedItems = val;
+      }
+    },
+    itemsPerPage(val) {
+      if (val !== undefined && val !== this.currentItemsPerPage) {
+        this.currentItemsPerPage = val;
+      }
+    },
     headers: {
       immediate: true,
       handler(val) {
@@ -1634,6 +1667,7 @@ export default {
       const filters = this.transformFilterValues(queryData);
       this.filterValues = filters;
       this.currentPage = 1; // 重置到第一页
+      this.$emit('update:page', 1);
       this.$emit('filter-search', filters);
       if (this.request) {
         this.reload();
@@ -1643,6 +1677,7 @@ export default {
     handleFilterReset() {
       this.filterValues = {};
       this.currentPage = 1; // 重置到第一页
+      this.$emit('update:page', 1);
       this.$emit('filter-reset');
       if (this.request) {
         this.reload();
@@ -1820,6 +1855,7 @@ export default {
     // 重置到第一页
     reset() {
       this.currentPage = 1;
+      this.$emit('update:page', 1);
       this.reload();
     },
     // 清空选择
