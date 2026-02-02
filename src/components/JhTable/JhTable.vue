@@ -2199,6 +2199,7 @@ export default {
 /* 工具栏 */
 .jh-pro-table-toolbar {
   padding: 16px 0 !important;
+  flex: inherit;
 }
 
 /* 表格额外内容区 */

@@ -119,7 +119,7 @@ export default {
 };
 
 // 基础用法
-export const Basic = {
+export const 基础用法 = {
   render: (args) => ({
     components: { JhModal },
     data() {
@@ -194,7 +194,7 @@ export const Basic = {
 };
 
 // 全屏弹窗
-export const Fullscreen = {
+export const 全屏弹窗 = {
   render: (args) => ({
     components: { JhModal },
     data() {
@@ -260,7 +260,7 @@ export const Fullscreen = {
 };
 
 // 自定义操作按钮
-export const CustomActions = {
+export const 自定义操作按钮 = {
   render: (args) => ({
     components: { JhModal },
     data() {
@@ -352,7 +352,7 @@ export const CustomActions = {
 };
 
 // 无操作区域
-export const NoActions = {
+export const 无操作区域 = {
   render: (args) => ({
     components: { JhModal },
     data() {
@@ -416,7 +416,7 @@ export const NoActions = {
 };
 
 // 不同尺寸
-export const DifferentSizes = {
+export const 不同尺寸 = {
   render: (args) => ({
     components: { JhModal },
     data() {
@@ -525,7 +525,7 @@ export const DifferentSizes = {
 };
 
 // 非持久化弹窗
-export const NonPersistent = {
+export const 非持久化弹窗 = {
   render: (args) => ({
     components: { JhModal },
     data() {

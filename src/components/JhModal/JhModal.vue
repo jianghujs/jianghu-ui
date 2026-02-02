@@ -10,7 +10,7 @@
   >
     <v-card>
       <!-- 标题栏 -->
-      <v-card-title class="d-flex align-center justify-space-between pa-4  sticky top-0 z-10 bg-white darken-1">
+      <v-card-title class="d-flex align-center justify-space-between pa-4 sticky top-0 z-10 bg-white darken-1">
         <span class="text-h6">{{ title }}</span>
         <v-btn
           v-if="closable"

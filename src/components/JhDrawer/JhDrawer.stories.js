@@ -115,7 +115,7 @@ export default {
 };
 
 // 基础用法
-export const Basic = {
+export const 基础用法 = {
   render: (args) => ({
     components: { JhDrawer },
     data() {
@@ -188,7 +188,7 @@ export const Basic = {
 };
 
 // 左侧抽屉
-export const LeftDrawer = {
+export const 左侧抽屉 = {
   render: (args) => ({
     components: { JhDrawer },
     data() {
@@ -230,7 +230,7 @@ export const LeftDrawer = {
 };
 
 // 底部抽屉
-export const BottomDrawer = {
+export const 底部抽屉 = {
   render: (args) => ({
     components: { JhDrawer },
     data() {
@@ -282,7 +282,7 @@ export const BottomDrawer = {
 };
 
 // 自定义操作按钮
-export const CustomActions = {
+export const 自定义操作按钮 = {
   render: (args) => ({
     components: { JhDrawer },
     data() {
@@ -369,7 +369,7 @@ export const CustomActions = {
 };
 
 // 无按钮抽屉
-export const NoButtons = {
+export const 无按钮抽屉 = {
   render: (args) => ({
     components: { JhDrawer },
     data() {
@@ -416,7 +416,7 @@ export const NoButtons = {
 };
 
 // 宽度配置
-export const WidthConfig = {
+export const 宽度配置 = {
   render: (args) => ({
     components: { JhDrawer },
     data() {
