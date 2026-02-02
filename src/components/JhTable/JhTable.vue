@@ -254,7 +254,7 @@
       :show-select="showSelectComputed"
       :single-select="singleSelectComputed"
       :value="selectedItems"
-      :item-key="rowKey"
+      :item-key="computedRowKey"
       :dense="tableDense"
       :multi-sort="multiSort"
       :must-sort="mustSort"
@@ -277,7 +277,7 @@
         <slot :name="`header.${header.value}`" :header="h">{{ h.text || h.title }}</slot>
       </template>
 
-      <!-- 自定义列插槽 -->
+      <!-- 自定义列插槽 (透传 item.* 并在没有时回退到默认渲染) -->
       <template
         v-for="header in visibleHeaders"
         v-slot:[`item.${header.value}`]="{ item, value, index }"
@@ -383,10 +383,10 @@
 
         <!-- 普通列 -->
         <template v-else>
-          <!-- 自定义插槽 -->
-          <slot v-if="header.slot || $scopedSlots[`item.${header.value}`]" :name="`item.${header.value}`" :item="item" :value="value"></slot>
+          <!-- 自定义插槽 (透传 item.[value]) -->
+          <slot v-if="header.slot || $scopedSlots[`item.${header.value}`]" :name="`item.${header.value}`" :item="item" :value="value" :index="index"></slot>
 
-          <!-- 列配置渲染 -->
+          <!-- 列配置渲染 (没有自定义插槽时) -->
           <div v-else class="jh-table-schema-cell d-flex align-center flex-wrap">
             <!-- 状态标签 -->
             <template v-if="header.valueType === 'status'">
@@ -486,8 +486,13 @@
         </template>
       </template>
 
+      <!-- 透传所有其他插槽 (v-data-table 的原生插槽，排除已处理的) -->
+      <template v-for="slotName in passthroughSlots" v-slot:[slotName]="slotProps">
+        <slot :name="slotName" v-bind="slotProps"></slot>
+      </template>
+
       <!-- 加载中 -->
-      <template v-slot:loading>
+      <template v-if="!$scopedSlots.loading" v-slot:loading>
         <div class="jh-no-data pa-6">
           <v-progress-circular indeterminate color="primary"></v-progress-circular>
           <div class="mt-2">数据加载中...</div>
@@ -495,7 +500,7 @@
       </template>
 
       <!-- 无数据 -->
-      <template v-slot:no-data>
+      <template v-if="!$scopedSlots['no-data']" v-slot:no-data>
         <div class="jh-no-data pa-6">
           <v-icon large color="grey lighten-1">mdi-inbox-outline</v-icon>
           <div class="mt-2 text-body-2 grey--text">暂无数据</div>
@@ -503,7 +508,7 @@
       </template>
 
       <!-- 无结果 -->
-      <template v-slot:no-results>
+      <template v-if="!$scopedSlots['no-results']" v-slot:no-results>
         <div class="jh-no-data pa-6">
           <v-icon large color="grey lighten-1">mdi-magnify</v-icon>
           <div class="mt-2 text-body-2 grey--text">未找到匹配的数据</div>
@@ -511,7 +516,7 @@
       </template>
 
       <!-- 分页文本 -->
-      <template v-slot:[`footer.page-text`]="pagination">
+      <template v-if="!$scopedSlots['footer.page-text']" v-slot:[`footer.page-text`]="pagination">
         <span>{{ pagination.pageStart }}-{{ pagination.pageStop }}</span>
         <span class="ml-1">共{{ pagination.itemsLength }}条</span>
       </template>
@@ -808,7 +813,12 @@ export default {
     },
     rowKey: {
       type: String,
-      default: 'id'
+      default: undefined
+    },
+    // 别名，兼容 v-data-table
+    itemKey: {
+      type: String,
+      default: undefined
     },
     size: {
       type: String,
@@ -882,13 +892,15 @@ export default {
       internalSortBy: this.normalizeSortBy(this.sortBy),
       internalSortDesc: this.normalizeSortDesc(this.sortDesc),
       sortChangeTimer: null,
-      hasAppliedDefaultRowSelection: false
+      hasAppliedDefaultRowSelection: false,
+      // 最终使用的 item-key
+      computedRowKey: this.rowKey || this.itemKey || this.$attrs['item-key'] || 'id'
     };
   },
   computed: {
     // 选中的行 keys
     selectedRowKeys() {
-      return this.selectedItems.map(item => item[this.rowKey]);
+      return this.selectedItems.map(item => item[this.computedRowKey]);
     },
 
     tableAlertScope() {
@@ -1013,6 +1025,24 @@ export default {
     customHeaderSlots() {
       return this.internalColumns.filter(h => this.$scopedSlots[`header.${h.value}`]);
     },
+    // 需要透传的原生插槽
+    passthroughSlots() {
+      const handledSlots = [
+        'loading', 'no-data', 'no-results', 'footer.page-text',
+        'toolbar-actions', 'toolbar-extra', 'header-title', 'table-extra', 'alert', 'alert-actions'
+      ];
+      return Object.keys(this.$scopedSlots).filter(name => {
+        // 排除已处理的 item.* 和 header.*
+        if (name.startsWith('item.') || name.startsWith('header.')) {
+          return false;
+        }
+        // 排除筛选字段插槽
+        if (name.startsWith('filter-field-')) {
+          return false;
+        }
+        return !handledSlots.includes(name);
+      });
+    },
     // 表格样式类
     tableClassComputed() {
       return [
@@ -1098,7 +1128,7 @@ export default {
         'filterSearchText', 'filterResetText', 'showCreateButton', 'showUpdateAction',
         'showDeleteAction', 'actionColumn', 'columnsState', 'pagination',
         'itemsPerPage', 'rowSelection', 'tableAlertRender', 'tableAlertOptionRender',
-        'showSelect', 'singleSelect', 'rowKey', 'size', 'footerProps',
+        'showSelect', 'singleSelect', 'rowKey', 'itemKey', 'size', 'footerProps',
         'tableClass', 'polling', 'debounceTime', 'dataTableProps'
       ];
       
@@ -1214,6 +1244,12 @@ export default {
         this.hasAppliedDefaultRowSelection = false;
         this.$nextTick(() => this.applySelectionState());
       }
+    },
+    rowKey(val) {
+      this.computedRowKey = val || this.itemKey || this.$attrs['item-key'] || 'id';
+    },
+    itemKey(val) {
+      this.computedRowKey = this.rowKey || val || this.$attrs['item-key'] || 'id';
     },
     actionColumn: {
       handler() {
@@ -1618,7 +1654,7 @@ export default {
     handleSelectionChange(selectedItems) {
       this.selectedItems = selectedItems;
       const payload = {
-        selectedRowKeys: selectedItems.map(item => item[this.rowKey]),
+        selectedRowKeys: selectedItems.map(item => item[this.computedRowKey]),
         selectedRows: selectedItems
       };
       this.$emit('selection-change', payload);
@@ -1823,6 +1859,10 @@ export default {
     formatAutoFieldPlaceholder(label, type) {
       if (!label) return '';
       return type === 'select' ? `请选择${label}` : `请输入${label}`;
+    },
+    // 获取原生 v-data-table 实例
+    getVDataTable() {
+      return this.$refs.dataTable;
     },
     // 重新加载数据（服务端分页）
     async reload() {
@@ -2042,7 +2082,7 @@ export default {
     syncSelectionByKeys(keys) {
       if (!Array.isArray(keys)) return;
       const keySet = new Set(keys);
-      const matched = this.currentItems.filter(item => keySet.has(item[this.rowKey]));
+      const matched = this.currentItems.filter(item => keySet.has(item[this.computedRowKey]));
       this.selectedItems = matched;
       this.$emit('input', matched);
     },
@@ -2050,7 +2090,7 @@ export default {
       if (this.hasAppliedDefaultRowSelection) return;
       if (!this.rowSelection || !Array.isArray(this.rowSelection.defaultSelectedRowKeys)) return;
       const keySet = new Set(this.rowSelection.defaultSelectedRowKeys);
-      const matched = this.currentItems.filter(item => keySet.has(item[this.rowKey]));
+      const matched = this.currentItems.filter(item => keySet.has(item[this.computedRowKey]));
       if (matched.length) {
         this.selectedItems = matched;
         this.$emit('input', matched);

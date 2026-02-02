@@ -101,6 +101,14 @@ export default {
       control: 'boolean',
       description: '是否显示选择框',
     },
+    rowKey: {
+      control: 'text',
+      description: '行唯一标识字段，默认为 "id"',
+    },
+    itemKey: {
+      control: 'text',
+      description: 'rowKey 的别名，与 v-data-table API 保持一致',
+    },
     size: {
       control: 'select',
       options: ['default', 'medium', 'compact'],
@@ -144,97 +152,51 @@ export default {
       description: {
         component: `
 
-增强版数据表格组件，参考 Ant Design Pro 的 ProTable 设计，提供丰富的功能。
+增强版数据表格组件，深度继承 Vuetify 2 的 v-data-table，并提供 Pro 级功能。
 
-## 新增功能特性（Pro 版）
+## 核心特性
 
-### 1. 工具栏功能
-- **搜索框**：全局快速搜索
-- **刷新按钮**：重新加载数据
-- **列设置**：显示/隐藏列，实时生效
-- **密度切换**：默认/中等/紧凑三种密度
-- **全屏切换**：全屏显示表格（可选）
+### 1. 深度继承
+- **API 兼容**：支持 v-data-table 的所有 Props（如 \`show-expand\`、\`group-by\`、\`item-class\` 等）。
+- **插槽透传**：支持所有原生插槽（如 \`top\`、\`footer\`、\`expanded-item\` 等）以及自定义列插槽 \`item.<value>\`。
+- **事件透传**：支持所有原生事件（如 \`click:row\`、\`current-items\` 等）。
+- **实例访问**：通过 \`getVDataTable()\` 获取底层 v-data-table 实例。
 
-### 2. 列增强功能
-- **copyable**：显示复制按钮，一键复制单元格内容
-- **ellipsis**：超长文本自动省略，鼠标悬停显示完整内容
-- **tooltip**：鼠标悬停提示
-- **自定义插槽**：完全自定义列渲染
+### 2. 工具栏与高级筛选
+- **集成搜索**：工具栏内置全局搜索。
+- **列设置**：支持运行时列显示/隐藏切换。
+- **密度切换**：支持 default/medium/compact 三种视觉密度。
+- **高级筛选**：可集成 JhQueryFilter 实现复杂的组合查询。
 
-### 3. 操作列配置化
-\`\`\`javascript
-actionColumn: {
-  title: '操作',
-  width: 180,
-  fixed: 'right',
-  buttons: [
-    {
-      text: '编辑',
-      type: 'link', // link / icon / button
-      icon: 'mdi-pencil',
-      color: 'primary',
-      tooltip: '编辑记录',
-      onClick: (row) => { console.log('编辑', row) },
-      visible: (row) => row.status !== '禁用',
-      confirm: '确认编辑？'
-    },
-    {
-      text: '删除',
-      type: 'link',
-      icon: 'mdi-delete',
-      color: 'error',
-      onClick: (row) => { console.log('删除', row) },
-      confirm: '确认删除？'
-    }
-  ]
-}
-\`\`\`
+### 3. 列与单元格增强
+- **Schema 渲染**：支持 \`valueType\` (status, progress, money, date, json 等) 自动化渲染。
+- **交互功能**：支持 \`copyable\` (一键复制) 和 \`ellipsis\` (超长省略)。
+- **操作列配置**：支持配置化的按钮列表，内置权限控制和二次确认。
 
-### 4. 服务端分页
-通过 \`request\` prop 支持服务端分页：
-\`\`\`javascript
-async fetchData(params) {
-  // params: { page, pageSize, search, sorter, filters }
-  const response = await fetch('/api/users', {
-    method: 'POST',
-    body: JSON.stringify(params),
-  });
-  return {
-    data: response.list,
-    total: response.total,
-    success: true,
-  };
-}
-\`\`\`
-
-### 5. 行选择增强
-- 支持单选/多选
-- \`selection-change\` 事件返回 \`{ selectedRowKeys, selectedRows }\`
-- 提供 \`getSelectedRows()\` 和 \`clearSelection()\` 方法
-
-### 6. 响应式密度
-三种密度自动适配：
-- **default**: 48px 行高
-- **medium**: 40px 行高
-- **compact**: 32px 行高
+### 4. 数据流控制
+- **服务端分页**：通过 \`request\` 自动处理请求、分页、排序。
+- **状态持久化**：支持列显示状态持久化。
 
 ## 方法
 
+- \`getVDataTable()\`: 获取底层 v-data-table 实例
 - \`reload()\`: 重新加载数据（服务端分页）
 - \`reset()\`: 重置到第一页
 - \`clearSelection()\`: 清空选择
 - \`getSelectedRows()\`: 获取选中的行
 
-## 事件
+## 事件 (除 v-data-table 原生事件外)
 
 - \`create-click\`: 点击新增按钮
-- \`update-click\`: 点击详情按钮（item）
-- \`delete-click\`: 点击删除按钮（item）
-- \`row-click\`: 点击行（item, event）
+- \`update-click\`: 点击详情按钮（针对 actionColumn 默认按钮）
+- \`delete-click\`: 点击删除按钮（针对 actionColumn 默认按钮）
 - \`selection-change\`: 选择改变 ({ selectedRowKeys, selectedRows })
-- \`refresh\`: 点击刷新按钮
-- \`copy-success\`: 复制成功（text）
-- \`request-error\`: 请求失败（error）
+- \`columns-state-change\`: 列状态改变 (snapshot)
+- \`filter-search\`: 高级筛选查询
+- \`filter-reset\`: 高级筛选重置
+- \`sort-change\`: 排序改变
+- \`copy-success\`: 复制成功 (text)
+- \`request-error\`: 请求失败 (error)
         `,
       },
     },
@@ -857,16 +819,20 @@ export const 自定义列渲染 = {
       <div>
         <jh-table v-bind="args">
           <!-- 自定义状态列 -->
-          <template v-slot:item.status="{ item }">
+          <template v-slot:item.status="{ item, index }">
             <v-chip
               :color="item.status === '启用' ? 'success' : 'error'"
               small
               label
             >
-              <v-icon left x-small>
-                {{ item.status === '启用' ? 'mdi-check-circle' : 'mdi-close-circle' }}
-              </v-icon>
-              {{ item.status }}
+              <v-badge
+                v-if="index === 0"
+                dot
+                inline
+                color="red"
+                class="mr-1"
+              ></v-badge>
+              {{ item.status }} (索引: {{ index }})
             </v-chip>
           </template>
         </jh-table>
@@ -1513,3 +1479,157 @@ export const 受控服务端分页 = {
     `,
   }),
 };
+
+// 原生插槽透传
+export const 原生插槽透传 = {
+  render: () => ({
+    components: { JhTable },
+    data() {
+      return {
+        headers: sampleHeaders,
+        items: sampleItems.slice(0, 5),
+      };
+    },
+    template: `
+      <jh-table :headers="headers" :items="items" header-title="原生插槽透传示例">
+        <!-- 顶部插槽 -->
+        <template v-slot:top>
+          <v-toolbar flat color="blue lighten-4">
+            <v-toolbar-title>这是 v-data-table 的 top 插槽</v-toolbar-title>
+            <v-divider class="mx-4" inset vertical></v-divider>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" dark class="mb-2">自定义按钮</v-btn>
+          </v-toolbar>
+        </template>
+
+        <!-- 底部插槽 -->
+        <template v-slot:footer>
+          <div class="pa-4 text-center grey lighten-3">
+            这是 v-data-table 的 footer 插槽，可以放置汇总信息等
+          </div>
+        </template>
+
+        <!-- 自定义表头插槽 (原生方式) -->
+        <template v-slot:header.username="{ header }">
+          <span class="orange--text font-weight-bold italic">{{ header.text }} (自定义)</span>
+        </template>
+      </jh-table>
+    `,
+  }),
+};
+
+// 展开行示例
+export const 展开行示例 = {
+  render: () => ({
+    components: { JhTable },
+    data() {
+      return {
+        headers: [
+          { text: '', value: 'data-table-expand' },
+          ...sampleHeaders
+        ],
+        items: sampleItems.slice(0, 5),
+        expanded: [],
+      };
+    },
+    template: `
+      <jh-table
+        :headers="headers"
+        :items="items"
+        show-expand
+        single-expand
+        :expanded.sync="expanded"
+        header-title="展开行示例"
+      >
+        <template v-slot:expanded-item="{ headers, item }">
+          <td :colspan="headers.length" class="pa-4">
+            <v-card flat color="grey lighten-4">
+              <v-card-text>
+                <div class="text-h6 mb-2">详情信息：{{ item.username }}</div>
+                <p>这里展示的是 v-data-table 的 expanded-item 插槽内容。</p>
+                <v-row>
+                  <v-col cols="6"><strong>邮箱:</strong> {{ item.email }}</v-col>
+                  <v-col cols="6"><strong>手机:</strong> {{ item.phone }}</v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </td>
+        </template>
+      </jh-table>
+    `,
+  }),
+};
+
+// API兼容性测试
+export const API兼容性测试 = {
+  render: () => ({
+    components: { JhTable },
+    data() {
+      return {
+        headers: sampleHeaders,
+        items: sampleItems,
+      };
+    },
+    template: `
+      <div>
+        <div class="mb-4 pa-4 green lighten-5 rounded">
+          <strong>API 兼容性测试 (item-key)</strong>
+          <p class="mb-0 mt-2">使用 v-data-table 原生的 item-key 属性而非 JhTable 的 rowKey。</p>
+        </div>
+        <jh-table
+          :headers="headers"
+          :items="items"
+          show-select
+          item-key="id"
+          header-title="使用 item-key 的表格"
+        />
+      </div>
+    `,
+  }),
+};
+
+// 原生实例访问
+export const 原生实例访问 = {
+  render: () => ({
+    components: { JhTable },
+    data() {
+      return {
+        headers: sampleHeaders,
+        items: sampleItems,
+      };
+    },
+    template: `
+      <div>
+        <div class="mb-4">
+          <v-btn @click="callNativeSelectAll" color="primary">通过 Ref 调用原生全选 (selectAll)</v-btn>
+          <v-btn @click="checkNativeInstance" color="secondary" class="ml-2">检查原生实例</v-btn>
+        </div>
+        <jh-table
+          ref="jhTableRef"
+          :headers="headers"
+          :items="items"
+          show-select
+          header-title="原生实例访问示例"
+        />
+      </div>
+    `,
+    methods: {
+      callNativeSelectAll() {
+        const vDataTable = this.$refs.jhTableRef.getVDataTable();
+        if (vDataTable) {
+          // 注意：Vuetify 2.x 的 selectAll 可能需要特定参数或通过内部 toggle 实现
+          // 这里演示获取实例并操作
+          vDataTable.toggleSelectAll(true);
+          alert('已通过 getVDataTable().toggleSelectAll(true) 触发全选');
+        }
+      },
+      checkNativeInstance() {
+        const vDataTable = this.$refs.jhTableRef.getVDataTable();
+        console.log('原生 v-data-table 实例:', vDataTable);
+        alert('实例已打印到控制台，构造函数名：' + vDataTable.$options.name);
+      }
+    }
+  }),
+};
+
+
