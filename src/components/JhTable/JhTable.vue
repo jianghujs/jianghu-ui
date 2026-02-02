@@ -65,8 +65,9 @@
         />
         <template v-else>
           <v-icon small class="mr-2" color="primary">mdi-checkbox-marked-circle</v-icon>
-          <span>已选择 <strong class="primary--text">{{ selectedItems.length }}</strong> 项</span>
-          <v-btn text x-small class="ml-2" @click="clearSelection">清空</v-btn>
+          <div>已选择 <strong class="primary--text">{{ selectedItems.length }}</strong> 项</div>
+          <v-spacer></v-spacer>
+          <a text x-small class="ml-2" @click="clearSelection">清空</a>
         </template>
       </div>
       <div v-if="hasAlertActionsContent" class="jh-pro-table-alert-actions">
@@ -822,7 +823,7 @@ export default {
     },
     size: {
       type: String,
-      default: 'default', // default / medium / compact
+      default: 'medium', // default / medium / compact
       validator: (v) => ['default', 'medium', 'compact'].includes(v)
     },
     footerProps: {
@@ -2121,7 +2122,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px;
+  padding: 16px 0;
   border-bottom: 1px solid #f0f0f0;
   min-height: 64px;
 }
@@ -2139,7 +2140,10 @@ export default {
   height: 40px;
 }
 .jh-pro-table ::v-deep .jh-table-medium.v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
-  height: 40px;
+    min-height: 40px;
+    height: 40px;
+    color: #333C44;
+    font-size: .8125rem;
 }
 
 
@@ -2173,14 +2177,14 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-  background: #e6f7ff;
-  border: 1px solid #91d5ff;
+  background: #fbfbfb;
   border-radius: 4px;
   margin: 16px 0 0;
 }
 
 .jh-pro-table-alert-info {
   display: flex;
+  flex: 1;
   align-items: center;
   font-size: 14px;
   color: rgba(0, 0, 0, 0.65);
@@ -2265,6 +2269,7 @@ export default {
 .jh-table-default >>> .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
   height: 48px !important;
   padding: 0 16px !important;
+  
 }
 
 .jh-table-medium >>> .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
@@ -2376,6 +2381,20 @@ export default {
 /* 游标指针 */
 .cursor-pointer {
   cursor: pointer;
+}
+
+/* 表格行选中样式 */
+.jh-pro-table ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr.v-data-table__selected {
+  background-color: #E6F7FF !important;
+}
+
+.jh-pro-table ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr.v-data-table__selected:hover {
+  background-color: #D1EDFF !important;
+}
+
+/* 优化选中行的过渡效果 */
+.jh-pro-table ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr {
+  transition: background-color 0.2s ease;
 }
 
 /* Flex 工具类（如果没有 Tailwind） */

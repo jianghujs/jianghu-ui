@@ -166,7 +166,7 @@ export default {
     // 隐藏详情信息
     hideDetails: {
       type: [Boolean, String],
-      default: false,
+      default: true,
     },
 
     // 自定义标签样式类
@@ -251,6 +251,9 @@ export default {
   data() {
     return {
       formData: {},
+      // 表单提交状态
+      submitLoading: false,
+      submitError: null,
     };
   },
 
@@ -350,7 +353,7 @@ export default {
       // 只排除组件内部明确处理的事件，其他所有事件都透传给 v-form
       const excludedEvents = [
         // JhForm 特有的事件（不在 v-form 中）
-        'submit', 'reset', 'validate', 'input', 'change', 'blur', 'field-change'
+        'field-change'
       ];
       
       const listeners = { ...this.$listeners || {} };
@@ -456,6 +459,27 @@ export default {
     getForm() {
       return this.$refs[this.formRef];
     },
+    
+    // 转发 v-form 的所有方法
+    ...(() => {
+      const methods = {};
+      // 定义需要转发的 v-form 方法
+      const formMethods = ['validate', 'reset', 'resetValidation'];
+      
+      formMethods.forEach(methodName => {
+        methods[methodName] = function(...args) {
+          const form = this.$refs[this.formRef];
+          if (form && typeof form[methodName] === 'function') {
+            return form[methodName](...args);
+          }
+          // 如果 v-form 不存在或方法不存在，返回默认值
+          if (methodName === 'validate') return true;
+          return undefined;
+        };
+      });
+      
+      return methods;
+    })(),
 
     // 获取表单数据
     getFormData() {
@@ -518,28 +542,97 @@ export default {
       return true;
     },
 
-    // 提交表单
-    async submit() {
-      const isValid = await this.validate();
-      if (isValid) {
-        const transformedData = this.getTransformedData();
+    // 提交表单（增强版，支持加载状态和错误处理）
+    async submit(options = {}) {
+      const {
+        validate = true,
+        transform = true,
+        showLoading = false,
+        resetError = true
+      } = options;
+      
+      // 重置错误
+      if (resetError) {
+        this.submitError = null;
+      }
+      
+      // 显示加载状态
+      if (showLoading) {
+        this.submitLoading = true;
+      }
+      
+      try {
+        // 验证表单
+        if (validate) {
+          const isValid = await this.validate();
+          if (!isValid) {
+            // 调用 onFinishFailed 回调
+            if (this.onFinishFailed) {
+              this.onFinishFailed(this.formData);
+            }
+            return false;
+          }
+        }
+        
+        // 转换数据
+        const transformedData = transform ? this.getTransformedData() : { ...this.formData };
+        
+        // 触发 submit 事件
         this.$emit('submit', transformedData);
         
         // 调用 onFinish 回调
         if (this.onFinish) {
-          try {
-            await this.onFinish(transformedData);
-          } catch (error) {
-            console.error('Form submit error:', error);
-          }
+          await this.onFinish(transformedData);
         }
-      } else {
-        // 调用 onFinishFailed 回调
-        if (this.onFinishFailed) {
-          this.onFinishFailed(this.formData);
+        
+        return true;
+      } catch (error) {
+        console.error('Form submit error:', error);
+        this.submitError = error.message || '提交失败';
+        this.$emit('submit-error', error);
+        return false;
+      } finally {
+        // 隐藏加载状态
+        if (showLoading) {
+          this.submitLoading = false;
         }
       }
-      return isValid;
+    },
+    
+    // 验证单个字段（增强版）
+    async validateField(fieldName) {
+      // 首先尝试通过 v-form 验证
+      const form = this.$refs[this.formRef];
+      if (form && form.validate) {
+        // v-form 的 validate 方法会验证所有字段
+        // 这里我们返回整体验证结果
+        return await this.validate();
+      }
+      
+      // 如果 v-form 不存在，返回 true
+      return true;
+    },
+    
+    // 获取表单状态
+    getFormState() {
+      return {
+        submitLoading: this.submitLoading,
+        submitError: this.submitError,
+        formData: { ...this.formData }
+      };
+    },
+    
+    // 清除提交错误
+    clearSubmitError() {
+      this.submitError = null;
+    },
+    
+    // 批量更新字段值
+    batchUpdateFields(values) {
+      Object.keys(values).forEach(key => {
+        this.$set(this.formData, key, values[key]);
+        this.handleFieldChange({ key, value: values[key] });
+      });
     },
 
     // 获取转换后的数据
@@ -604,10 +697,44 @@ export default {
 }
 
 /* 只读模式 */
-.jh-form--readonly .jh-form-readonly-text {
-  padding: 8px 0;
-  min-height: 40px;
-  color: rgba(0, 0, 0, 0.87);
+.jh-form--readonly {
+  /* 只读模式整体样式 */
+  .jh-field-label {
+    /* 只读模式下的标签样式 */
+    color: rgba(0, 0, 0, 0.65);
+    font-weight: 500;
+  }
+  
+  .jh-form-readonly-text {
+    /* 只读模式下的文本样式 */
+    padding: 6px 12px;
+    color: rgba(0, 0, 0, 0.87);
+    background-color: rgba(0, 0, 0, 0.04);
+    border-radius: 4px;
+    line-height: 1.5;
+    transition: all 0.2s ease;
+  }
+  
+  /* 水平布局下的调整 */
+  &.jh-form--horizontal {
+    .jh-field-wrapper {
+      margin-bottom: 16px;
+    }
+  }
+  
+  /* 垂直布局下的调整 */
+  &.jh-form--vertical {
+    .jh-field-wrapper {
+      margin-bottom: 16px;
+    }
+  }
+  
+  /* 网格布局下的调整 */
+  &.jh-form--grid {
+    .jh-field-wrapper {
+      margin-bottom: 16px;
+    }
+  }
 }
 
 /* 字段标签 */

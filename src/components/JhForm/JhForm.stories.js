@@ -301,8 +301,8 @@ export const Grid栅格布局 = {
     template: `
       <JhForm v-bind="args">
         <template #actions="{ validate, resetForm }">
-          <v-btn class="mr-2" text @click="resetForm">重置</v-btn>
-          <v-btn color="primary" @click="validate">提交</v-btn>
+          <v-btn class="mr-2 mt-4" text @click="resetForm">重置</v-btn>
+          <v-btn color="primary mt-4" @click="validate">提交</v-btn>
         </template>
       </JhForm>
     `,
@@ -656,8 +656,8 @@ export const 行内布局 = {
       <div>
         <JhForm v-bind="args">
           <template #actions="{ validate, resetForm }">
-            <v-btn color="primary" class="ml-2" @click="validate">查询</v-btn>
-            <v-btn text class="ml-2" @click="resetForm">重置</v-btn>
+            <v-btn color="primary" class="ml-2 mt-4" @click="validate">查询</v-btn>
+            <v-btn text class="ml-2 mt-4" @click="resetForm">重置</v-btn>
           </template>
         </JhForm>
       </div>
@@ -1059,97 +1059,6 @@ export const 数据转换 = {
   }),
 };
 
-// onFinish 回调示例
-export const 提交回调 = {
-  args: {
-    fields: [
-      {
-        key: 'title',
-        label: '标题',
-        type: 'text',
-        placeholder: '请输入标题',
-        required: true,
-      },
-      {
-        key: 'content',
-        label: '内容',
-        type: 'textarea',
-        placeholder: '请输入内容',
-        required: true,
-        rows: 4,
-        cols: { md: 12 },
-      },
-    ],
-    initialData: {
-      title: '',
-      content: '',
-    },
-  },
-  render: (args) => ({
-    components: { JhForm },
-    data() {
-      return {
-        args: {
-          ...args,
-          onFinish: this.handleFinish,
-          onFinishFailed: this.handleFinishFailed,
-        },
-        loading: false,
-      };
-    },
-    template: `
-      <div>
-        <JhForm v-bind="args">
-          <template #actions="{ validate, resetForm }">
-            <v-row class="mt-4">
-              <v-col cols="12" class="text-right">
-                <v-btn class="mr-2" @click="resetForm" :disabled="loading">重置</v-btn>
-                <v-btn 
-                  color="success" 
-                  @click="validate" 
-                  :loading="loading"
-                >
-                  提交
-                </v-btn>
-              </v-col>
-            </v-row>
-          </template>
-        </JhForm>
-        <v-alert v-if="submitResult" :type="submitResult.type" class="mt-4">
-          {{ submitResult.message }}
-        </v-alert>
-      </div>
-    `,
-    data() {
-      return {
-        submitResult: null,
-      };
-    },
-    methods: {
-      async handleFinish(values) {
-        this.loading = true;
-        this.submitResult = null;
-        
-        // 模拟 API 调用
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        console.log('提交成功:', values);
-        this.submitResult = {
-          type: 'success',
-          message: '提交成功! 数据: ' + JSON.stringify(values),
-        };
-        this.loading = false;
-      },
-      handleFinishFailed(values) {
-        console.log('验证失败:', values);
-        this.submitResult = {
-          type: 'error',
-          message: '表单验证失败,请检查必填项',
-        };
-      },
-    },
-  }),
-};
 
 // 只读模式示例
 export const 只读模式 = {
@@ -1225,6 +1134,116 @@ export const 只读模式 = {
       bio: '这是一段个人简介,用于展示只读模式下的文本域显示效果。',
     },
   },
+};
+
+// 增强版提交功能示例
+export const 增强版提交功能 = {
+  args: {
+    fields: [
+      {
+        key: 'name',
+        label: '姓名',
+        type: 'text',
+        placeholder: '请输入姓名',
+        required: true,
+        cols: { md: 6 },
+      },
+      {
+        key: 'email',
+        label: '邮箱',
+        type: 'text',
+        placeholder: '请输入邮箱',
+        rules: 'email',
+        required: true,
+        cols: { md: 6 },
+      },
+      {
+        key: 'phone',
+        label: '手机号',
+        type: 'text',
+        placeholder: '请输入手机号',
+        rules: 'phone',
+        required: true,
+        cols: { md: 12 },
+      },
+    ],
+  },
+  render: (args) => ({
+    components: { JhForm },
+    data() {
+      return {
+        args,
+        submitResult: null,
+      };
+    },
+    template: `
+      <div>
+        <JhForm v-bind="args" ref="form" @submit-error="handleSubmitError">
+          <template #actions="{ validate, resetForm }">
+            <v-row class="mt-4">
+              <v-col cols="12" class="text-right">
+                <v-btn class="mr-2" @click="resetForm">重置</v-btn>
+                <v-btn 
+                  color="success" 
+                  @click="handleSubmit" 
+                  :loading="$refs.form?.submitLoading"
+                >
+                  提交（增强版）
+                </v-btn>
+              </v-col>
+            </v-row>
+          </template>
+        </JhForm>
+        <v-alert 
+          v-if="submitResult" 
+          :type="submitResult.type" 
+          class="mt-4"
+        >
+          {{ submitResult.message }}
+        </v-alert>
+        <v-alert 
+          v-if="$refs.form?.submitError" 
+          type="error" 
+          class="mt-4"
+        >
+          提交错误: {{ $refs.form.submitError }}
+        </v-alert>
+        <div class="mt-4">
+          <v-btn text @click="showFormState">查看表单状态</v-btn>
+        </div>
+      </div>
+    `,
+    methods: {
+      async handleSubmit() {
+        this.submitResult = null;
+        
+        const result = await this.$refs.form.submit({
+          showLoading: true,
+          resetError: true
+        });
+        
+        if (result) {
+          this.submitResult = {
+            type: 'success',
+            message: '提交成功！',
+          };
+        } else {
+          this.submitResult = {
+            type: 'error',
+            message: '提交失败，请检查表单',
+          };
+        }
+      },
+      handleSubmitError(error) {
+        console.error('提交错误:', error);
+      },
+      showFormState() {
+        const state = this.$refs.form.getFormState();
+        console.log('表单状态:', state);
+        alert('表单状态已打印到控制台，请查看');
+      },
+    },
+  }),
 };
 
 // 使用 JhFormFields 组合表单

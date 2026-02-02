@@ -74,11 +74,6 @@
                 </v-tooltip>
               </div>
 
-              <!-- 额外提示信息 -->
-              <div v-if="field.extra" class="jh-field-extra text-caption grey--text mb-2">
-                {{ field.extra }}
-              </div>
-
               <!-- 只读模式展示 -->
               <div v-if="isFieldReadonly(field)" class="jh-form-readonly-text">
                 {{ getReadonlyValue(field) }}
@@ -168,6 +163,7 @@
                   :multiple="field.multiple"
                   :chips="field.chips"
                   :hide-details="field.hideDetails || hideDetails"
+                  small-chips
                   v-bind="field.props"
                   @change="handleChange(field.key, $event)"
                   @blur="handleBlur(field.key, $event)"
@@ -912,7 +908,7 @@ export default {
 .jh-form-fields--bordered {
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 4px;
-  padding: 16px;
+  padding: 15px 16px 30px;
 }
 
 .jh-form-fields-header {
@@ -943,10 +939,37 @@ export default {
   margin-bottom: 0 !important;
 }
 
-.jh-form-fields--readonly .jh-form-readonly-text {
-  padding: 8px 0;
-  min-height: 40px;
-  color: rgba(0, 0, 0, 0.87);
+.jh-form-fields--readonly {
+  /* 只读模式整体样式 */
+  .jh-field-label {
+    /* 只读模式下的标签样式 */
+    color: rgba(0, 0, 0, 0.65);
+    font-weight: 500;
+  }
+  
+  .jh-form-readonly-text {
+    /* 只读模式下的文本样式 */
+    padding: 6px 12px;
+    color: rgba(0, 0, 0, 0.87);
+    background-color: rgba(0, 0, 0, 0.04);
+    border-radius: 4px;
+    line-height: 1.5;
+    transition: all 0.2s ease;
+  }
+  
+  /* 水平布局下的调整 */
+  &.jh-form-fields--horizontal {
+    .jh-field-wrapper {
+      margin-bottom: 16px;
+    }
+  }
+  
+  /* 垂直布局下的调整 */
+  &.jh-form-fields--vertical {
+    .jh-field-wrapper {
+      margin-bottom: 16px;
+    }
+  }
 }
 
 .jh-field-label {
@@ -983,10 +1006,6 @@ export default {
   word-break: break-word;
 }
 
-.jh-field-extra {
-  margin-top: -8px;
-  line-height: 1.5;
-}
 
 .jh-color-preview {
   display: inline-block;

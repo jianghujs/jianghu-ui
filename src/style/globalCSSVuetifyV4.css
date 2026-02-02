@@ -359,8 +359,7 @@
     .v-data-table>.v-data-table__wrapper>table>tbody>tr>td,
     .v-data-table>.v-data-table__wrapper>table>tfoot>tr>td,
     .v-data-table>.v-data-table__wrapper>table>thead>tr>td {
-        min-height: 40px;
-        height: 40px;
+       
         color: #333C44;
         font-size: .8125rem;
     }

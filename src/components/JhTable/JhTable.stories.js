@@ -215,7 +215,7 @@ export const 基础示例 = {
     showUpdateAction: true,
     showDeleteAction: true,
     showSelect: false,
-    size: 'default',
+    size: 'medium',
   },
   render: (args) => ({
     components: { JhTable },
@@ -1326,89 +1326,6 @@ export const 完整CRUD示例 = {
 };
 
 
-export const SelectionAlertRender = {
-  render: () => ({
-    components: { JhTable },
-    data() {
-      return {
-        headers: [
-          { text: '????', value: 'name' },
-          { text: '????', value: 'containers' },
-          { text: '????', value: 'calls' },
-          { text: '???', value: 'owner' },
-          { text: '????', value: 'createdAt' }
-        ],
-        items: [
-          { id: 1, name: 'AppName-0', containers: 8, calls: 1276, owner: '???', createdAt: '2025-11-23' },
-          { id: 2, name: 'AppName-1', containers: 12, calls: 938, owner: '???', createdAt: '2025-11-23' },
-          { id: 3, name: 'AppName-2', containers: 1, calls: 820, owner: '???', createdAt: '2025-11-23' },
-          { id: 4, name: 'AppName-3', containers: 5, calls: 1291, owner: '???', createdAt: '2025-11-23' },
-          { id: 5, name: 'AppName-4', containers: 17, calls: 1796, owner: '???', createdAt: '2025-11-23' }
-        ]
-      };
-    },
-    methods: {
-      renderAlert(h, { selectedRows, onCleanSelected }) {
-        const totalContainers = selectedRows.reduce((sum, row) => sum + row.containers, 0);
-        const totalCalls = selectedRows.reduce((sum, row) => sum + row.calls, 0);
-        return h(
-          'div',
-          { class: 'd-flex align-center flex-wrap', style: { gap: '12px' } },
-          [
-            h('span', { class: 'font-weight-medium' }, `?? ${selectedRows.length} ?`),
-            h(
-              'v-btn',
-              {
-                props: { text: true, xSmall: true, color: 'primary' },
-                on: { click: onCleanSelected }
-              },
-              '????'
-            ),
-            h('span', { class: 'grey--text text--darken-1' }, `?????${totalContainers} ?`),
-            h('span', { class: 'grey--text text--darken-1' }, `????${totalCalls} ?`)
-          ]
-        );
-      },
-      renderAlertActions(h, { selectedRows }) {
-        return h('div', { class: 'd-flex align-center', style: { gap: '8px' } }, [
-          h(
-            'v-btn',
-            {
-              props: { small: true, color: 'error' },
-              on: { click: () => this.handleBatchDelete(selectedRows) }
-            },
-            '????'
-          ),
-          h(
-            'v-btn',
-            {
-              props: { small: true, outlined: true, color: 'primary' },
-              on: { click: () => this.handleExport(selectedRows) }
-            },
-            '????'
-          )
-        ]);
-      },
-      handleBatchDelete(rows) {
-        alert(`???? ${rows.length} ?`);
-      },
-      handleExport(rows) {
-        alert(`?? ${rows.length} ?`);
-      }
-    },
-    template: `
-      <jh-table
-        :headers="headers"
-        :items="items"
-        show-select
-        :toolbar="false"
-        :table-alert-render="renderAlert"
-        :table-alert-option-render="renderAlertActions"
-      />
-    `
-  })
-};
-
 // 受控服务端分页 (完全由父组件控制)
 export const 受控服务端分页 = {
   render: () => ({
@@ -1514,76 +1431,6 @@ export const 原生插槽透传 = {
           <span class="orange--text font-weight-bold italic">{{ header.text }} (自定义)</span>
         </template>
       </jh-table>
-    `,
-  }),
-};
-
-// 展开行示例
-export const 展开行示例 = {
-  render: () => ({
-    components: { JhTable },
-    data() {
-      return {
-        headers: [
-          { text: '', value: 'data-table-expand' },
-          ...sampleHeaders
-        ],
-        items: sampleItems.slice(0, 5),
-        expanded: [],
-      };
-    },
-    template: `
-      <jh-table
-        :headers="headers"
-        :items="items"
-        show-expand
-        single-expand
-        :expanded.sync="expanded"
-        header-title="展开行示例"
-      >
-        <template v-slot:expanded-item="{ headers, item }">
-          <td :colspan="headers.length" class="pa-4">
-            <v-card flat color="grey lighten-4">
-              <v-card-text>
-                <div class="text-h6 mb-2">详情信息：{{ item.username }}</div>
-                <p>这里展示的是 v-data-table 的 expanded-item 插槽内容。</p>
-                <v-row>
-                  <v-col cols="6"><strong>邮箱:</strong> {{ item.email }}</v-col>
-                  <v-col cols="6"><strong>手机:</strong> {{ item.phone }}</v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-          </td>
-        </template>
-      </jh-table>
-    `,
-  }),
-};
-
-// API兼容性测试
-export const API兼容性测试 = {
-  render: () => ({
-    components: { JhTable },
-    data() {
-      return {
-        headers: sampleHeaders,
-        items: sampleItems,
-      };
-    },
-    template: `
-      <div>
-        <div class="mb-4 pa-4 green lighten-5 rounded">
-          <strong>API 兼容性测试 (item-key)</strong>
-          <p class="mb-0 mt-2">使用 v-data-table 原生的 item-key 属性而非 JhTable 的 rowKey。</p>
-        </div>
-        <jh-table
-          :headers="headers"
-          :items="items"
-          show-select
-          item-key="id"
-          header-title="使用 item-key 的表格"
-        />
-      </div>
     `,
   }),
 };
