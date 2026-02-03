@@ -490,3 +490,164 @@ export const 自定义验证 = {
     },
   }),
 };
+
+// 初始化表单数据
+export const 初始化表单数据 = {
+  render: () => ({
+    components: { JhDrawerForm },
+    data() {
+      return {
+        visible: false,
+        fields: [
+          {
+            key: 'username',
+            label: '用户名',
+            type: 'text',
+            rules: 'require',
+            placeholder: '请输入用户名',
+            cols: 12,
+          },
+          {
+            key: 'email',
+            label: '邮箱',
+            type: 'text',
+            rules: 'require|email',
+            placeholder: '请输入邮箱',
+            cols: 12,
+          },
+          {
+            key: 'phone',
+            label: '手机号',
+            type: 'text',
+            rules: 'phone',
+            placeholder: '请输入手机号',
+            cols: 12,
+          },
+          {
+            key: 'role',
+            label: '角色',
+            type: 'select',
+            rules: 'require',
+            options: [
+              { text: '管理员', value: 'admin' },
+              { text: '普通用户', value: 'user' },
+              { text: '访客', value: 'guest' },
+            ],
+            cols: 12,
+          },
+        ],
+        initialData: {
+          username: '默认用户名',
+          email: 'default@example.com',
+          phone: '13800138000',
+          role: 'user',
+        },
+      };
+    },
+    template: `
+      <div>
+        <v-btn color="primary" @click="visible = true">
+          打开表单（带初始数据）
+        </v-btn>
+        <jh-drawer-form
+          v-model="visible"
+          title="用户信息"
+          :fields="fields"
+          :initial-data="initialData"
+          @confirm="handleConfirm"
+        />
+      </div>
+    `,
+    methods: {
+      handleConfirm(data) {
+        console.log('表单数据:', data);
+        alert('提交成功！\n' + JSON.stringify(data, null, 2));
+        this.visible = false;
+      },
+    },
+  }),
+};
+
+// 异步填充数据
+export const 异步填充数据 = {
+  render: () => ({
+    components: { JhDrawerForm },
+    data() {
+      return {
+        visible: false,
+        fields: [
+          {
+            key: 'userId',
+            label: '用户ID',
+            type: 'text',
+            rules: 'require',
+            placeholder: '请输入用户ID',
+            cols: 12,
+          },
+          {
+            key: 'username',
+            label: '用户名',
+            type: 'text',
+            rules: 'require',
+            placeholder: '请输入用户名',
+            cols: 12,
+          },
+          {
+            key: 'email',
+            label: '邮箱',
+            type: 'text',
+            rules: 'require|email',
+            placeholder: '请输入邮箱',
+            cols: 12,
+          },
+          {
+            key: 'phone',
+            label: '手机号',
+            type: 'text',
+            rules: 'phone',
+            placeholder: '请输入手机号',
+            cols: 12,
+          },
+        ],
+      };
+    },
+    template: `
+      <div>
+        <v-btn color="primary" @click="openDrawer">
+          打开表单（异步填充数据）
+        </v-btn>
+        <jh-drawer-form
+          ref="drawerForm"
+          v-model="visible"
+          title="用户信息"
+          :fields="fields"
+          @confirm="handleConfirm"
+        />
+      </div>
+    `,
+    methods: {
+      // 打开抽屉并异步填充数据
+      openDrawer() {
+        this.visible = true;
+        
+        // 模拟异步请求获取数据
+        setTimeout(() => {
+          // 等待抽屉完全打开后设置数据
+          this.$nextTick(() => {
+            this.$refs.drawerForm.setFieldsValue({
+              userId: '1001',
+              username: '异步获取的用户名',
+              email: 'async@example.com',
+              phone: '13900139000',
+            });
+          });
+        }, 1000); // 模拟1秒的网络延迟
+      },
+      handleConfirm(data) {
+        console.log('表单数据:', data);
+        alert('提交成功！\n' + JSON.stringify(data, null, 2));
+        this.visible = false;
+      },
+    },
+  }),
+};

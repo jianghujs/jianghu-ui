@@ -587,10 +587,17 @@ export default {
 
   watch: {
     value: {
-      handler(val) {
-        this.values = { ...val };
+      handler() {
+        this.initValues();
       },
       immediate: true,
+      deep: true,
+    },
+
+    fields: {
+      handler() {
+        this.initValues();
+      },
       deep: true,
     },
 
