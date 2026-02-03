@@ -1,0 +1,92 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  background-color: #f0f2f5;
+}
+
+.page-container {
+  padding: 24px;
+}
+
+.dashboard-card {
+  height: 100%;
+}
+
+.rank-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rank-list li {
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+  zoom: 1;
+}
+
+.rank-list li:first-child {
+  margin-top: 0;
+}
+
+.rank-list .rank-index {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 16px;
+  margin-top: 1.5px;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  background-color: #f0f2f5;
+  border-radius: 20px;
+}
+
+.rank-list .rank-index.active {
+  color: #fff;
+  background-color: #314659;
+}
+
+.rank-list .rank-name {
+  flex: 1 1;
+  margin-right: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rank-list .rank-value {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.trend-up {
+  color: #52c41a;
+}
+
+.trend-down {
+  color: #f5222d;
+}
+
+/* Status Dots */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.status-online { background-color: #52c41a; }
+.status-running { background-color: #1890ff; }
+.status-closed { background-color: #d9d9d9; }
+.status-exception { background-color: #f5222d; }
+
+/* Profile Styles */
+.profile-detail {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* Override Vuetify container for full width feel if needed */
+.container--fluid {
+  padding: 0;
+}

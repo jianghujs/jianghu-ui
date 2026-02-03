@@ -49,7 +49,7 @@
     <v-divider class="jh-divider"></v-divider>
 
     <!-- 抽屉内容 -->
-    <div class="pa-4">
+    <div :class="drawerContentClass">
       <!-- 完全自定义内容插槽 -->
       <slot></slot>
     </div>
@@ -130,6 +130,12 @@ export default {
     cancelText: {
       type: String,
       default: '取消'
+    },
+
+    // 抽屉内容class
+    drawerContentClass: {
+      type: String,
+      default: 'pa-4',
     },
   },
 

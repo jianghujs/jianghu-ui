@@ -1,6 +1,6 @@
 <template>
   <v-form
-    ref="form"
+    :ref="formRef"
     :lazy-validation="lazyValidation"
     :class="formClasses"
     v-bind="mergedFormProps"
@@ -54,7 +54,7 @@
               :class="getHorizontalLabelClass(field)"
               :style="getHorizontalLabelStyle(field)"
             >
-              <span v-if="field.required && showRequiredMark" class="error--text mr-1">*</span>
+              <span v-if="(field.required && showRequiredMark)" class="error--text mr-1">*</span>
               {{ field.label }}
               <v-tooltip v-if="field.tooltip" bottom>
                 <template v-slot:activator="{ on, attrs }">
@@ -437,7 +437,13 @@ export default {
       default: () => [],
     },
 
-    // 初始表单数据
+    // v-model 绑定的值
+    value: {
+      type: Object,
+      default: () => ({}),
+    },
+
+    // 初始表单数据 (当不使用 v-model 时使用)
     initialData: {
       type: Object,
       default: () => ({}),
@@ -446,7 +452,7 @@ export default {
     // 表单引用名称
     formRef: {
       type: String,
-      default: 'jhForm',
+      default: 'form',
     },
 
     // 懒加载验证
@@ -529,7 +535,7 @@ export default {
     // 隐藏详情信息
     hideDetails: {
       type: [Boolean, String],
-      default: true,
+      default: false,
     },
 
     // 自定义标签样式类
@@ -781,6 +787,14 @@ export default {
   },
 
   watch: {
+    value: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.formData)) {
+          this.initFormData();
+        }
+      },
+      deep: true,
+    },
     initialData: {
       handler() {
         this.initFormData();
@@ -815,7 +829,8 @@ export default {
   methods: {
     // 初始化表单数据
     initFormData() {
-      const data = { ...this.initialData };
+      const sourceData = { ...this.initialData, ...this.value };
+      const data = { ...sourceData };
 
       // 从 fields 中提取默认值
       this.fields.forEach(field => {
@@ -1023,13 +1038,14 @@ export default {
 
     handleInput(key, value) {
       this.$set(this.formData, key, value);
-      this.$emit('input', key, value, this.formData);
+      this.$emit('input', this.formData);
       this.$emit('field-input', { key, value, formData: this.formData });
     },
 
     handleChange(key, value) {
       this.$set(this.formData, key, value);
-      this.$emit('change', key, value, this.formData);
+      this.$emit('input', this.formData);
+      this.$emit('change', this.formData);
       this.$emit('field-change', { key, value, formData: this.formData });
     },
     

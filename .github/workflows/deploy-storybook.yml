@@ -82,6 +82,14 @@ jobs:
           cp -r dist/* storybook-static/cdn/latest/
           echo "$CDN_VERSION" > storybook-static/cdn/latest/version.txt
           
+      - name: Deploy Demo
+        run: |
+          mkdir -p storybook-static/demo
+          cp -r demo/* storybook-static/demo/
+          # Update paths to point to the CDN version
+          sed -i 's|\.\./\.\./dist/|\.\./cdn/latest/|g' storybook-static/demo/index.html
+          sed -i 's|\.\./dist/|\.\./cdn/latest/|g' storybook-static/demo/index.html
+
       - name: Create CDN usage example
         env:
           CDN_VERSION: ${{ steps.cdn_version.outputs.value }}

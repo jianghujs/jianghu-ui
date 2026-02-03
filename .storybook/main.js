@@ -15,7 +15,7 @@ module.exports = {
   docs: {
     autodocs: 'tag',
   },
-  staticDirs: ['../public'],
+  staticDirs: ['../public', '../dist'],
   webpackFinal: async (config) => {
     // 确保 PostCSS 配置被正确应用
     const postcssLoader = {
