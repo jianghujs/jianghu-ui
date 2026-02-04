@@ -161,5 +161,84 @@ window.MockData = {
         avatar: 'https://gw.alipayobjects.com/zos/rmsportal/dURIMkkrRFpPgTuzkwnB.png'
       }
     ]
-  }
+  },
+
+  // HR System Data
+  hrStats: {
+    totalEmployees: {
+      value: 1245,
+      trend: "5%",
+      trendType: "up",
+      newHires: 45
+    },
+    recruitment: {
+      value: 32,
+      target: 50,
+      progress: 64, // percentage
+      interviews: 128
+    },
+    turnover: {
+      value: "2.3%",
+      trend: "0.5%",
+      trendType: "down",
+      leavers: 8
+    },
+    departmentDist: [
+      { value: 335, name: '研发部' },
+      { value: 310, name: '销售部' },
+      { value: 234, name: '市场部' },
+      { value: 135, name: '人事部' },
+      { value: 1548, name: '运营部' }
+    ],
+    funnel: [
+      { value: 100, name: '简历筛选' },
+      { value: 80, name: '初试' },
+      { value: 60, name: '复试' },
+      { value: 40, name: 'Offer' },
+      { value: 20, name: '入职' }
+    ]
+  },
+
+  salaryStats: {
+    departmentSalary: [
+      { name: '研发部', value: 25000 },
+      { name: '销售部', value: 18000 },
+      { name: '市场部', value: 16000 },
+      { name: '人事部', value: 12000 },
+      { name: '运营部', value: 14000 }
+    ],
+    yearlyTrend: {
+      months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+      values: [1200, 1250, 1300, 1320, 1350, 1400, 1420, 1450, 1480, 1500, 1550, 1600] // 单位：万元
+    }
+  },
+
+  employees: Array.from({ length: 50 }).map((_, i) => ({
+    id: `EMP${String(i + 1).padStart(4, '0')}`,
+    name: ['张三', '李四', '王五', '赵六', '孙七', '周八', '吴九', '郑十'][i % 8] + (Math.floor(i / 8) + 1),
+    department: ['研发部', '销售部', '市场部', '人事部', '运营部'][i % 5],
+    position: ['工程师', '销售经理', '市场专员', 'HRBP', '运营主管'][i % 5],
+    status: ['active', 'probation', 'leave'][i % 3],
+    joinDate: `202${Math.floor(Math.random() * 4) + 1}-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-15`,
+    email: `emp${i + 1}@example.com`,
+    phone: `1380013${String(i).padStart(4, '0')}`
+  })),
+
+  departments: [
+    { id: 1, name: '研发部', manager: '张总监', count: 335, location: '3F-A区', established: '2020-01-01' },
+    { id: 2, name: '销售部', manager: '李总监', count: 310, location: '3F-B区', established: '2020-02-01' },
+    { id: 3, name: '市场部', manager: '王总监', count: 234, location: '4F-A区', established: '2020-03-01' },
+    { id: 4, name: '人事部', manager: '赵经理', count: 135, location: '4F-B区', established: '2020-01-01' },
+    { id: 5, name: '运营部', manager: '孙总监', count: 1548, location: '5F-Whole', established: '2019-12-01' }
+  ],
+
+  candidates: Array.from({ length: 30 }).map((_, i) => ({
+    id: i + 1,
+    name: ['Candidate A', 'Candidate B', 'Candidate C', 'Candidate D'][i % 4] + i,
+    position: ['Java工程师', '前端专家', '销售代表', '产品经理'][i % 4],
+    status: ['new', 'screening', 'interview', 'offer', 'hired', 'rejected'][i % 6],
+    experience: `${Math.floor(Math.random() * 10) + 1}年`,
+    education: ['本科', '硕士', '博士', '大专'][i % 4],
+    applyDate: `2026-02-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`
+  }))
 };

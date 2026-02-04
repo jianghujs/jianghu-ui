@@ -4,8 +4,18 @@ const routes = [
   { path: '/dashboard', component: window.DashboardView },
   { path: '/form', component: window.FormView },
   { path: '/table', component: window.TableView },
-  { path: '/profile', component: window.ProfileView },
-  { path: '/projects', component: window.ProjectListView }
+  { path: '/projects', component: window.ProjectListView },
+  
+  // HR System Routes
+  { path: '/hr-dashboard', component: window.HrDashboardView },
+  { path: '/employees', component: window.EmployeeListView },
+  { path: '/departments', component: window.DepartmentListView },
+  { path: '/candidates', component: window.CandidateListView },
+  { path: '/salary-stats', component: window.SalaryStatisticsView },
+
+  // New Feature Routes
+  { path: '/quick-entry', component: window.QuickEntryView },
+  { path: '/business-demo', component: window.BusinessDemoView }
 ];
 
 const router = new VueRouter({
@@ -22,34 +32,85 @@ new Vue({
     layout: 'mix',
     menuData: [
       {
-        path: '/dashboard',
-        name: 'Dashboard',
-        icon: 'mdi-view-dashboard',
-        title: '工作台'
+        path: '',
+        title: '系统演示',
+        icon: 'mdi-monitor-dashboard',
+        children: [
+          {
+            path: '/dashboard',
+            title: '工作台',
+            icon: 'mdi-view-dashboard',
+          },
+          {
+            path: '/form',
+            title: '表单页',
+            icon: 'mdi-form-select',
+          },
+          {
+            path: '/table',
+            title: '查询表格',
+            icon: 'mdi-table-search',
+          },
+          {
+            path: '/projects',
+            title: '项目列表',
+            icon: 'mdi-table',
+          }
+        ]
       },
       {
-        path: '/form',
-        name: 'Form',
-        icon: 'mdi-form-select',
-        title: '表单页'
+        path: '',
+        title: '人力资源',
+        icon: 'mdi-account-group-outline',
+        children: [
+          {
+            path: '/hr-dashboard',
+            title: 'HR工作台',
+            icon: 'mdi-monitor-dashboard',
+          },
+          {
+            path: '/employees',
+            title: '员工管理',
+            icon: 'mdi-account-group',
+          },
+          {
+            path: '/quick-entry',
+            title: '快速入职',
+            icon: 'mdi-account-plus',
+          },
+          {
+            path: '/departments',
+            title: '部门管理',
+            icon: 'mdi-domain',
+          },
+          {
+            path: '/candidates',
+            title: '招聘管理',
+            icon: 'mdi-account-search',
+          },
+          {
+            path: '/salary-stats',
+            title: '薪资分析',
+            icon: 'mdi-chart-bar',
+          }
+        ]
       },
       {
-        path: '/table',
-        name: 'Table',
-        icon: 'mdi-table-search',
-        title: '查询表格'
-      },
-      {
-        path: '/projects',
-        name: 'Projects',
-        icon: 'mdi-table',
-        title: '项目列表'
-      },
-      {
-        path: '/profile',
-        name: 'Profile',
-        icon: 'mdi-account',
-        title: '个人中心'
+        path: '',
+        title: '业务组件',
+        icon: 'mdi-widgets',
+        children: [
+          {
+            path: '/business-demo',
+            title: '组件演示',
+            icon: 'mdi-view-list',
+          },
+          {
+            path: '/profile',
+            title: '个人中心',
+            icon: 'mdi-account',
+          }
+        ]
       }
     ],
     userInfo: {
