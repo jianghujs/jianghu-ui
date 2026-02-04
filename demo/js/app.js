@@ -74,7 +74,7 @@ new Vue({
   },
   template: `
     <jh-layout
-      title="Jianghu Dashboard"
+      title="JianghuUI"
       logo="mdi-rocket-launch"
       :layout="layout"
       :menu-data="menuData"

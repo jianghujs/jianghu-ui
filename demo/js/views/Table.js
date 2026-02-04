@@ -2,7 +2,6 @@ window.TableView = {
   template: `
     <div class="page-container">
       <jh-card :bordered="false">
-        <div class="table-header-title mb-4">查询表格</div>
         
         <!-- Filter Area is handled by JhTable's built-in search or custom filter -->
         
@@ -11,8 +10,10 @@ window.TableView = {
           :headers="headers"
           :request="loadData"
           :show-search="true"
+          :header-title="查询表格"
           :show-select="true"
           :filter-fields="filterFields"
+          class="flex-1"
           :toolbar="{
             search: false, 
             refresh: true,

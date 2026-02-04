@@ -1,12 +1,14 @@
 window.ProjectListView = {
   template: `
-    <div class="project-list-container">
+    <div class="page-container">
+      <jh-card :bordered="false">
       <jh-table
         ref="table"
         header-title="项目列表"
         :headers="headers"
         :request="loadData"
         :show-search="true"
+        class="flex-1"
         :show-select="true"
         :toolbar="{
           search: true,
@@ -42,6 +44,7 @@ window.ProjectListView = {
         :initial-data="formData"
         @confirm="handleConfirm"
       />
+      </jh-card>
     </div>
   `,
   data() {

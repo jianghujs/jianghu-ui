@@ -1,107 +1,185 @@
 window.ProfileView = {
   template: `
-    <div class="page-container">
-      <v-row>
-        <!-- Left Column: User Info -->
-        <v-col cols="12" md="4" lg="3">
-          <jh-card :bordered="false" class="mb-4">
-            <div class="text-center mb-6">
-              <v-avatar size="104" class="mb-4">
-                <img src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" alt="avatar">
-              </v-avatar>
-              <div class="text-h5 font-weight-bold mb-1">{{ userInfo.name }}</div>
-              <div class="text-body-1">{{ userInfo.title }}</div>
-            </div>
-            
-            <div class="profile-detail mb-6">
-              <div class="mb-2"><v-icon small left>mdi-briefcase-outline</v-icon>{{ userInfo.title }}</div>
-              <div class="mb-2"><v-icon small left>mdi-sitemap-outline</v-icon>{{ userInfo.group }}</div>
-              <div class="mb-2"><v-icon small left>mdi-map-marker-outline</v-icon>{{ userInfo.address }}</div>
-            </div>
+    <div class="page-container min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col lg:flex-row gap-6">
+          <!-- Left Column: User Info -->
+          <div class="w-full lg:w-1/4">
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+              <!-- Profile Header -->
+              <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-white">
+                <div class="flex justify-center mb-4">
+                  <img 
+                    src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" 
+                    alt="avatar" 
+                    class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+                  >
+                </div>
+                <div class="text-center">
+                  <h2 class="text-2xl font-bold mb-1">{{ userInfo.name }}</h2>
+                  <p class="text-blue-100">{{ userInfo.title }}</p>
+                </div>
+              </div>
+              
+              <!-- Profile Details -->
+              <div class="p-6">
+                <div class="space-y-4 mb-6">
+                  <div class="flex items-center text-gray-700">
+                    <v-icon small class="mr-3 text-blue-500">mdi-briefcase-outline</v-icon>
+                    <span>{{ userInfo.title }}</span>
+                  </div>
+                  <div class="flex items-center text-gray-700">
+                    <v-icon small class="mr-3 text-blue-500">mdi-sitemap-outline</v-icon>
+                    <span>{{ userInfo.group }}</span>
+                  </div>
+                  <div class="flex items-center text-gray-700">
+                    <v-icon small class="mr-3 text-blue-500">mdi-map-marker-outline</v-icon>
+                    <span>{{ userInfo.address }}</span>
+                  </div>
+                </div>
 
-            <v-divider class="mb-6"></v-divider>
+                <!-- Tags Section -->
+                <div class="border-t border-gray-100 pt-6 mb-6">
+                  <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">标签</h3>
+                  <div class="flex flex-wrap gap-2">
+                    <v-chip 
+                      v-for="tag in userInfo.tags" 
+                      :key="tag" 
+                      small 
+                      outlined 
+                      class="bg-white text-gray-700 border-gray-200 hover:border-blue-400 hover:text-blue-500 transition-colors"
+                    >
+                      {{ tag }}
+                    </v-chip>
+                    <v-chip 
+                      small 
+                      outlined 
+                      @click="addTag"
+                      class="bg-white text-blue-500 border-blue-200 hover:bg-blue-50 transition-colors"
+                    >
+                      <v-icon small>mdi-plus</v-icon>
+                    </v-chip>
+                  </div>
+                </div>
 
-            <div class="mb-6">
-              <div class="text-subtitle-1 font-weight-bold mb-3">标签</div>
-              <div class="d-flex flex-wrap">
-                <v-chip v-for="tag in userInfo.tags" :key="tag" small outlined class="mr-2 mb-2">
-                  {{ tag }}
-                </v-chip>
-                <v-chip small outlined class="mb-2" @click="addTag">
-                  <v-icon small>mdi-plus</v-icon>
-                </v-chip>
+                <!-- Teams Section -->
+                <div class="border-t border-gray-100 pt-6">
+                  <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">团队</h3>
+                  <div class="space-y-3">
+                    <div 
+                      v-for="team in userInfo.teams" 
+                      :key="team.name" 
+                      class="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <div class="w-8 h-8 rounded-full overflow-hidden mr-3 flex-shrink-0">
+                        <img :src="team.icon" :alt="team.name" class="w-full h-full object-cover">
+                      </div>
+                      <span class="text-sm font-medium text-gray-700">{{ team.name }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
 
-            <v-divider class="mb-6"></v-divider>
+          <!-- Right Column: Tabs & Content -->
+          <div class="w-full lg:w-3/4">
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+              <!-- Tabs -->
+              <div class="border-b border-gray-200">
+                <v-tabs v-model="activeTab" background-color="transparent" class="px-6">
+                  <v-tab class="text-base font-medium text-gray-600 hover:text-gray-900">
+                    文章 ({{ articles.length }})
+                  </v-tab>
+                  <v-tab class="text-base font-medium text-gray-600 hover:text-gray-900">
+                    应用 (8)
+                  </v-tab>
+                  <v-tab class="text-base font-medium text-gray-600 hover:text-gray-900">
+                    项目 (8)
+                  </v-tab>
+                </v-tabs>
+              </div>
 
-            <div>
-              <div class="text-subtitle-1 font-weight-bold mb-3">团队</div>
-              <v-row dense>
-                <v-col v-for="team in userInfo.teams" :key="team.name" cols="6" class="mb-2">
-                  <div class="d-flex align-center">
-                    <v-avatar size="24" class="mr-2">
-                      <img :src="team.icon" :alt="team.name">
-                    </v-avatar>
-                    <span class="text-caption text-truncate">{{ team.name }}</span>
-                  </div>
-                </v-col>
-              </v-row>
-            </div>
-          </jh-card>
-        </v-col>
-
-        <!-- Right Column: Tabs & Content -->
-        <v-col cols="12" md="8" lg="9">
-          <jh-card :bordered="false">
-            <v-tabs v-model="activeTab" background-color="transparent">
-              <v-tab>文章 ({{ articles.length }})</v-tab>
-              <v-tab>应用 (8)</v-tab>
-              <v-tab>项目 (8)</v-tab>
-            </v-tabs>
-
-            <v-tabs-items v-model="activeTab" class="mt-4">
-              <v-tab-item>
-                <v-list three-line>
-                  <template v-for="(item, index) in articles">
-                    <v-list-item :key="item.title">
-                      <v-list-item-content>
-                        <v-list-item-title class="text-h6 mb-1">
-                          <a :href="item.href" target="_blank" class="text-decoration-none black--text">{{ item.title }}</a>
-                        </v-list-item-title>
-                        <div class="mb-2">
-                          <v-chip x-small outlined v-for="tag in item.tags" :key="tag" class="mr-1">{{ tag }}</v-chip>
-                        </div>
-                        <v-list-item-subtitle class="text--primary mb-2">
-                          {{ item.content }}
-                        </v-list-item-subtitle>
-                        <div class="d-flex align-center caption grey--text">
-                          <span class="mr-4 text-primary">{{ item.author }}</span>
-                          <span class="mr-4">发布在 {{ item.href }}</span>
-                          <span>{{ item.updatedAt }}</span>
-                        </div>
-                      </v-list-item-content>
-                    </v-list-item>
-                    
-                    <div class="d-flex px-4 pb-4 grey--text text-caption" :key="'actions-' + index">
-                      <span class="mr-4 d-flex align-center"><v-icon small left>mdi-star-outline</v-icon> {{ item.star }}</span>
-                      <span class="mr-4 d-flex align-center"><v-icon small left>mdi-thumb-up-outline</v-icon> {{ item.like }}</span>
-                      <span class="d-flex align-center"><v-icon small left>mdi-message-outline</v-icon> {{ item.message }}</span>
+              <!-- Tab Content -->
+              <v-tabs-items v-model="activeTab" class="p-6">
+                <v-tab-item>
+                  <div class="space-y-6">
+                    <div 
+                      v-for="(item, index) in articles" 
+                      :key="item.title" 
+                      class="p-5 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
+                    >
+                      <h3 class="text-xl font-semibold mb-3">
+                        <a 
+                          :href="item.href" 
+                          target="_blank" 
+                          class="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                        >
+                          {{ item.title }}
+                        </a>
+                      </h3>
+                      <div class="mb-4 flex flex-wrap gap-2">
+                        <v-chip 
+                          x-small 
+                          outlined 
+                          v-for="tag in item.tags" 
+                          :key="tag" 
+                          class="text-xs text-gray-600 border-gray-200"
+                        >
+                          {{ tag }}
+                        </v-chip>
+                      </div>
+                      <p class="text-gray-700 mb-4 line-clamp-2">{{ item.content }}</p>
+                      <div class="flex flex-wrap items-center text-sm text-gray-500 mb-4">
+                        <span class="mr-6 font-medium text-gray-700">{{ item.author }}</span>
+                        <span class="mr-6">
+                          发布在 
+                          <a 
+                            :href="item.href" 
+                            target="_blank" 
+                            class="text-blue-500 hover:underline"
+                          >
+                            {{ item.href }}
+                          </a>
+                        </span>
+                        <span>{{ item.updatedAt }}</span>
+                      </div>
+                      <div class="flex items-center text-sm text-gray-500 pt-3 border-t border-gray-100">
+                        <button class="flex items-center mr-6 hover:text-blue-500 transition-colors">
+                          <v-icon small class="mr-1">mdi-star-outline</v-icon>
+                          <span>{{ item.star }}</span>
+                        </button>
+                        <button class="flex items-center mr-6 hover:text-blue-500 transition-colors">
+                          <v-icon small class="mr-1">mdi-thumb-up-outline</v-icon>
+                          <span>{{ item.like }}</span>
+                        </button>
+                        <button class="flex items-center hover:text-blue-500 transition-colors">
+                          <v-icon small class="mr-1">mdi-message-outline</v-icon>
+                          <span>{{ item.message }}</span>
+                        </button>
+                      </div>
                     </div>
-                    <v-divider v-if="index < articles.length - 1" :key="'div-' + index"></v-divider>
-                  </template>
-                </v-list>
-              </v-tab-item>
-              <v-tab-item>
-                <div class="pa-4 text-center grey--text">应用列表暂无数据</div>
-              </v-tab-item>
-              <v-tab-item>
-                <div class="pa-4 text-center grey--text">项目列表暂无数据</div>
-              </v-tab-item>
-            </v-tabs-items>
-          </jh-card>
-        </v-col>
-      </v-row>
+                  </div>
+                </v-tab-item>
+                <v-tab-item>
+                  <div class="flex flex-col items-center justify-center py-16 text-center">
+                    <v-icon large class="text-gray-300 mb-4">mdi-apps</v-icon>
+                    <h3 class="text-lg font-medium text-gray-900 mb-1">应用列表暂无数据</h3>
+                    <p class="text-gray-500">您还没有添加任何应用</p>
+                  </div>
+                </v-tab-item>
+                <v-tab-item>
+                  <div class="flex flex-col items-center justify-center py-16 text-center">
+                    <v-icon large class="text-gray-300 mb-4">mdi-folder</v-icon>
+                    <h3 class="text-lg font-medium text-gray-900 mb-1">项目列表暂无数据</h3>
+                    <p class="text-gray-500">您还没有添加任何项目</p>
+                  </div>
+                </v-tab-item>
+              </v-tabs-items>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   `,
   data() {
