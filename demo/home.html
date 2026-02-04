@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jianghu UI - 开箱即用的中台前端/设计解决方案</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#1677ff', // Ant Design Blue 6
+              'primary-hover': '#4096ff', // Blue 5
+              secondary: '#f0f2f5',
+              dark: '#001529',
+              paragraph: '#4a4a4a',
+            },
+            fontFamily: {
+              sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'],
+            },
+            boxShadow: {
+              'hero': '0 20px 50px -12px rgba(0,0,0,0.1)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        background-color: #fff;
+      }
+      
+      /* 自定义动画 */
+      @keyframes bounce {
+        0%, 100% {
+          transform: translateY(0) rotate(12deg);
+        }
+        50% {
+          transform: translateY(-10px) rotate(12deg);
+        }
+      }
+      
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <!-- 导航栏 -->
+      <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-16 bg-transparent">
+        <div class="max-w-[1200px] mx-auto px-6 h-full">
+          <div class="flex justify-between items-center h-full">
+            <!-- Logo Section -->
+            <div class="flex items-center gap-3 cursor-pointer">
+              <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <svg viewBox="0 0 24 24" fill="none" class="w-5 h-5 text-white" stroke="currentColor" stroke-width="2.5">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <span class="font-bold text-xl text-gray-900 dark:text-white tracking-tight font-sans">
+                Jianghu UI
+              </span>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center gap-4">
+              <!-- <button 
+                id="theme-toggle"
+                class="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-full transition-all dark:text-gray-300 dark:hover:bg-slate-800"
+                title="切换主题"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sun"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="moon hidden"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+              </button>
+               -->
+              <a 
+                href="https://github.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-full transition-all dark:text-gray-300 dark:hover:bg-slate-800"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- 主要内容 -->
+      <main>
+        <!-- 英雄区 -->
+        <div class="relative pt-40 pb-12 lg:pt-48 lg:pb-20 overflow-hidden bg-gradient-to-b from-[#f5f8ff] to-white dark:from-slate-900 dark:to-slate-900 transition-colors duration-300">
+          <div class="max-w-[1200px] mx-auto px-6 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center justify-between">
+              
+              <!-- Left: Text Content -->
+              <div class="flex-1 text-center lg:text-left lg:max-w-lg">
+                <h1 class="text-5xl lg:text-[68px] font-bold text-[#000000] dark:text-white tracking-tight leading-[1.1] mb-6 font-sans">
+                  JIANGHU UI
+                </h1>
+                
+                <p class="text-lg lg:text-xl text-gray-800 dark:text-gray-300 mb-10 font-medium tracking-wide">
+                  开箱即用的中台前端/设计解决方案
+                </p>
+
+                <div class="flex flex-wrap gap-4 justify-center lg:justify-start items-center mb-20">
+                  <a href="./demo/" class="px-8 py-2.5 bg-[#1677ff] text-white rounded-full text-[15px] shadow-lg shadow-blue-500/30 hover:bg-[#4096ff] transition-all hover:-translate-y-0.5 active:scale-95 no-underline flex items-center justify-center">
+                    预览
+                  </a>
+                  <a href="./docs/" class="px-8 py-2.5 bg-white text-[#1677ff] border border-[#1677ff] rounded-full text-[15px] hover:bg-blue-50 transition-all hover:-translate-y-0.5 active:scale-95 dark:bg-transparent dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20 no-underline flex items-center justify-center">
+                    开始使用
+                  </a>
+                  
+                  <div class="flex items-center ml-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md overflow-hidden h-8 hover:border-gray-300 transition-colors cursor-pointer group">
+                    <div class="px-3 py-1 bg-gray-50 dark:bg-slate-700 border-r border-gray-200 dark:border-slate-600 flex items-center gap-1 text-xs font-bold text-gray-700 dark:text-gray-200 group-hover:text-gray-900 group-hover:bg-gray-100 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+                      <span>Star</span>
+                    </div>
+                    <div class="px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-slate-800">
+                      37926
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Abstract Isometric Illustration -->
+              <div class="flex-1 w-full lg:w-auto flex justify-center lg:justify-end relative mt-12 lg:mt-0">
+                <!-- Main Container -->
+                <div class="relative w-[500px] h-[400px]">
+                  
+                  <!-- Decorative Elements -->
+                  <!-- Red Ring -->
+                  <div class="absolute top-10 right-10 w-20 h-20 border-[12px] border-[#ff4d4f] rounded-full opacity-80 shadow-xl transform rotate-12 z-20 animate-[bounce_4s_infinite]"></div>
+                  
+                  <!-- Blue Folder/File Icon -->
+                  <div class="absolute -top-10 left-20 z-10 animate-[pulse_3s_infinite]">
+                    <div class="w-16 h-12 bg-[#4096ff] rounded-lg shadow-lg transform -rotate-12 flex items-center justify-center">
+                      <div class="w-8 h-1 bg-white/50 rounded"></div>
+                    </div>
+                  </div>
+
+                  <!-- Code Block Icon -->
+                  <div class="absolute bottom-0 right-0 z-30 animate-[bounce_5s_infinite]">
+                    <div class="w-20 h-20 bg-[#597ef7] rounded-2xl shadow-2xl flex items-center justify-center transform rotate-12">
+                      <code class="text-white font-mono text-xl font-bold">&lt;/&gt;</code>
+                    </div>
+                  </div>
+
+                  <!-- Main Dashboard Card -->
+                  <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[520px] h-[320px] bg-white dark:bg-slate-800 rounded-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-gray-100 dark:border-slate-700 p-6 z-10 flex gap-6 transition-colors duration-300">
+                      <!-- Sidebar -->
+                      <div class="w-12 h-full flex flex-col gap-3 pt-2">
+                          <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-700 mb-2"></div>
+                          <div class="w-8 h-2 rounded-full bg-gray-100 dark:bg-slate-700"></div>
+                          <div class="w-8 h-2 rounded-full bg-gray-100 dark:bg-slate-700"></div>
+                          <div class="w-8 h-2 rounded-full bg-gray-100 dark:bg-slate-700"></div>
+                          <div class="w-8 h-2 rounded-full bg-gray-100 dark:bg-slate-700"></div>
+                      </div>
+
+                      <!-- Content -->
+                      <div class="flex-1 flex flex-col gap-4">
+                          <!-- Header -->
+                          <div class="flex justify-between items-center mb-2">
+                              <div class="w-32 h-3 bg-gray-100 dark:bg-slate-700 rounded"></div>
+                              <div class="w-16 h-8 bg-blue-50 dark:bg-blue-900/30 rounded-md"></div>
+                          </div>
+
+                          <!-- Charts Area -->
+                          <div class="flex gap-4 h-full">
+                              <!-- Pie Chart Card -->
+                              <div class="flex-1 bg-gray-50 dark:bg-slate-700 rounded-lg p-4 flex flex-col items-center justify-center relative overflow-hidden">
+                                  <div class="w-24 h-24 rounded-full" style="background: 'conic-gradient(#1677ff 0% 35%, #ff4d4f 35% 60%, #f0f2f5 60% 100%)'"></div>
+                                  <!-- Floating 3D Pie Slice -->
+                                  <div class="absolute top-1/2 left-1/2 w-12 h-12 bg-[#1677ff] rounded-tr-full transform -translate-x-1/2 -translate-y-1/2 shadow-lg z-10"></div>
+                              </div>
+                              
+                              <!-- Stats Card -->
+                              <div class="flex-1 flex flex-col gap-3">
+                                  <div class="h-20 bg-gray-50 dark:bg-slate-700 rounded-lg p-3">
+                                      <div class="w-12 h-2 bg-gray-200 dark:bg-slate-600 rounded mb-2"></div>
+                                      <div class="w-24 h-2 bg-gray-100 dark:bg-slate-500 rounded"></div>
+                                  </div>
+                                  <div class="flex-1 bg-gray-50 dark:bg-slate-700 rounded-lg p-3 flex items-end justify-between gap-2 px-4 pb-4">
+                                       <div class="w-full bg-gray-200 dark:bg-slate-600 rounded-t h-[40%]"></div>
+                                       <div class="w-full bg-[#1677ff] rounded-t h-[70%] opacity-80"></div>
+                                       <div class="w-full bg-gray-200 dark:bg-slate-600 rounded-t h-[50%]"></div>
+                                  </div>
+                              </div>
+                          </div>
+                          
+                          <!-- Bottom List -->
+                          <div class="grid grid-cols-2 gap-4">
+                              <div class="h-8 bg-gray-50 dark:bg-slate-700 rounded w-full"></div>
+                              <div class="h-8 bg-gray-50 dark:bg-slate-700 rounded w-full"></div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Background Shadow Blob -->
+                  <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-blue-100/30 dark:bg-blue-500/10 blur-3xl -z-10 rounded-full"></div>
+                  <!-- Pill shape decoration -->
+                  <div class="absolute bottom-10 -left-10 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-slate-700 dark:to-slate-600 h-8 w-32 rounded-full blur-sm opacity-60"></div>
+                  <div class="absolute bottom-10 -left-10 flex gap-2 items-center bg-white/80 dark:bg-slate-800/80 backdrop-blur border border-blue-100 dark:border-slate-600 py-1.5 px-3 rounded-full shadow-lg z-20">
+                      <div class="h-2 w-8 bg-[#1677ff] rounded-full"></div>
+                      <div class="h-2 w-2 bg-[#1677ff] rounded-full"></div>
+                      <div class="h-2 w-2 bg-[#1677ff] rounded-full"></div>
+                  </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Three Main Features -->
+          <div class="max-w-[1200px] mx-auto px-6 mt-20 lg:mt-24">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+              <div class="flex flex-col items-center group">
+                <div class="mb-6 transform transition-transform group-hover:scale-110 duration-300">
+                  <div class="w-20 h-20 rounded-full bg-yellow-400/10 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#eab308" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bolt"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><circle cx="12" cy="12" r="4"></circle></svg>
+                  </div>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">高效快速</h3>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">
+                  下载即用，无需配置
+                </p>
+              </div>
+
+              <div class="flex flex-col items-center group">
+                <div class="mb-6 transform transition-transform group-hover:scale-110 duration-300">
+                  <div class="w-20 h-20 rounded-full bg-blue-400/10 flex items-center justify-center">
+                    <div class="relative">
+                      <div class="absolute inset-0 bg-blue-500 blur-lg opacity-20"></div>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#1677ff" stroke="#1677ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="layout"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><line x1="3" x2="21" y1="9" y2="9"></line><line x1="9" x2="9" y1="21" y2="9"></line></svg>
+                    </div>
+                  </div>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">模板组件</h3>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">
+                  提炼自企业级中后台产品的交互语言和视觉风格
+                </p>
+              </div>
+
+              <div class="flex flex-col items-center group">
+                <div class="mb-6 transform transition-transform group-hover:scale-110 duration-300">
+                  <div class="w-20 h-20 rounded-full bg-blue-400/10 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1677ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="globe2"><circle cx="12" cy="12" r="10"></circle><line x1="2" x2="22" y1="12" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                  </div>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">国际化</h3>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">
+                  内建数十种语言包，支持动态切换
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+      // 导航栏滚动效果
+      function handleScroll() {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 10) {
+          navbar.classList.add('bg-white/80', 'backdrop-blur-md', 'shadow-sm', 'border-b', 'border-gray-100', 'dark:bg-slate-900/80', 'dark:border-slate-800');
+          navbar.classList.remove('bg-transparent');
+        } else {
+          navbar.classList.remove('bg-white/80', 'backdrop-blur-md', 'shadow-sm', 'border-b', 'border-gray-100', 'dark:bg-slate-900/80', 'dark:border-slate-800');
+          navbar.classList.add('bg-transparent');
+        }
+      }
+
+      // 主题切换功能
+      function toggleTheme() {
+        const html = document.documentElement;
+        const sunIcon = document.querySelector('.sun');
+        const moonIcon = document.querySelector('.moon');
+        
+        html.classList.toggle('dark');
+        
+        if (html.classList.contains('dark')) {
+          sunIcon.classList.add('hidden');
+          moonIcon.classList.remove('hidden');
+        } else {
+          sunIcon.classList.remove('hidden');
+          moonIcon.classList.add('hidden');
+        }
+      }
+
+      // 初始化
+      function init() {
+        // 添加滚动事件监听
+        window.addEventListener('scroll', handleScroll);
+        
+        // 初始化导航栏状态
+        handleScroll();
+        
+        // 添加主题切换事件监听
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', toggleTheme);
+      }
+
+      // 页面加载完成后初始化
+      window.addEventListener('DOMContentLoaded', init);
+    </script>
+  </body>
+</html>

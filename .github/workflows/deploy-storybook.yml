@@ -43,18 +43,48 @@ jobs:
       - name: Build Storybook
         run: npm run build-storybook
 
-      - name: Prepare Demo & Dist
+      - name: Prepare Site Structure
         run: |
-          # 复制 Demo
-          mkdir -p storybook-static/demo
-          cp -r demo/* storybook-static/demo/
-          
-          # 复制构建产物供 Demo 使用
+          # 1. 移动 Storybook 文档到 /docs
+          # 先创建一个临时目录 docs
+          mkdir -p storybook-static/docs
+          # 将 storybook-static 下除了 docs 以外的所有内容移动到 docs
+          # 使用 find 避免移动 docs 目录自身
+          find storybook-static -maxdepth 1 -mindepth 1 -not -name 'docs' -exec mv {} storybook-static/docs/ \;
+
+          # 2. 准备构建产物 /dist
           mkdir -p storybook-static/dist
           cp -r dist/* storybook-static/dist/
-          
-          # 修正 Demo 中的引用路径 (从 ../../dist 改为 ../dist)
+
+          # 3. 准备 Demo 页面 /demo
+          mkdir -p storybook-static/demo
+          cp -r demo/* storybook-static/demo/
+          # 修正 /demo 下页面的引用路径 (从 ../../dist 改为 ../dist)
           find storybook-static/demo -name "*.html" -exec sed -i 's|\.\./\.\./dist/|\.\./dist/|g' {} +
+
+          # 4. 设置首页 (使用 demo/home.html)
+          cp demo/home.html storybook-static/index.html
+          # 修正首页的引用路径 (因为从 demo/home.html 移到了根目录，原 ../../dist 变为 ./dist)
+          # 注意：原 home.html 可能没有引用 dist，如果有，需要根据实际情况调整。
+          # 假设 home.html 中有指向 demo 或 docs 的链接，这里可以进行替换或增强
+          
+          # 更新首页中的链接 (如果存在)
+          # 例如将 "预览" 按钮链接到 /demo/
+          sed -i 's|href="preview.html"|href="./demo/"|g' storybook-static/index.html || true
+          # 或者将 "开始使用" 链接到 /docs/
+          sed -i 's|href="docs.html"|href="./docs/"|g' storybook-static/index.html || true
+          
+          # 修正首页中可能存在的资源引用
+          # 假设 home.html 原本在 demo/ 下，引用同级资源是 ./css/style.css
+          # 现在移到根目录，需要确保 css/style.css 也存在于根目录，或者修改引用为 ./demo/css/style.css
+          # 策略：修改引用指向 /demo/
+          sed -i 's|src="./|src="./demo/|g' storybook-static/index.html
+          sed -i 's|href="./|href="./demo/|g' storybook-static/index.html
+          
+          # 针对 Vue/Vuetify/JianghuUI 的引用修正
+          # 如果 home.html 使用了 CDN 链接则无需修改
+          # 如果使用了相对路径引用 dist，需要修正为 ./dist/
+          sed -i 's|\.\./\.\./dist/|./dist/|g' storybook-static/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
