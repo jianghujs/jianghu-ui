@@ -14,6 +14,7 @@ import JhQueryFilter from './components/JhQueryFilter/JhQueryFilter.vue';
 import JhTable from './components/JhTable/JhTable.vue';
 import JhTreeSelect from './components/JhTreeSelect/JhTreeSelect.vue';
 import JhAddressSelect from './components/JhAddressSelect/JhAddressSelect.vue';
+import JhIcon from './components/JhIcon/JhIcon.vue';
 
 // Layout Components
 import JhPageContainer from './components/JhPageContainer/JhPageContainer.vue';
@@ -52,6 +53,7 @@ const components = {
   JhTable,
   JhTreeSelect,
   JhAddressSelect,
+  JhIcon,
   // Layout Components
   JhPageContainer,
   JhLayout,
@@ -111,6 +113,7 @@ export {
   JhQueryFilter,
   JhTable,
   JhTreeSelect,
+  JhIcon,
   // Layout Components
   JhPageContainer,
   JhCard,
