@@ -4,6 +4,7 @@
 import './style/storybook.css';
 import './style/globalCSSVuetifyV4.css';
 import './style/globalCSSJHV4.css';
+import { createVuetifyInstance } from './utils/vuetify';
 
 // Basic Components
 import JhMenu from './components/JhMenu/JhMenu.vue';
@@ -97,10 +98,12 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 export default {
   install,
+  createVuetify: createVuetifyInstance,
   ...components,
 };
 
 export {
+  createVuetifyInstance as createVuetify,
   // Basic Components
   JhMenu,
   JhScene,

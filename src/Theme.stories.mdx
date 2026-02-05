@@ -1,0 +1,90 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="介绍/主题配置" />
+
+# 主题配置
+
+Jianghu-UI 基于 Vuetify 2 构建，因此支持 Vuetify 强大的主题系统。你可以轻松自定义应用的主色调、字体和其他样式属性。
+
+## 默认主题
+
+Jianghu-UI 提供了一套默认的主题配色，旨在提供清晰、现代的视觉体验。
+
+| 属性 | 颜色值 | 说明 |
+| :--- | :--- | :--- |
+| **primary** | `#1976D2` | 主色，用于按钮、链接和活动状态 |
+| **secondary** | `#424242` | 次要颜色，用于次级操作和文本 |
+| **accent** | `#82B1FF` | 强调色，用于突出显示的元素 |
+| **error** | `#FF5252` | 错误状态颜色 |
+| **info** | `#2196F3` | 信息提示颜色 |
+| **success** | `#4CAF50` | 成功状态颜色 |
+| **warning** | `#FB8C00` | 警告状态颜色 |
+
+## 自定义主题
+
+我们提供了一个 `createVuetify` 辅助函数，可以帮助你轻松创建带有自定义主题的 Vuetify 实例。该函数会自动合并你的配置与默认主题，确保未覆盖的部分保持 Jianghu-UI 的默认风格。
+
+### 使用方法
+
+引入 `createVuetify` 并传入你的主题配置：
+
+```javascript
+// 引入 createVuetify
+import { createVuetify } from 'jianghu-ui';
+
+// 创建 Vuetify 实例
+const vuetify = createVuetify({
+  theme: {
+    themes: {
+      light: {
+        primary: '#4CAF50', // 修改主色为绿色
+        secondary: '#009688', // 修改次要颜色
+        // 其他颜色将保持默认值
+      },
+    },
+  },
+});
+
+// 初始化 Vue 应用
+new Vue({
+  el: '#app',
+  vuetify,
+  // ...其他配置
+});
+```
+
+### 深度定制
+
+除了颜色，你还可以通过 `options` 参数传递任何 Vuetify 支持的配置项，例如图标集、国际化等。
+
+```javascript
+const vuetify = createVuetify({
+  theme: { ... },
+  icons: {
+    iconfont: 'fa', // 使用 FontAwesome
+  },
+  lang: {
+    current: 'zh-Hans',
+  },
+});
+```
+
+## 暗黑模式 (Dark Mode)
+
+Vuetify 内置了暗黑模式支持。你可以在配置中定义暗黑模式下的颜色：
+
+```javascript
+const vuetify = createVuetify({
+  theme: {
+    dark: true, // 默认开启暗黑模式
+    themes: {
+      dark: {
+        primary: '#2196F3',
+        // ...
+      },
+    },
+  },
+});
+```
+
+更多关于 Vuetify 主题配置的信息，请参考 [Vuetify 2 官方文档](https://v2.vuetifyjs.com/zh-Hans/features/theme/)。
