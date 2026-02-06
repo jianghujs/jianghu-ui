@@ -170,8 +170,8 @@ export default {
         return attrsStyle || null;
       }
       const baseStyle = {
-        borderTopLeftRadius: '16px',
-        borderTopRightRadius: '16px',
+        borderTopLeftRadius: 'var(--radius-lg)',
+        borderTopRightRadius: 'var(--radius-lg)',
         top: 'auto',
         bottom: '0',
         left: '0',
@@ -268,7 +268,7 @@ export default {
 
 <style scoped>
 .jh-drawer-header {
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .jh-drawer-action-btn-group {
@@ -277,8 +277,8 @@ export default {
 }
 
 .jh-drawer-bottom {
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
 }
 
 .drawer-close-float-btn {

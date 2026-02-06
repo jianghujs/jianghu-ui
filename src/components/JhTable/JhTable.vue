@@ -2105,8 +2105,9 @@ export default {
 <style scoped>
 /* 表格容器 */
 .jh-pro-table {
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   position: relative;
+  background: var(--color-bg-primary);
 }
 
 
@@ -2122,43 +2123,62 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: var(--spacing-lg) 0;
+  border-bottom: 1px solid var(--color-border-light);
   min-height: 64px;
 }
 
 .jh-pro-table-header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--spacing-lg);
   flex: 1;
 }
 
 /* --- 密度调整 --- */
+/* 默认密度 */
+.jh-pro-table ::v-deep .jh-table-default.v-data-table > .v-data-table__wrapper > table > thead > tr > th {
+  height: 54px !important;
+  padding: 0 var(--spacing-lg) !important;
+}
+.jh-pro-table ::v-deep .jh-table-default.v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
+  height: 54px !important;
+  padding: 0 var(--spacing-lg) !important;
+}
+
 /* 中等密度 */
 .jh-pro-table ::v-deep .jh-table-medium.v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-  height: 40px;
+  height: 48px !important;
+  padding: 0 var(--spacing-md) !important;
 }
 .jh-pro-table ::v-deep .jh-table-medium.v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
-    min-height: 40px;
-    height: 40px;
-    color: #333C44;
-    font-size: .8125rem;
+  height: 48px !important;
+  padding: 0 var(--spacing-md) !important;
+}
+
+/* 紧凑密度 */
+.jh-pro-table ::v-deep .jh-table-compact.v-data-table > .v-data-table__wrapper > table > thead > tr > th {
+  height: 40px !important;
+  padding: 0 var(--spacing-sm) !important;
+}
+.jh-pro-table ::v-deep .jh-table-compact.v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
+  height: 40px !important;
+  padding: 0 var(--spacing-sm) !important;
 }
 
 
 .jh-pro-table-header-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 .jh-pro-table-title {
   display: flex;
   align-items: center;
-  font-size: 16px;
+  font-size: var(--font-size-h3);
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.85);
+  color: var(--color-text-primary);
 }
 
 .jh-pro-table-title-text {
@@ -2168,7 +2188,7 @@ export default {
 .jh-pro-table-header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 /* 批量操作提示栏 */
@@ -2176,36 +2196,37 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
-  background: #fbfbfb;
-  border-radius: 4px;
-  margin: 16px 0 0;
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  margin: var(--spacing-lg) 0 0;
+  border: 1px solid var(--color-border-light);
 }
 
 .jh-pro-table-alert-info {
   display: flex;
   flex: 1;
   align-items: center;
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.65);
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
 }
 
 .jh-pro-table-alert-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 /* 工具栏 */
 .jh-pro-table-toolbar {
-  padding: 16px 0 !important;
+  padding: var(--spacing-lg) 0 !important;
   flex: inherit;
 }
 
 /* 表格额外内容区 */
 .jh-pro-table-extra {
-  padding: 16px 24px;
-  border-top: 1px solid #f0f0f0;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-top: 1px solid var(--color-border-light);
 }
 
 /* 移动端适配 */
@@ -2213,29 +2234,29 @@ export default {
   .jh-pro-table-header {
     flex-direction: column;
     align-items: flex-start;
-    padding: 12px 16px;
+    padding: var(--spacing-md) var(--spacing-lg);
     min-height: auto;
   }
 
   .jh-pro-table-header-left {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: var(--spacing-sm);
     width: 100%;
   }
 
   .jh-pro-table-header-right {
     width: 100%;
     justify-content: flex-end;
-    margin-top: 8px;
+    margin-top: var(--spacing-sm);
   }
 
   .jh-pro-table-alert {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
-    margin: 12px 16px 0;
-    padding: 8px 12px;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-md) var(--spacing-lg) 0;
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 
   .jh-pro-table-alert-actions {
@@ -2244,11 +2265,11 @@ export default {
   }
 
   .jh-pro-table-toolbar {
-    padding: 12px 16px !important;
+    padding: var(--spacing-md) var(--spacing-lg) !important;
   }
 
   .jh-pro-table-extra {
-    padding: 12px 16px;
+    padding: var(--spacing-md) var(--spacing-lg);
   }
 }
 
@@ -2265,56 +2286,11 @@ export default {
   }
 }
 
-/* 表格密度 */
-.jh-table-default >>> .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-.jh-table-default >>> .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-  height: 48px !important;
-  padding: 0 16px !important;
-  
-}
-
-.jh-table-medium >>> .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-.jh-table-medium >>> .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-  height: 40px !important;
-  padding: 0 12px !important;
-}
-
-.jh-table-compact >>> .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-.jh-table-compact >>> .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-  height: 32px !important;
-  padding: 0 8px !important;
-  font-size: 13px !important;
-}
-
-/* 移动端表格密度调整 */
-@media (max-width: 600px) {
-  .jh-table-default >>> .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-  .jh-table-default >>> .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-    height: 44px !important;
-    padding: 0 12px !important;
-    font-size: 14px !important;
-  }
-
-  .jh-table-medium >>> .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-  .jh-table-medium >>> .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-    height: 40px !important;
-    padding: 0 10px !important;
-    font-size: 13px !important;
-  }
-
-  .jh-table-compact >>> .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-  .jh-table-compact >>> .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
-    height: 36px !important;
-    padding: 0 8px !important;
-    font-size: 12px !important;
-  }
-}
-
 /* 移动端操作列样式优化 */
 @media (max-width: 600px) {
   /* 操作列下拉菜单触发器 */
   .jh-pro-table >>> .v-data-table td[data-action-column] {
-    padding: 0 8px !important;
+    padding: 0 var(--spacing-sm) !important;
   }
 
   /* 操作按钮文字在小屏幕隐藏 */
@@ -2331,14 +2307,14 @@ export default {
   right: 0;
   bottom: 0;
   z-index: 9999;
-  background: white;
-  padding: 16px;
+  background: var(--color-bg-primary);
+  padding: var(--spacing-lg);
   overflow: auto;
 }
 
 @media (max-width: 600px) {
   .jh-table-fullscreen {
-    padding: 8px;
+    padding: var(--spacing-sm);
   }
 }
 
@@ -2346,7 +2322,7 @@ export default {
 .jh-no-data {
   text-align: center;
   padding: 40px 0;
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--color-text-tertiary);
 }
 
 .jh-table-schema-cell {
@@ -2355,18 +2331,18 @@ export default {
 
 .jh-table-json {
   margin: 0;
-  font-family: 'Fira Code', 'JetBrains Mono', Consolas, monospace;
-  font-size: 12px;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-small);
   white-space: pre-wrap;
   word-break: break-word;
 }
 
 .jh-table-code {
-  font-family: 'Fira Code', 'JetBrains Mono', Consolas, monospace;
-  font-size: 12px;
-  background: #f4f5f7;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-small);
+  background: var(--color-bg-tertiary);
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 @media (max-width: 600px) {
@@ -2386,16 +2362,16 @@ export default {
 
 /* 表格行选中样式 */
 .jh-pro-table ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr.v-data-table__selected {
-  background-color: #E6F7FF !important;
+  background-color: var(--color-bg-selected) !important;
 }
 
 .jh-pro-table ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr.v-data-table__selected:hover {
-  background-color: #D1EDFF !important;
+  background-color: var(--color-bg-selected-hover) !important;
 }
 
 /* 优化选中行的过渡效果 */
 .jh-pro-table ::v-deep .v-data-table > .v-data-table__wrapper > table > tbody > tr {
-  transition: background-color 0.2s ease;
+  transition: background-color var(--transition-base) var(--easing-ease);
 }
 
 /* Flex 工具类（如果没有 Tailwind） */

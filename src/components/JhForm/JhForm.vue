@@ -1247,27 +1247,27 @@ export default {
 }
 
 .jh-form--bordered {
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 4px;
-  padding: 15px 16px 30px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-2xl);
 }
 
 .jh-form-header {
-  margin-bottom: 16px;
+  margin-bottom: var(--spacing-lg);
 }
 
 .jh-form-title {
-  font-size: 16px;
+  font-size: var(--font-size-h3);
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.85);
+  color: var(--color-text-primary);
   display: flex;
   align-items: center;
 }
 
 .jh-form-description {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.45);
-  margin-top: 4px;
+  font-size: var(--font-size-body);
+  color: var(--color-text-tertiary);
+  margin-top: var(--spacing-xs);
   line-height: 1.5;
 }
 
@@ -1285,27 +1285,27 @@ export default {
 /* Readonly Mode */
 .jh-form--readonly {
   .jh-field-label {
-    color: rgba(0, 0, 0, 0.65);
+    color: var(--color-text-secondary);
     font-weight: 500;
   }
   
   .jh-form-readonly-text {
     padding: 6px 12px;
-    color: rgba(0, 0, 0, 0.87);
-    background-color: rgba(0, 0, 0, 0.04);
-    border-radius: 4px;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-sm);
     line-height: 1.5;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base) var(--easing-ease);
   }
   
   &.jh-form--horizontal .jh-field-wrapper,
   &.jh-form--vertical .jh-field-wrapper {
-    margin-bottom: 16px;
+    margin-bottom: var(--spacing-lg);
   }
 }
 
 .jh-field-label--horizontal {
-  padding-right: 12px;
+  padding-right: var(--spacing-md);
 }
 
 .jh-field-label--vertical {
@@ -1313,12 +1313,12 @@ export default {
 }
 
 .jh-form-group-title {
-  margin-top: 8px;
-  margin-bottom: 16px;
+  margin-top: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
 }
 
 .jh-form-group-title h3 {
-  color: rgba(0, 0, 0, 0.85);
+  color: var(--color-text-primary);
   font-weight: 500;
 }
 
@@ -1338,11 +1338,11 @@ export default {
   display: inline-block;
   width: 20px;
   height: 20px;
-  border-radius: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-normal);
 }
 
 .jh-form-actions-wrapper {
-  margin-top: 16px;
+  margin-top: var(--spacing-lg);
 }
 </style>

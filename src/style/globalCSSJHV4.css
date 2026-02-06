@@ -1,7 +1,8 @@
+@import "./design-tokens.css";
 
 /* 表单 >>>>>> */
 .jh-input-label {
-  color: var(--gray-800);
+  color: var(--color-gray-800);
   font-weight: 400;
   font-size: 12px;
   line-height: 32px;
@@ -54,25 +55,25 @@
 
 /* header 菜单 >>>>>> */
 .jh-page-header {
-  border-bottom: 1px solid #e6e6e6 !important;
+  border-bottom: 1px solid var(--color-border-strong) !important;
 }
 .jh-header-tab {
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   margin: 8px 0;
   text-transform: none;
   font-weight: 400;
 }
 .jh-header-tab-active {
-  background: #f6f6f6;
+  background: var(--color-bg-tertiary);
   font-weight: 500;
 }
 
 .jh-header-tab::before {
-  border-radius: 5px !important;
+  border-radius: var(--radius-sm) !important;
 }
 
 .jh-header-tab:hover::before {
-  border-radius: 5px !important;
+  border-radius: var(--radius-sm) !important;
   opacity: 0.1 !important;
 }
 /* <<<<< header 菜单 */
@@ -130,7 +131,7 @@
 }
 /* 分割线 */
 .jh-divider {
-  border-color: rgba(0, 0, 0, 0.06) !important;
+  border-color: var(--color-border-light) !important;
 }
 /* 抽屉 */
 body .v-navigation-drawer.jh-drawer-level-2 {
@@ -146,19 +147,19 @@ body .v-navigation-drawer.jh-drawer-level-2 {
 
 /* 边框 */
 .jh-border {
-  border: 1px solid #eee;
+  border: 1px solid var(--color-border-strong);
 }
 .jh-border-b {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-strong);
 }
 .jh-border-t {
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border-strong);
 }
 .jh-border-r {
-  border-right: 1px solid #eee;
+  border-right: 1px solid var(--color-border-strong);
 }
 .jh-border-l {
-  border-left: 1px solid #eee;
+  border-left: 1px solid var(--color-border-strong);
 }
 
 .jh-page-second-bar span[role="button"] {
@@ -344,5 +345,5 @@ body .v-navigation-drawer.jh-drawer-level-2 {
 }
 
 .jh-field-input>.jh-v-input .v-input__slot {
-  border: 1px solid #DFDFDF!important;
+  border: 1px solid var(--color-border-normal) !important;
 }
