@@ -94,7 +94,8 @@
             @click.stop="$emit('create-click')"
             small
           >
-            <v-icon left small>mdi-plus</v-icon>
+            <jh-icon icon="material-symbols:add-rounded" class="ml-1" />
+
             <span class="d-none d-sm-inline">新增</span>
           </v-btn>
         </slot>
@@ -527,6 +528,7 @@
 
 <script>
 import JhQueryFilter from '../JhQueryFilter/JhQueryFilter.vue';
+import JhIcon from '../JhIcon/JhIcon.vue';
 
 const DEFAULT_STATUS_COLOR_MAP = {
   success: { color: 'success', textColor: 'white' },
@@ -567,7 +569,8 @@ export default {
   inheritAttrs: false,
   components: {
     JhQueryFilter,
-    RenderFunction
+    RenderFunction,
+    JhIcon
   },
   props: {
     // ========== 数据相关 ==========
