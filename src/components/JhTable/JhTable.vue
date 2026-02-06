@@ -9,7 +9,7 @@
             <span class="jh-pro-table-title-text">{{ headerTitle }}</span>
             <v-tooltip v-if="tooltip" bottom>
               <template v-slot:activator="{ on, attrs }">
-                <v-icon small class="ml-1" v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+                <jh-icon icon="mdi:help-circle-outline" width="16" height="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
               </template>
               <span>{{ tooltip }}</span>
             </v-tooltip>
@@ -64,7 +64,7 @@
           :params="tableAlertScope"
         />
         <template v-else>
-          <v-icon small class="mr-2" color="primary">mdi-checkbox-marked-circle</v-icon>
+          <jh-icon icon="mdi:checkbox-marked-circle" width="16" height="16" class="mr-2" color="primary"></jh-icon>
           <div>已选择 <strong class="primary--text">{{ selectedItems.length }}</strong> 项</div>
           <v-spacer></v-spacer>
           <a text x-small class="ml-2" @click="clearSelection">清空</a>
@@ -127,7 +127,7 @@
           @click="handleExport"
           title="导出"
         >
-          <v-icon>mdi-export-variant</v-icon>
+          <jh-icon icon="mdi:export-variant" width="24" height="24"></jh-icon>
         </v-btn>
 
         <!-- 刷新按钮 -->
@@ -138,7 +138,7 @@
           @click="handleRefresh"
           title="刷新"
         >
-          <v-icon>mdi-refresh</v-icon>
+          <jh-icon icon="mdi:refresh" width="24" height="24"></jh-icon>
         </v-btn>
 
         <!-- 密度切换 -->
@@ -151,25 +151,25 @@
               v-on="on"
               title="密度"
             >
-              <v-icon>mdi-format-line-spacing</v-icon>
+              <jh-icon icon="mdi:format-line-spacing" width="24" height="24"></jh-icon>
             </v-btn>
           </template>
           <v-list dense>
             <v-list-item @click="currentDensity = 'default'">
               <v-list-item-title>
-                <v-icon v-if="currentDensity === 'default'" small left>mdi-check</v-icon>
+                <jh-icon v-if="currentDensity === 'default'" icon="mdi:check" width="16" height="16" class="left"></jh-icon>
                 默认
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="currentDensity = 'medium'">
               <v-list-item-title>
-                <v-icon v-if="currentDensity === 'medium'" small left>mdi-check</v-icon>
+                <jh-icon v-if="currentDensity === 'medium'" icon="mdi:check" width="16" height="16" class="left"></jh-icon>
                 中等
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="currentDensity = 'compact'">
               <v-list-item-title>
-                <v-icon v-if="currentDensity === 'compact'" small left>mdi-check</v-icon>
+                <jh-icon v-if="currentDensity === 'compact'" icon="mdi:check" width="16" height="16" class="left"></jh-icon>
                 紧凑
               </v-list-item-title>
             </v-list-item>
@@ -186,7 +186,7 @@
               v-on="on"
               title="列设置"
             >
-              <v-icon>mdi-cog-outline</v-icon>
+              <jh-icon icon="mdi:cog-outline" width="24" height="24"></jh-icon>
             </v-btn>
           </template>
           <v-card min-width="200">
@@ -226,7 +226,7 @@
           @click="toggleFullscreen"
           :title="isFullscreen ? '退出全屏' : '全屏'"
         >
-          <v-icon>{{ isFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen' }}</v-icon>
+          <jh-icon :icon="isFullscreen ? 'mdi:fullscreen-exit' : 'mdi:fullscreen'" width="24" height="24"></jh-icon>
         </v-btn>
       </div>
     </v-row>
@@ -303,7 +303,7 @@
                         v-on="on"
                         @click.stop="handleActionClick(btn, item)"
                       >
-                        <v-icon v-if="btn.icon" small>{{ btn.icon }}</v-icon>
+                        <jh-icon v-if="btn.icon" :icon="btn.icon" width="16" height="16"></jh-icon>
                         <span v-if="btn.type !== 'icon'">{{ btn.text }}</span>
                       </v-btn>
                     </template>
@@ -318,7 +318,7 @@
                     :color="btn.color || 'primary'"
                     @click.stop="handleActionClick(btn, item)"
                   >
-                    <v-icon v-if="btn.icon" small>{{ btn.icon }}</v-icon>
+                    <jh-icon v-if="btn.icon" :icon="btn.icon" width="16" height="16"></jh-icon>
                     <span v-if="btn.type !== 'icon'">{{ btn.text }}</span>
                   </v-btn>
                 </template>
@@ -329,18 +329,18 @@
                 <span
                   v-if="showUpdateAction"
                   role="button"
-                  class="success--text font-weight-medium font-size-2 mr-2 cursor-pointer"
+                  class="success--text font-weight-medium font-size-2 mr-2 cursor-pointer inline-flex items-center"
                   @click.stop="$emit('update-click', item)"
                 >
-                  <v-icon size="16" class="success--text">mdi-note-edit-outline</v-icon>详情
+                  <jh-icon icon="mdi:note-edit-outline" width="16" height="16" class="success--text"></jh-icon>详情
                 </span>
                 <span
                   v-if="showDeleteAction"
                   role="button"
-                  class="error--text font-weight-medium font-size-2 mr-2 cursor-pointer"
+                  class="error--text font-weight-medium font-size-2 mr-2 cursor-pointer inline-flex items-center"
                   @click.stop="$emit('delete-click', item)"
                 >
-                  <v-icon size="16" class="error--text">mdi-trash-can-outline</v-icon>删除
+                  <jh-icon icon="mdi:trash-can-outline" width="16" height="16" class="error--text"></jh-icon>删除
                 </span>
               </template>
             </div>
@@ -354,7 +354,7 @@
                   v-bind="attrs"
                   v-on="on"
                 >
-                  <v-icon size="20" class="success--text">mdi-chevron-down</v-icon>操作
+                  <jh-icon icon="mdi:chevron-down" width="20" height="20" class="success--text"></jh-icon>操作
                 </span>
               </template>
               <v-list dense>
@@ -365,7 +365,7 @@
                     @click.stop="handleActionClick(btn, item)"
                   >
                     <v-list-item-icon v-if="btn.icon">
-                      <v-icon small>{{ btn.icon }}</v-icon>
+                      <jh-icon :icon="btn.icon" width="16" height="16"></jh-icon>
                     </v-list-item-icon>
                     <v-list-item-title>{{ btn.text }}</v-list-item-title>
                   </v-list-item>
@@ -398,9 +398,7 @@
                 v-bind="getStatusChipProps(header, value, item)"
                 class="mr-2"
               >
-                <v-icon v-if="getStatusChipProps(header, value, item).icon" left x-small>
-                  {{ getStatusChipProps(header, value, item).icon }}
-                </v-icon>
+                <jh-icon v-if="getStatusChipProps(header, value, item).icon" :icon="getStatusChipProps(header, value, item).icon" width="16" height="16" class="left"></jh-icon>
                 {{ getStatusText(header, value, item) }}
               </v-chip>
             </template>
@@ -482,7 +480,7 @@
               class="ml-1"
               @click.stop="copyToClipboard(getCopyValue(header, item, value))"
             >
-              <v-icon x-small>mdi-content-copy</v-icon>
+              <jh-icon icon="mdi:content-copy" width="16" height="16"></jh-icon>
             </v-btn>
           </div>
         </template>
@@ -504,7 +502,7 @@
       <!-- 无数据 -->
       <template v-if="!$scopedSlots['no-data']" v-slot:no-data>
         <div class="jh-no-data pa-6">
-          <v-icon large color="grey lighten-1">mdi-inbox-outline</v-icon>
+          <jh-icon icon="mdi:inbox-outline" width="36" height="36" color="grey lighten-1"></jh-icon>
           <div class="mt-2 text-body-2 grey--text">暂无数据</div>
         </div>
       </template>
@@ -512,7 +510,7 @@
       <!-- 无结果 -->
       <template v-if="!$scopedSlots['no-results']" v-slot:no-results>
         <div class="jh-no-data pa-6">
-          <v-icon large color="grey lighten-1">mdi-magnify</v-icon>
+          <jh-icon icon="mdi:magnify" width="36" height="36" color="grey lighten-1"></jh-icon>
           <div class="mt-2 text-body-2 grey--text">未找到匹配的数据</div>
         </div>
       </template>

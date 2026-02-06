@@ -22,9 +22,9 @@ export default {
   name: 'JhIcon',
   components: { Icon },
   props: {
-    name: { type: String, required: true },
-    width: { type: [Number, String], default: 24 },
-    height: { type: [Number, String], default: 24 },
+    icon: { type: String, required: true },
+    width: { type: [Number, String], default: 18 },
+    height: { type: [Number, String], default: 18 },
     color: { type: String },
     rotate: { type: [Number, String] },
     flip: { type: String },
@@ -32,10 +32,10 @@ export default {
   computed: {
     iconName() {
       // Handle mdi- prefix for Vuetify compatibility
-      if (this.name && this.name.startsWith('mdi-')) {
-        return this.name.replace('mdi-', 'mdi:');
+      if (this.icon && this.icon.startsWith('mdi-')) {
+        return this.icon.replace('mdi-', 'mdi:');
       }
-      return this.name;
+      return this.icon;
     },
     isCssColor() {
       return this.color && (
