@@ -30,7 +30,7 @@
                   </v-list-item>
                 </template>
                 <template v-slot:appendIcon>
-                  <jh-icon icon="mdi:chevron-down" width="18" height="18"></jh-icon>
+                  <jh-icon icon="mdi:chevron-down" size="18"></jh-icon>
                 </template>
                 <template v-for="(child, childIndex) in item.children">
                   <!-- 三级菜单 -->
@@ -44,7 +44,7 @@
                         </v-list-item>
                       </template>
                       <template v-slot:appendIcon>
-                        <jh-icon icon="mdi:chevron-down" width="16" height="16"></jh-icon>
+                        <jh-icon icon="mdi:chevron-down" size="16"></jh-icon>
                       </template>
                       <v-list-item
                         v-for="(grandchild, grandchildIndex) in child.children"
@@ -84,7 +84,7 @@
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
               </v-list-item-content>
               <v-list-item-icon class="my-3">
-                <jh-icon icon="mdi:chevron-right" width="18" height="18"></jh-icon>
+                <jh-icon icon="mdi:chevron-right" size="18"></jh-icon>
               </v-list-item-icon>
             </v-list-item>
           </template>
@@ -155,7 +155,7 @@
         <v-list nav dense class="flex-1">
           <v-list-item v-for="(menu, index) in avatarMenuList" :key="index" @click="handleMenuClick(menu)">
             <v-list-item-icon class="mr-1 mt-1">
-              <jh-icon icon="mdi:account-cog-outline" width="16" height="16" color="grey darken-3"></jh-icon>
+              <jh-icon icon="mdi:account-cog-outline" size="16" color="grey darken-3"></jh-icon>
             </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title color="grey darken-3">{{ menu.title }}</v-list-item-title>
@@ -166,7 +166,7 @@
         <!-- 登出按钮 -->
         <div class="px-4">
           <v-btn block elevation="0" small color="error" @click="handleLogout">
-            <jh-icon icon="mdi:logout" width="16" height="16"></jh-icon>
+            <jh-icon icon="mdi:logout" size="16"></jh-icon>
             <span class="ml-2">登出</span>
           </v-btn>
         </div>
@@ -289,7 +289,7 @@
             style="cursor: pointer"
             @click="handleMenuClick(menu)"
           >
-            <jh-icon v-if="menu.icon" :icon="menu.icon" width="20" height="20"></jh-icon>
+            <jh-icon v-if="menu.icon" :icon="menu.icon" size="20"></jh-icon>
             <div :class="{ 'ml-1': menu.icon }">{{ menu.title }}</div>
           </div>
         </div>
@@ -351,7 +351,7 @@
               <!-- 用户菜单项 -->
               <v-list-item v-for="(menu, index) in avatarMenuList" :key="index" @click="handleMenuClick(menu)">
                 <v-list-item-icon class="mr-1 mt-1">
-                  <jh-icon icon="mdi:account-cog-outline" width="16" height="16" color="grey darken-3"></jh-icon>
+                  <jh-icon icon="mdi:account-cog-outline" size="16" color="grey darken-3"></jh-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title color="grey darken-3">{{ menu.title }}</v-list-item-title>
@@ -361,7 +361,7 @@
               <!-- 登出 -->
               <v-list-item @click="handleLogout">
                 <v-list-item-icon class="mr-1 mt-1">
-                  <jh-icon icon="mdi:logout" width="16" height="16" color="grey darken-3"></jh-icon>
+                  <jh-icon icon="mdi:logout" size="16" color="grey darken-3"></jh-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title color="grey darken-3">登出</v-list-item-title>

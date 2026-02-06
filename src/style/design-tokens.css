@@ -42,7 +42,7 @@
   
   /* 背景色系 */
   --color-bg-primary: #FFFFFF;        /* 主背景（白） */
-  --color-bg-secondary: #FBFBFB;      /* 次级背景（浅灰） */
+  --color-bg-secondary: #F0F0F0;      /* 次级背景（浅灰） */
   --color-bg-tertiary: #F2F2F2;       /* 第三背景（中灰） */
   --color-bg-quaternary: #E8E8E8;     /* 第四背景（较深灰） */
   --color-bg-hover: #EEF7ED;          /* Hover背景（绿底） */

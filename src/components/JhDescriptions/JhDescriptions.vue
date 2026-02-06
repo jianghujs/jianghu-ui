@@ -22,7 +22,7 @@
           color="primary"
           @click="toggleEdit"
         >
-          <jh-icon :icon="isEditing ? 'mdi:close' : 'mdi:pencil'" width="16" height="16" class="left mr-1"></jh-icon>
+          <jh-icon :icon="isEditing ? 'mdi:close' : 'mdi:pencil'" size="16" class="left mr-1"></jh-icon>
           {{ isEditing ? cancelText : editText }}
         </v-btn>
         <v-btn
@@ -34,7 +34,7 @@
           :loading="saving"
           @click="handleSave"
         >
-          <jh-icon icon="mdi:check" width="16" height="16" class="left mr-1"></jh-icon>
+          <jh-icon icon="mdi:check" size="16" class="left mr-1"></jh-icon>
           {{ saveText }}
         </v-btn>
       </slot>
@@ -52,7 +52,7 @@
             <span class="jh-descriptions-item-label-text">{{ item.label || item.title }}</span>
             <v-tooltip v-if="item.tooltip" bottom>
               <template v-slot:activator="{ on, attrs }">
-                <jh-icon icon="mdi:help-circle-outline" width="16" height="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
+                <jh-icon icon="mdi:help-circle-outline" size="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
               </template>
               <span>{{ item.tooltip }}</span>
             </v-tooltip>
@@ -107,7 +107,7 @@
                   class="ml-2"
                   @click="copyToClipboard(getValue(item), item)"
                 >
-                  <jh-icon icon="mdi:content-copy" width="16" height="16"></jh-icon>
+                  <jh-icon icon="mdi:content-copy" size="16"></jh-icon>
                 </v-btn>
               </div>
             </template>
@@ -127,7 +127,7 @@
             <span class="jh-descriptions-item-label-text">{{ item.label || item.title }}</span>
             <v-tooltip v-if="item.tooltip" bottom>
               <template v-slot:activator="{ on, attrs }">
-                <jh-icon icon="mdi:help-circle-outline" width="16" height="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
+                <jh-icon icon="mdi:help-circle-outline" size="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
               </template>
               <span>{{ item.tooltip }}</span>
             </v-tooltip>
@@ -178,7 +178,7 @@
                   class="ml-2"
                   @click="copyToClipboard(getValue(item), item)"
                 >
-                  <jh-icon icon="mdi:content-copy" width="16" height="16"></jh-icon>
+                  <jh-icon icon="mdi:content-copy" size="16"></jh-icon>
                 </v-btn>
               </div>
             </template>
@@ -205,7 +205,7 @@
             <span class="jh-descriptions-item-label-text">{{ item.label || item.title }}</span>
             <v-tooltip v-if="item.tooltip" bottom>
               <template v-slot:activator="{ on, attrs }">
-                <jh-icon icon="mdi:help-circle-outline" width="16" height="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
+                <jh-icon icon="mdi:help-circle-outline" size="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
               </template>
               <span>{{ item.tooltip }}</span>
             </v-tooltip>
@@ -256,7 +256,7 @@
                   class="ml-2"
                   @click="copyToClipboard(getValue(item), item)"
                 >
-                  <jh-icon icon="mdi:content-copy" width="16" height="16"></jh-icon>
+                  <jh-icon icon="mdi:content-copy" size="16"></jh-icon>
                 </v-btn>
               </div>
             </template>

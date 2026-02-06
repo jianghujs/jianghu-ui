@@ -215,7 +215,7 @@ export const 基础示例 = {
     showUpdateAction: true,
     showDeleteAction: true,
     showSelect: false,
-    size: 'medium',
+    size: 'compact',
   },
   render: (args) => ({
     components: { JhTable },

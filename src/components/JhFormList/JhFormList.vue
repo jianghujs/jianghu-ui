@@ -48,7 +48,7 @@
               @click="toggleCollapse(item)"
               class="mr-2"
             >
-              <jh-icon :icon="isCollapsed(item) ? 'mdi:chevron-down' : 'mdi:chevron-up'" width="16" height="16"></jh-icon>
+              <jh-icon :icon="isCollapsed(item) ? 'mdi:chevron-down' : 'mdi:chevron-up'" size="16"></jh-icon>
             </v-btn>
             <!-- 序号 -->
             <span v-if="showIndex && alwaysShowItemLabel" class="jh-form-list-item-index">
@@ -70,7 +70,7 @@
                   @click="copyItem(index)"
                   title="复制"
                 >
-                  <jh-icon icon="mdi:content-copy" width="16" height="16"></jh-icon>
+                  <jh-icon icon="mdi:content-copy" size="16"></jh-icon>
                 </v-btn>
                 <v-btn
                   icon
@@ -80,7 +80,7 @@
                   :disabled="listData.length <= min"
                   title="删除"
                 >
-                  <jh-icon icon="mdi:delete" width="16" height="16"></jh-icon>
+                  <jh-icon icon="mdi:delete" size="16"></jh-icon>
                 </v-btn>
               </template>
             </slot>
@@ -160,7 +160,7 @@
             <td v-if="showIndex" class="text-center">{{ index + 1 }}</td>
             <!-- 拖拽把手 -->
             <td v-if="sortable && !disabled && !readonly" class="text-center">
-              <jh-icon icon="mdi:drag" width="16" height="16" class="jh-form-list-drag-handle"></jh-icon>
+              <jh-icon icon="mdi:drag" size="16" class="jh-form-list-drag-handle"></jh-icon>
             </td>
             <!-- 字段列 -->
             <td v-for="field in fields" :key="field.key">
@@ -190,7 +190,7 @@
                   title="复制"
                   class="mr-1"
                 >
-                  <jh-icon icon="mdi:content-copy" width="14" height="14"></jh-icon>
+                  <jh-icon icon="mdi:content-copy" size="14"></jh-icon>
                 </v-btn>
                 <v-btn
                   icon
@@ -200,7 +200,7 @@
                   :disabled="listData.length <= min"
                   title="删除"
                 >
-                  <jh-icon icon="mdi:delete" width="14" height="14"></jh-icon>
+                  <jh-icon icon="mdi:delete" size="14"></jh-icon>
                 </v-btn>
               </slot>
             </td>
@@ -227,7 +227,7 @@
             @click:close="removeItem(index)"
             :draggable="sortable && !disabled && !readonly"
           >
-            <jh-icon v-if="sortable && !disabled && !readonly" icon="mdi:drag" width="14" height="14" class="jh-form-list-drag-handle mr-1"></jh-icon>
+            <jh-icon v-if="sortable && !disabled && !readonly" icon="mdi:drag" size="14" class="jh-form-list-drag-handle mr-1"></jh-icon>
             {{ getInlineItemDisplay(item) }}
           </v-chip>
         </slot>
@@ -279,7 +279,7 @@
             :disabled="!canAdd"
             @click="addItem()"
           >
-            <jh-icon icon="mdi:plus" width="16" height="16" left></jh-icon>
+            <jh-icon icon="mdi:plus" size="16" left></jh-icon>
             {{ computedCreatorButtonProps.text || addButtonText }}
           </v-btn>
       </slot>

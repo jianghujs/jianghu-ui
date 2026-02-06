@@ -102,7 +102,7 @@
               class="mb-2"
               @click="applyPreset('default')"
             >
-              <jh-icon icon="mdi:palette" width="16" height="16" left></jh-icon>
+              <jh-icon icon="mdi:palette" size="16" left></jh-icon>
               默认主题
             </v-btn>
             <v-btn
@@ -112,7 +112,7 @@
               class="mb-2"
               @click="applyPreset('dark')"
             >
-              <jh-icon icon="mdi:weather-night" width="16" height="16" left></jh-icon>
+              <jh-icon icon="mdi:weather-night" size="16" left></jh-icon>
               暗色主题
             </v-btn>
             <v-btn
@@ -121,7 +121,7 @@
               small
               @click="applyPreset('compact')"
             >
-              <jh-icon icon="mdi:arrow-collapse-vertical" width="16" height="16" left></jh-icon>
+              <jh-icon icon="mdi:arrow-collapse-vertical" size="16" left></jh-icon>
               紧凑模式
             </v-btn>
           </v-list-item-content>
@@ -138,7 +138,7 @@
               outlined
               @click="resetSettings"
             >
-              <jh-icon icon="mdi:restore" width="16" height="16" left></jh-icon>
+              <jh-icon icon="mdi:restore" size="16" left></jh-icon>
               重置为默认
             </v-btn>
           </v-list-item-content>

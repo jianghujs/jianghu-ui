@@ -6,8 +6,8 @@
   >
     <Icon 
       :icon="iconName" 
-      :width="width" 
-      :height="height" 
+      :width="size || width" 
+      :height="size || height" 
       :rotate="rotate" 
       :flip="flip"
       :color="computedColor"
@@ -23,6 +23,7 @@ export default {
   components: { Icon },
   props: {
     icon: { type: String, required: true },
+    size: { type: [Number, String], default: null },
     width: { type: [Number, String], default: 18 },
     height: { type: [Number, String], default: 18 },
     color: { type: String },

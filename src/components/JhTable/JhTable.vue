@@ -1,7 +1,7 @@
 <template>
   <div :class="wrapperClass" :style="wrapperStyle">
     <!-- 表格标题区 -->
-    <div v-if="headerTitle || $slots['header-title'] || $slots['toolbar-extra']" class="jh-pro-table-header">
+    <div v-if="headerTitle || $slots['header-title'] || $slots['toolbar-extra']" class="jh-pro-table-header mb-3">
       <div class="jh-pro-table-header-left">
         <!-- 标题 -->
         <div v-if="headerTitle || $slots['header-title']" class="jh-pro-table-title">
@@ -9,7 +9,7 @@
             <span class="jh-pro-table-title-text">{{ headerTitle }}</span>
             <v-tooltip v-if="tooltip" bottom>
               <template v-slot:activator="{ on, attrs }">
-                <jh-icon icon="mdi:help-circle-outline" width="16" height="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
+                <jh-icon icon="mdi:help-circle-outline" size="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
               </template>
               <span>{{ tooltip }}</span>
             </v-tooltip>
@@ -64,7 +64,7 @@
           :params="tableAlertScope"
         />
         <template v-else>
-          <jh-icon icon="mdi:checkbox-marked-circle" width="16" height="16" class="mr-2" color="primary"></jh-icon>
+          <jh-icon icon="mdi:checkbox-marked-circle" size="16" class="mr-2" color="primary"></jh-icon>
           <div>已选择 <strong class="primary--text">{{ selectedItems.length }}</strong> 项</div>
           <v-spacer></v-spacer>
           <a text x-small class="ml-2" @click="clearSelection">清空</a>
@@ -94,7 +94,7 @@
             @click.stop="$emit('create-click')"
             small
           >
-            <jh-icon icon="material-symbols:add-rounded" class="ml-1" />
+            <jh-icon icon="hugeicons:add-circle" class="mr-1" size="14" />
 
             <span class="d-none d-sm-inline">新增</span>
           </v-btn>
@@ -120,56 +120,51 @@
         ></v-text-field>
 
         <!-- 导出按钮 -->
-        <v-btn
+        <div
           v-if="toolbarConfig.export"
-          icon
-          small
           @click="handleExport"
           title="导出"
+          class="flex items-center justify-center w-1 h-1 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
         >
-          <jh-icon icon="mdi:export-variant" width="24" height="24"></jh-icon>
-        </v-btn>
+          <jh-icon icon="mdi:export-variant" size="20"></jh-icon>
+        </div>
 
         <!-- 刷新按钮 -->
-        <v-btn
+        <div
           v-if="toolbarConfig.refresh"
-          icon
-          small
           @click="handleRefresh"
           title="刷新"
         >
-          <jh-icon icon="mdi:refresh" width="24" height="24"></jh-icon>
-        </v-btn>
+          <jh-icon class="border border-gray-200 p-1 rounded-md bg-white hover:bg-gray-50 transition-colors" icon="hugeicons:refresh-03" size="20"></jh-icon>
+        </div>
 
         <!-- 密度切换 -->
         <v-menu v-if="toolbarConfig.density" offset-y>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              icon
-              small
+            <div
               v-bind="attrs"
               v-on="on"
               title="密度"
             >
-              <jh-icon icon="mdi:format-line-spacing" width="24" height="24"></jh-icon>
-            </v-btn>
+              <jh-icon class="border border-gray-200 p-1 rounded-md bg-white hover:bg-gray-50 transition-colors" icon="hugeicons:sorting-05" size="20"></jh-icon>
+            </div>
           </template>
           <v-list dense>
             <v-list-item @click="currentDensity = 'default'">
-              <v-list-item-title>
-                <jh-icon v-if="currentDensity === 'default'" icon="mdi:check" width="16" height="16" class="left"></jh-icon>
+              <v-list-item-title class="flex items-center">
+                <jh-icon v-if="currentDensity === 'default'" icon="hugeicons:checkmark-circle-01" size="16" class="left mr-1"></jh-icon>
                 默认
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="currentDensity = 'medium'">
-              <v-list-item-title>
-                <jh-icon v-if="currentDensity === 'medium'" icon="mdi:check" width="16" height="16" class="left"></jh-icon>
+              <v-list-item-title class="flex items-center">
+                <jh-icon v-if="currentDensity === 'medium'" icon="hugeicons:checkmark-circle-01" size="16" class="left mr-1"></jh-icon>
                 中等
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="currentDensity = 'compact'">
-              <v-list-item-title>
-                <jh-icon v-if="currentDensity === 'compact'" icon="mdi:check" width="16" height="16" class="left"></jh-icon>
+              <v-list-item-title class="flex items-center">
+                <jh-icon v-if="currentDensity === 'compact'" icon="hugeicons:checkmark-circle-01" size="16" class="left mr-1"></jh-icon>
                 紧凑
               </v-list-item-title>
             </v-list-item>
@@ -179,15 +174,13 @@
         <!-- 列设置 -->
         <v-menu v-if="toolbarConfig.setting" offset-y left max-height="400">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              icon
-              small
+            <div
               v-bind="attrs"
               v-on="on"
               title="列设置"
             >
-              <jh-icon icon="mdi:cog-outline" width="24" height="24"></jh-icon>
-            </v-btn>
+              <jh-icon class="border border-gray-200 p-1 rounded-md bg-white hover:bg-gray-50 transition-colors" icon="hugeicons:setting-07" size="20"></jh-icon>
+            </div>
           </template>
           <v-card min-width="200">
             <v-card-text class="pa-2">
@@ -219,15 +212,13 @@
         </v-menu>
 
         <!-- 全屏 -->
-        <v-btn
+        <div
           v-if="toolbarConfig.fullscreen"
-          icon
-          small
           @click="toggleFullscreen"
           :title="isFullscreen ? '退出全屏' : '全屏'"
         >
-          <jh-icon :icon="isFullscreen ? 'mdi:fullscreen-exit' : 'mdi:fullscreen'" width="24" height="24"></jh-icon>
-        </v-btn>
+          <jh-icon class="border border-gray-200 p-1 rounded-md bg-white hover:bg-gray-50 transition-colors" :icon="isFullscreen ? 'hugeicons:minimize-screen' : 'hugeicons:full-screen'" size="20"></jh-icon>
+        </div>
       </div>
     </v-row>
 
@@ -303,7 +294,7 @@
                         v-on="on"
                         @click.stop="handleActionClick(btn, item)"
                       >
-                        <jh-icon v-if="btn.icon" :icon="btn.icon" width="16" height="16"></jh-icon>
+                        <jh-icon v-if="btn.icon" :icon="btn.icon" size="16"></jh-icon>
                         <span v-if="btn.type !== 'icon'">{{ btn.text }}</span>
                       </v-btn>
                     </template>
@@ -318,7 +309,7 @@
                     :color="btn.color || 'primary'"
                     @click.stop="handleActionClick(btn, item)"
                   >
-                    <jh-icon v-if="btn.icon" :icon="btn.icon" width="16" height="16"></jh-icon>
+                    <jh-icon v-if="btn.icon" :icon="btn.icon" size="16"></jh-icon>
                     <span v-if="btn.type !== 'icon'">{{ btn.text }}</span>
                   </v-btn>
                 </template>
@@ -332,7 +323,7 @@
                   class="success--text font-weight-medium font-size-2 mr-2 cursor-pointer inline-flex items-center"
                   @click.stop="$emit('update-click', item)"
                 >
-                  <jh-icon icon="mdi:note-edit-outline" width="16" height="16" class="success--text"></jh-icon>详情
+                  <jh-icon icon="basil:edit-outline" size="16" class="success--text"></jh-icon>详情
                 </span>
                 <span
                   v-if="showDeleteAction"
@@ -340,7 +331,7 @@
                   class="error--text font-weight-medium font-size-2 mr-2 cursor-pointer inline-flex items-center"
                   @click.stop="$emit('delete-click', item)"
                 >
-                  <jh-icon icon="mdi:trash-can-outline" width="16" height="16" class="error--text"></jh-icon>删除
+                  <jh-icon icon="fluent:delete-12-regular" size="16" class="error--text"></jh-icon>删除
                 </span>
               </template>
             </div>
@@ -354,7 +345,7 @@
                   v-bind="attrs"
                   v-on="on"
                 >
-                  <jh-icon icon="mdi:chevron-down" width="20" height="20" class="success--text"></jh-icon>操作
+                  <jh-icon icon="mdi:chevron-down" size="20" class="success--text"></jh-icon>操作
                 </span>
               </template>
               <v-list dense>
@@ -365,7 +356,7 @@
                     @click.stop="handleActionClick(btn, item)"
                   >
                     <v-list-item-icon v-if="btn.icon">
-                      <jh-icon :icon="btn.icon" width="16" height="16"></jh-icon>
+                      <jh-icon :icon="btn.icon" size="16"></jh-icon>
                     </v-list-item-icon>
                     <v-list-item-title>{{ btn.text }}</v-list-item-title>
                   </v-list-item>
@@ -398,7 +389,7 @@
                 v-bind="getStatusChipProps(header, value, item)"
                 class="mr-2"
               >
-                <jh-icon v-if="getStatusChipProps(header, value, item).icon" :icon="getStatusChipProps(header, value, item).icon" width="16" height="16" class="left"></jh-icon>
+                <jh-icon v-if="getStatusChipProps(header, value, item).icon" :icon="getStatusChipProps(header, value, item).icon" size="16" class="left"></jh-icon>
                 {{ getStatusText(header, value, item) }}
               </v-chip>
             </template>
@@ -480,7 +471,7 @@
               class="ml-1"
               @click.stop="copyToClipboard(getCopyValue(header, item, value))"
             >
-              <jh-icon icon="mdi:content-copy" width="16" height="16"></jh-icon>
+              <jh-icon icon="mdi:content-copy" size="12"></jh-icon>
             </v-btn>
           </div>
         </template>
@@ -824,7 +815,7 @@ export default {
     },
     size: {
       type: String,
-      default: 'medium', // default / medium / compact
+      default: 'compact', // default / medium / compact
       validator: (v) => ['default', 'medium', 'compact'].includes(v)
     },
     footerProps: {

@@ -7,7 +7,7 @@
           {{ title }}
           <v-tooltip v-if="tooltip" bottom>
             <template v-slot:activator="{ on, attrs }">
-              <jh-icon icon="mdi:help-circle-outline" width="16" height="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
+              <jh-icon icon="mdi:help-circle-outline" size="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
             </template>
             <span>{{ tooltip }}</span>
           </v-tooltip>
@@ -51,7 +51,7 @@
               {{ field.label }}
               <v-tooltip v-if="field.tooltip" bottom>
                 <template v-slot:activator="{ on, attrs }">
-                  <jh-icon icon="mdi:help-circle-outline" width="16" height="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
+                  <jh-icon icon="mdi:help-circle-outline" size="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
                 </template>
                 <span>{{ field.tooltip }}</span>
               </v-tooltip>
@@ -68,7 +68,7 @@
                 {{ field.label }}
                 <v-tooltip v-if="field.tooltip" bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <jh-icon icon="mdi:help-circle-outline" width="16" height="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
+                    <jh-icon icon="mdi:help-circle-outline" size="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
                   </template>
                   <span>{{ field.tooltip }}</span>
                 </v-tooltip>

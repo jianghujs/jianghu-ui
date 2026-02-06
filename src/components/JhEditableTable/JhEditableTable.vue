@@ -123,7 +123,7 @@
               </v-chip>
 
               <!-- 开关显示 -->
-              <jh-icon v-else-if="column.type === 'switch'" :color="item[column.key] ? 'success' : 'grey'" :icon="item[column.key] ? 'mdi:check-circle' : 'mdi:circle-outline'" width="20" height="20"></jh-icon>
+              <jh-icon v-else-if="column.type === 'switch'" :color="item[column.key] ? 'success' : 'grey'" :icon="item[column.key] ? 'mdi:check-circle' : 'mdi:circle-outline'" size="20"></jh-icon>
 
               <!-- 普通文本 -->
               <span v-else>{{ item[column.key] }}</span>
@@ -144,7 +144,7 @@
               @click="handleSave(item)"
               title="保存"
             >
-              <jh-icon icon="mdi:check" width="16" height="16"></jh-icon>
+              <jh-icon icon="mdi:check" size="16"></jh-icon>
             </v-btn>
             <v-btn
               icon
@@ -153,7 +153,7 @@
               @click="handleCancel(item)"
               title="取消"
             >
-              <jh-icon icon="mdi:close" width="16" height="16"></jh-icon>
+              <jh-icon icon="mdi:close" size="16"></jh-icon>
             </v-btn>
           </template>
 
@@ -167,7 +167,7 @@
               @click="handleEdit(item)"
               title="编辑"
             >
-              <jh-icon icon="mdi:pencil" width="16" height="16"></jh-icon>
+              <jh-icon icon="mdi:pencil" size="16"></jh-icon>
             </v-btn>
             <v-btn
               v-if="deletable"
@@ -177,7 +177,7 @@
               @click="handleDelete(item)"
               title="删除"
             >
-              <jh-icon icon="mdi:delete" width="16" height="16"></jh-icon>
+              <jh-icon icon="mdi:delete" size="16"></jh-icon>
             </v-btn>
 
             <!-- 自定义操作按钮 -->
@@ -195,7 +195,7 @@
               @click="handleAddRow"
               :disabled="hasEditingRow"
             >
-              <jh-icon icon="mdi:plus" width="16" height="16" left></jh-icon>
+              <jh-icon icon="mdi:plus" size="16" left></jh-icon>
               {{ recordCreatorProps.creatorButtonText || '添加一行数据' }}
             </v-btn>
         </div>

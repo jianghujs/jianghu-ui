@@ -18,7 +18,7 @@
               class="absolute top-1 right-1 !bg-black/50"
               @click="handleRemoveSingleFile"
             >
-              <jh-icon icon="mdi:close" width="16" height="16" color="white"></jh-icon>
+              <jh-icon icon="mdi:close" size="16" color="white"></jh-icon>
             </v-btn>
           </div>
           <div v-else-if="value && Array.isArray(value)" v-for="(file, index) in value" :key="index" class="relative aspect-square border border-gray-200 rounded overflow-hidden">
@@ -39,7 +39,7 @@
               class="absolute top-1 right-1 !bg-black/50"
               @click="removeFile(index)"
             >
-              <jh-icon icon="mdi:close" width="16" height="16" color="white"></jh-icon>
+              <jh-icon icon="mdi:close" size="16" color="white"></jh-icon>
             </v-btn>
             <!-- 类型 -->
             <div class="absolute top-0 left-2 text-xs bg-green-500 text-white px-1 rounded-b-sm">
