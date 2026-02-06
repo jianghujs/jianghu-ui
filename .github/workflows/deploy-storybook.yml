@@ -46,11 +46,14 @@ jobs:
       - name: Prepare Site Structure
         run: |
           # 1. 移动 Storybook 文档到 /docs
-          # 先创建一个临时目录 docs
-          mkdir -p storybook-static/docs
-          # 将 storybook-static 下除了 docs 以外的所有内容移动到 docs
-          # 使用 find 避免移动 docs 目录自身
-          find storybook-static -maxdepth 1 -mindepth 1 -not -name 'docs' -exec mv {} storybook-static/docs/ \;
+          # 重命名构建输出目录，避免 find 命令的复杂性
+          mv storybook-static storybook-temp
+          
+          # 创建新的发布目录
+          mkdir storybook-static
+          
+          # 将原构建产物移动到 docs 子目录
+          mv storybook-temp storybook-static/docs
 
           # 2. 准备构建产物 /dist
           mkdir -p storybook-static/dist
@@ -60,31 +63,22 @@ jobs:
           mkdir -p storybook-static/demo
           cp -r demo/* storybook-static/demo/
           # 修正 /demo 下页面的引用路径 (从 ../../dist 改为 ../dist)
+          # demo/index.html 中使用了 ../../dist，部署后在该层级只需要 ../dist
           find storybook-static/demo -name "*.html" -exec sed -i 's|\.\./\.\./dist/|\.\./dist/|g' {} +
 
           # 4. 设置首页 (使用 demo/home.html)
           cp demo/home.html storybook-static/index.html
-          # 修正首页的引用路径 (因为从 demo/home.html 移到了根目录，原 ../../dist 变为 ./dist)
-          # 注意：原 home.html 可能没有引用 dist，如果有，需要根据实际情况调整。
-          # 假设 home.html 中有指向 demo 或 docs 的链接，这里可以进行替换或增强
           
-          # 更新首页中的链接 (如果存在)
-          # 例如将 "预览" 按钮链接到 /demo/
+          # 修正首页的引用路径
+          # home.html 中使用了 /jianghu-ui/demo/ 和 /jianghu-ui/docs/
+          # 替换为相对路径 ./demo/ 和 ./docs/ 以适配不同部署环境
+          sed -i 's|href="/jianghu-ui/demo/"|href="./demo/"|g' storybook-static/index.html
+          sed -i 's|href="/jianghu-ui/docs/"|href="./docs/"|g' storybook-static/index.html
+          
+          # 兜底替换：如果存在 preview.html 或 docs.html 的旧链接也进行修复
           sed -i 's|href="preview.html"|href="./demo/"|g' storybook-static/index.html || true
-          # 或者将 "开始使用" 链接到 /docs/
           sed -i 's|href="docs.html"|href="./docs/"|g' storybook-static/index.html || true
-          
-          # 修正首页中可能存在的资源引用
-          # 假设 home.html 原本在 demo/ 下，引用同级资源是 ./css/style.css
-          # 现在移到根目录，需要确保 css/style.css 也存在于根目录，或者修改引用为 ./demo/css/style.css
-          # 策略：修改引用指向 /demo/
-          sed -i 's|src="./|src="./demo/|g' storybook-static/index.html
-          sed -i 's|href="./|href="./demo/|g' storybook-static/index.html
-          
-          # 针对 Vue/Vuetify/JianghuUI 的引用修正
-          # 如果 home.html 使用了 CDN 链接则无需修改
-          # 如果使用了相对路径引用 dist，需要修正为 ./dist/
-          sed -i 's|\.\./\.\./dist/|./dist/|g' storybook-static/index.html
+
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
