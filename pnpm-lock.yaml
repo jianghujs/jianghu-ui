@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@iconify/vue':
-        specifier: ^5.0.0
-        version: 5.0.0(vue@2.7.16)
       '@iconify/vue2':
         specifier: ^2.1.0
         version: 2.1.0(vue@2.7.16)
@@ -845,11 +842,6 @@ packages:
     resolution: {integrity: sha512-+R4T9EqrUecMKh/tdiscju/mJS+HCzHFFuJ9XnNcFLaIj3lBOdh8RJolPY9n4k7XRG5V/tY16Lzx+mv+vOmjhA==}
     peerDependencies:
       vue: 2.x
-
-  '@iconify/vue@5.0.0':
-    resolution: {integrity: sha512-C+KuEWIF5nSBrobFJhT//JS87OZ++QDORB6f2q2Wm6fl2mueSTpFBeBsveK0KW9hWiZ4mNiPjsh6Zs4jjdROSg==}
-    peerDependencies:
-      vue: '>=3'
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -6219,11 +6211,6 @@ snapshots:
   '@iconify/types@2.0.0': {}
 
   '@iconify/vue2@2.1.0(vue@2.7.16)':
-    dependencies:
-      '@iconify/types': 2.0.0
-      vue: 2.7.16
-
-  '@iconify/vue@5.0.0(vue@2.7.16)':
     dependencies:
       '@iconify/types': 2.0.0
       vue: 2.7.16
