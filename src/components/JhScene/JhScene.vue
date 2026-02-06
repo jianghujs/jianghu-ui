@@ -18,20 +18,20 @@
         <template v-slot:activator="{ on, attrs }">
           <v-btn-toggle dense color="white">
             <v-btn small v-bind="attrs" v-on="on">
-              <v-icon small class="mx-0">mdi-chevron-down</v-icon>
+              <jh-icon small class="mx-0" icon="mdi:chevron-down"></jh-icon>
             </v-btn>
           </v-btn-toggle>
         </template>
         <v-list dense class="pb-0">
           <v-list-item @click="openCreateSceneDialog">
             <v-list-item-title class="success--text">
-              <v-icon small class="success--text">mdi-plus</v-icon>
+              <jh-icon small class="success--text" icon="mdi:plus"></jh-icon>
               <span class="success--text">新建场景</span>
             </v-list-item-title>
           </v-list-item>
           <v-list-item @click="openSceneListDialog">
             <v-list-item-title class="success--text">
-              <v-icon small class="success--text">mdi-cog-outline</v-icon>
+              <jh-icon small class="success--text" icon="mdi:cog-outline"></jh-icon>
               <span class="success--text">场景管理</span>
             </v-list-item-title>
           </v-list-item>
@@ -47,7 +47,7 @@
             <div style="font-size: 16px">新建场景</div>
             <v-spacer></v-spacer>
             <v-btn class="elevation-0" fab x-small @click="closeCreateSceneDialog">
-              <v-icon dark>mdi-close</v-icon>
+              <jh-icon dark icon="mdi:close"></jh-icon>
             </v-btn>
           </v-row>
         </v-card-title>
@@ -87,7 +87,7 @@
             <div style="font-size: 16px">场景管理</div>
             <v-spacer></v-spacer>
             <v-btn class="elevation-0" fab x-small @click="closeSceneListDialog">
-              <v-icon dark>mdi-close</v-icon>
+              <jh-icon dark icon="mdi:close"></jh-icon>
             </v-btn>
           </v-row>
         </v-card-title>
@@ -99,7 +99,7 @@
                 <v-list-item class="scene-item px-2" v-for="item in sceneCustomList" :key="item.id">
                   <v-list-item-content>{{ item.name }}</v-list-item-content>
                   <v-list-item-icon @click.stop="doDeleteScene(item)">
-                    <v-icon size="22">mdi-delete</v-icon>
+                    <jh-icon size="22" icon="mdi:delete"></jh-icon>
                   </v-list-item-icon>
                 </v-list-item>
               </template>
@@ -121,8 +121,13 @@
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue'
+
 export default {
   name: 'JhScene',
+  components: {
+    JhIcon
+  },
   props: {
     // 初始表单数据
     initFormData: {

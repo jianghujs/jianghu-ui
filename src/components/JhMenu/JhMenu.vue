@@ -30,7 +30,7 @@
                   </v-list-item>
                 </template>
                 <template v-slot:appendIcon>
-                  <v-icon size="18">mdi-chevron-down</v-icon>
+                  <jh-icon icon="mdi:chevron-down" width="18" height="18"></jh-icon>
                 </template>
                 <template v-for="(child, childIndex) in item.children">
                   <!-- 三级菜单 -->
@@ -44,7 +44,7 @@
                         </v-list-item>
                       </template>
                       <template v-slot:appendIcon>
-                        <v-icon size="16">mdi-chevron-down</v-icon>
+                        <jh-icon icon="mdi:chevron-down" width="16" height="16"></jh-icon>
                       </template>
                       <v-list-item
                         v-for="(grandchild, grandchildIndex) in child.children"
@@ -84,7 +84,7 @@
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
               </v-list-item-content>
               <v-list-item-icon class="my-3">
-                <v-icon size="18">mdi-chevron-right</v-icon>
+                <jh-icon icon="mdi:chevron-right" width="18" height="18"></jh-icon>
               </v-list-item-icon>
             </v-list-item>
           </template>
@@ -104,7 +104,7 @@
         class="jh-menu-drawer-close-float-btn"
         @click="mobileMenuDrawer = false"
       >
-        <v-icon>mdi-close</v-icon>
+        <jh-icon icon="mdi:close"></jh-icon>
       </v-btn>
     </v-navigation-drawer>
 
@@ -124,11 +124,11 @@
           <v-toolbar-title class="px-4" style="min-height: 110px">
             <div class="d-flex flex-column pt-3" style="gap: 12px">
               <div class="success--text text-xs text-center" style="cursor: pointer" @click="mobileUserMenuDrawer = false">
-                <v-icon size="22" class="success--text">mdi-window-close</v-icon>
+                <jh-icon icon="mdi:window-close" width="22" height="22" class="success--text"></jh-icon>
                 <div class="success--text" style="margin-top: -2px">关闭</div>
               </div>
               <div class="d-flex align-start mb-2" style="gap: 4px">
-                <v-icon :size="36">mdi-account-circle</v-icon>
+                <jh-icon icon="mdi:account-circle" :width="36" :height="36"></jh-icon>
                 <div class="flex-1">
                   <div class="text-xs">
                     {{ userInfo.username }}
@@ -155,7 +155,7 @@
         <v-list nav dense class="flex-1">
           <v-list-item v-for="(menu, index) in avatarMenuList" :key="index" @click="handleMenuClick(menu)">
             <v-list-item-icon class="mr-1 mt-1">
-              <v-icon size="16" color="grey darken-3">mdi-account-cog-outline</v-icon>
+              <jh-icon icon="mdi:account-cog-outline" width="16" height="16" color="grey darken-3"></jh-icon>
             </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title color="grey darken-3">{{ menu.title }}</v-list-item-title>
@@ -166,7 +166,7 @@
         <!-- 登出按钮 -->
         <div class="px-4">
           <v-btn block elevation="0" small color="error" @click="handleLogout">
-            <v-icon size="16">mdi-logout</v-icon>
+            <jh-icon icon="mdi:logout" width="16" height="16"></jh-icon>
             <span class="ml-2">登出</span>
           </v-btn>
         </div>
@@ -183,7 +183,7 @@
         @click="mobileMenuDrawer = !mobileMenuDrawer"
       >
         <span class="success--text text-caption">
-          <v-icon size="24" class="success--text">mdi-menu</v-icon>
+          <jh-icon icon="mdi:menu" width="24" height="24" class="success--text"></jh-icon>
           <div style="margin-top: -2px" class="text-xs">目录</div>
         </span>
       </div>
@@ -228,7 +228,7 @@
                   :class="{ 'jh-header-tab-active': currentMenuIndex === index }"
                 >
                   {{ item.title }}
-                  <v-icon size="12">mdi-chevron-down</v-icon>
+                  <jh-icon icon="mdi:chevron-down" width="12" height="12"></jh-icon>
                 </v-tab>
               </template>
               <v-list nav dense>
@@ -242,7 +242,7 @@
                             <v-list-item-title style="color: #41434f">{{ child.title }}</v-list-item-title>
                           </v-list-item-content>
                           <v-list-item-action>
-                            <v-icon>mdi-chevron-right</v-icon>
+                            <jh-icon icon="mdi:chevron-right"></jh-icon>
                           </v-list-item-action>
                         </v-list-item>
                       </template>
@@ -289,7 +289,7 @@
             style="cursor: pointer"
             @click="handleMenuClick(menu)"
           >
-            <v-icon v-if="menu.icon" size="20">{{ menu.icon }}</v-icon>
+            <jh-icon v-if="menu.icon" :icon="menu.icon" width="20" height="20"></jh-icon>
             <div :class="{ 'ml-1': menu.icon }">{{ menu.title }}</div>
           </div>
         </div>
@@ -304,7 +304,7 @@
             v-if="isMobile"
           >
             <div class="text-center">
-              <v-icon :size="24" color="success">mdi-account-circle</v-icon>
+              <jh-icon icon="mdi:account-circle" :width="24" :height="24" color="success"></jh-icon>
               <div style="margin-top: -2px">
                 <p class="text-xs success--text mb-0" style="max-width: 60px; overflow: hidden; text-overflow: ellipsis">
                   {{ userInfo.username }}
@@ -317,7 +317,7 @@
           <v-menu offset-y>
             <template v-slot:activator="{ on, attrs }">
               <div v-if="!isMobile" v-bind="attrs" v-on="on" class="jh-avatar-menu-btn d-flex align-center px-1 hidden-xs-only">
-                <v-icon :size="32" color="grey lighten-2">mdi-account-circle</v-icon>
+                <jh-icon icon="mdi:account-circle" :width="32" :height="32" color="grey lighten-2"></jh-icon>
                 <div class="ml-1">
                   <p class="caption black--text mb-0">{{ userInfo.username }}</p>
                 </div>
@@ -351,7 +351,7 @@
               <!-- 用户菜单项 -->
               <v-list-item v-for="(menu, index) in avatarMenuList" :key="index" @click="handleMenuClick(menu)">
                 <v-list-item-icon class="mr-1 mt-1">
-                  <v-icon size="16" color="grey darken-3">mdi-account-cog-outline</v-icon>
+                  <jh-icon icon="mdi:account-cog-outline" width="16" height="16" color="grey darken-3"></jh-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title color="grey darken-3">{{ menu.title }}</v-list-item-title>
@@ -361,7 +361,7 @@
               <!-- 登出 -->
               <v-list-item @click="handleLogout">
                 <v-list-item-icon class="mr-1 mt-1">
-                  <v-icon size="16" color="grey darken-3">mdi-logout</v-icon>
+                  <jh-icon icon="mdi:logout" width="16" height="16" color="grey darken-3"></jh-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title color="grey darken-3">登出</v-list-item-title>
@@ -376,8 +376,13 @@
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue'
+
 export default {
   name: 'JhMenu',
+  components: {
+    JhIcon
+  },
   props: {
     // 应用标题
     appTitle: {

@@ -68,15 +68,21 @@
       class="drawer-close-float-btn"
       @click="handleCancel"
     >
-      <v-icon>mdi-close</v-icon>
+      <jh-icon icon="mdi:close" width="24" height="24"></jh-icon>
     </v-btn>
   </v-navigation-drawer>
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue';
+
 export default {
   name: 'JhDrawer',
   inheritAttrs: false,
+
+  components: {
+    JhIcon
+  },
 
   props: {
     // 抽屉显示状态

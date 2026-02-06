@@ -54,7 +54,7 @@
       <v-card-title class="d-flex align-center pa-4">
         <span>{{ title }}</span>
         <v-spacer></v-spacer>
-        <v-icon @click="handleClose">mdi-close</v-icon>
+        <jh-icon @click="handleClose" icon="mdi:close"></jh-icon>
       </v-card-title>
       
       <v-card-text class="pa-0">
@@ -84,7 +84,7 @@
                   @click="handleBatchSelect"
                   class="mr-2 mb-2"
                 >
-                  <v-icon small left>mdi-checkbox-multiple-marked</v-icon>
+                  <jh-icon small left icon="mdi:checkbox-multiple-marked"></jh-icon>
                   {{ isAllSelected ? '取消全选' : '全选当前' }}
                 </v-btn>
               </div>
@@ -100,7 +100,7 @@
                 </div>
                 
                 <div v-else-if="filteredTreeData.length === 0" class="text-center grey--text py-8">
-                  <v-icon size="48" color="grey lighten-1">mdi-file-tree</v-icon>
+                  <jh-icon size="48" color="grey lighten-1" icon="mdi:file-tree"></jh-icon>
                   <div class="mt-2">未找到匹配的节点</div>
                 </div>
                 
@@ -148,7 +148,7 @@
               
               <div class="flex-grow-1" style="overflow-y: auto;">
                 <div v-if="tempSelectedNodes.length === 0" class="text-center py-8">
-                  <v-icon size="64" color="grey lighten-2">mdi-checkbox-multiple-blank-outline</v-icon>
+                  <jh-icon size="64" color="grey lighten-2" icon="mdi:checkbox-multiple-blank-outline"></jh-icon>
                   <div class="grey--text mt-2">暂无选中内容</div>
                 </div>
                 
@@ -162,7 +162,7 @@
                     small
                     @click:close="removeNodeFromTemp(node)"
                   >
-                    <v-icon left small>mdi-file-tree</v-icon>
+                    <jh-icon left small icon="mdi:file-tree"></jh-icon>
                     {{ getNodeLabel(node) }}
                   </v-chip>
                 </div>
@@ -194,6 +194,8 @@
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue';
+
 // 递归树节点组件
 const TreeNode = {
   name: 'TreeNode',
@@ -210,17 +212,16 @@ const TreeNode = {
           dense
           class="mr-2 mt-0"
         ></v-checkbox>
-        <v-icon 
+        <jh-icon 
           class="mr-2" 
           small
           @click="$emit('toggle-expand', getNodeKey(node))"
           style="cursor: pointer;"
           v-if="hasChildren(node)"
-        >
-          {{ expandedNodes.includes(getNodeKey(node)) ? 'mdi-chevron-down' : 'mdi-chevron-right' }}
-        </v-icon>
+          :icon="expandedNodes.includes(getNodeKey(node)) ? 'mdi:chevron-down' : 'mdi:chevron-right'"
+        ></jh-icon>
         <span v-else class="mr-2" style="width: 20px;"></span>
-        <v-icon small class="mr-2" color="primary">mdi-file-tree</v-icon>
+        <jh-icon small class="mr-2" color="primary" icon="mdi:file-tree"></jh-icon>
         <div class="flex-grow-1" @click="$emit('toggle-expand', getNodeKey(node))" style="cursor: pointer;">
           <div class="font-weight-medium">{{ getNodeLabel(node) }}</div>
           <div class="text-caption grey--text" v-if="hasChildren(node)">
@@ -236,7 +237,7 @@ const TreeNode = {
           @click.stop="$emit('toggle-node', node)"
           class="ml-2"
         >
-          <v-icon x-small left>mdi-check</v-icon>
+          <jh-icon x-small left icon="mdi:check"></jh-icon>
           {{ isNodeSelected(node) ? '已选' : '选择' }}
         </v-btn>
         <v-radio
@@ -357,7 +358,8 @@ const TreeNode = {
 export default {
   name: 'JhTreeSelect',
   components: {
-    TreeNode
+    TreeNode,
+    JhIcon
   },
   props: {
     // 双向绑定的已选节点

@@ -3,18 +3,18 @@
 /* 表单 >>>>>> */
 .jh-input-label {
   color: var(--color-gray-800);
-  font-weight: 400;
-  font-size: 12px;
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-small);
   line-height: 32px;
 }
 .jh-input-label-group {
   color: var(--cPrimaryColor);
-  padding-left: 10px;
-  font-size: 1rem !important;
-  line-height: 1.75rem;
-  letter-spacing: 0.009375em !important;
-  font-family: Roboto, sans-serif !important;
-  font-weight: 500 !important;
+  padding-left: var(--spacing-md);
+  font-size: var(--font-size-body) !important;
+  line-height: var(--line-height-body);
+  letter-spacing: var(--letter-spacing-body) !important;
+  font-family: var(--font-family-base) !important;
+  font-weight: var(--font-weight-medium) !important;
   position: relative;
   display: flex;
   align-items: center;
@@ -23,9 +23,9 @@
   content: "";
   background-color: var(--cPrimaryColor);
   position: absolute;
-  height: calc(100% - 12px); /* 高度为父元素高度减去3px */
+  height: calc(100% - var(--spacing-md));
   width: 4px;
-  bottom: 6px;
+  bottom: var(--spacing-sm);
   left: 0;
 }
 .jh-no-data {
@@ -37,7 +37,7 @@
   margin: 0 !important;
 }
 .jh-v-input.bg-white .v-input__slot {
-  background-color: #fff !important;
+  background-color: var(--color-white) !important;
 }
 .jh-v-input .v-messages-outer,
 .jh-v-input .v-text-field__details {
@@ -59,13 +59,13 @@
 }
 .jh-header-tab {
   border-radius: var(--radius-sm);
-  margin: 8px 0;
+  margin: var(--spacing-sm) 0;
   text-transform: none;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
 }
 .jh-header-tab-active {
   background: var(--color-bg-tertiary);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .jh-header-tab::before {
@@ -88,9 +88,9 @@
 }
 .custom-tabs .v-tab {
   min-width: auto;
-  padding: 0px;
+  padding: 0;
   margin-right: 30px;
-  font-size: 13px !important;
+  font-size: var(--font-size-small) !important;
 }
 /* <<<<< tab */
 
@@ -100,7 +100,7 @@
 }
 .jh-font-size-12,
 .jh-font-size-2 {
-  font-size: 12px;
+  font-size: var(--font-size-small);
 }
 .jh-font-size-13,
 .jh-font-size-3 {
@@ -112,7 +112,7 @@
 .jh-fixed-dialog-height {
   min-height: 60%;
   max-height: 80%;
-  background-color: #fff;
+  background-color: var(--color-white);
 }
 /* <<<<< dialog */
 
@@ -198,7 +198,7 @@ body .v-navigation-drawer.jh-drawer-level-2 {
   }
 }
 .v-data-table .v-data-table__mobile-table-row {
-  border-bottom: 5px solid rgb(243 244 246 / var(--tw-bg-opacity));
+  border-bottom: 5px solid var(--color-gray-100);
 }
 .v-data-table .v-data-table__mobile-table-row:last-child {
   border-bottom: none;
@@ -211,7 +211,7 @@ body .v-navigation-drawer.jh-drawer-level-2 {
   background-color: rgba(0, 0, 0, 0.3);
   height: calc(100vh - 88px);
   box-shadow: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
 }
 .jh-safe-bottom {
   padding-bottom: 0;
@@ -221,15 +221,15 @@ body .v-navigation-drawer.jh-drawer-level-2 {
 
 /* 场景搜索 v-btn-toggle >>>>>> */
 .jh-scene-toggle.v-btn-toggle .v-btn.v-btn {
-  background-color: #fff !important;
+  background-color: var(--color-white) !important;
 }
 .jh-scene-toggle.v-btn-toggle .v-btn.v-btn:not(:last-child) {
-  border-right-color: #fff !important;
+  border-right-color: var(--color-white) !important;
 }
 .jh-scene-toggle.v-btn-toggle .v-btn.v-btn.v-btn--active {
   border-color: var(--cPrimaryColor) !important;
   color: var(--cPrimaryColor) !important;
-  background-color: #fff !important;
+  background-color: var(--color-white) !important;
   border-right-color: var(--cPrimaryColor) !important;
 }
 /* <<<<< 场景搜索 v-btn-toggle */
@@ -238,38 +238,38 @@ body .v-navigation-drawer.jh-drawer-level-2 {
 .jh-status-tag-success,
 .jh-status-tag-primary,
 .jh-status-tag-green {
-  background-color: #59cb74 !important;
-  border-color: #59cb74 !important;
-  color: #ffffff !important;
-  caret-color: #ffffff !important;
+  background-color: var(--color-success) !important;
+  border-color: var(--color-success) !important;
+  color: var(--color-white) !important;
+  caret-color: var(--color-white) !important;
 }
 .jh-status-tag-error,
 .jh-status-tag-red {
-  background-color: #f4667c !important;
-  border-color: #f4667c !important;
-  color: #ffffff !important;
-  caret-color: #ffffff !important;
+  background-color: var(--color-error) !important;
+  border-color: var(--color-error) !important;
+  color: var(--color-white) !important;
+  caret-color: var(--color-white) !important;
 }
 .jh-status-tag-default,
 .jh-status-tag-grey {
-  background-color: #c2c2c2 !important;
-  border-color: #c2c2c2 !important;
-  color: #ffffff !important;
-  caret-color: #ffffff !important;
+  background-color: var(--color-gray-400) !important;
+  border-color: var(--color-gray-400) !important;
+  color: var(--color-white) !important;
+  caret-color: var(--color-white) !important;
 }
 .jh-status-tag-info,
 .jh-status-tag-blue {
-  background-color: #4fcccb !important;
-  border-color: #4fcccb !important;
-  color: #ffffff !important;
-  caret-color: #ffffff !important;
+  background-color: var(--color-info) !important;
+  border-color: var(--color-info) !important;
+  color: var(--color-white) !important;
+  caret-color: var(--color-white) !important;
 }
 .jh-status-tag-warning,
 .jh-status-tag-orange {
-  background-color: #fbd44b !important;
-  border-color: #fbd44b !important;
-  color: #ffffff !important;
-  caret-color: #ffffff !important;
+  background-color: var(--color-warning) !important;
+  border-color: var(--color-warning) !important;
+  color: var(--color-white) !important;
+  caret-color: var(--color-white) !important;
 }
 .jh-status-tag-indigo {
   background-color: #c5cae9 !important;
@@ -304,25 +304,25 @@ body .v-navigation-drawer.jh-drawer-level-2 {
 
 .jh-safe-bottom-1 {
   padding-bottom: max(
-    0.25rem,
+    var(--spacing-xs),
     env(safe-area-inset-bottom)
   ) !important; /* Tailwind pb-1 */
 }
 .jh-safe-bottom-2 {
   padding-bottom: max(
-    0.5rem,
+    var(--spacing-sm),
     env(safe-area-inset-bottom)
   ) !important; /* Tailwind pb-2 */
 }
 .jh-safe-bottom-3 {
   padding-bottom: max(
-    0.75rem,
+    var(--spacing-md),
     env(safe-area-inset-bottom)
   ) !important; /* Tailwind pb-3 */
 }
 .jh-safe-bottom-4 {
   padding-bottom: max(
-    1rem,
+    var(--spacing-lg),
     env(safe-area-inset-bottom)
   ) !important; /* Tailwind pb-4 */
 }
@@ -334,7 +334,7 @@ body .v-navigation-drawer.jh-drawer-level-2 {
 }
 .jh-safe-bottom-6 {
   padding-bottom: max(
-    1.5rem,
+    var(--spacing-xl),
     env(safe-area-inset-bottom)
   ) !important; /* Tailwind pb-6 */
 }

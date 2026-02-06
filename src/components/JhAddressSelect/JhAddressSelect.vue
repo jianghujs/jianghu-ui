@@ -118,7 +118,7 @@
                 <v-list dense class="pa-0">
                    <v-list-item v-for="item in provinces" :key="item.code" @click="onProvinceClick(item)" :class="{'v-item--active v-list-item--active primary--text': internalValue.province === item.code}">
                       <v-list-item-content><v-list-item-title :title="item.name">{{ item.name }}</v-list-item-title></v-list-item-content>
-                      <v-list-item-action v-if="level > 1"><v-icon small>mdi-chevron-right</v-icon></v-list-item-action>
+                      <v-list-item-action v-if="level > 1"><jh-icon icon="mdi:chevron-right" width="16" height="16"></jh-icon></v-list-item-action>
                    </v-list-item>
                 </v-list>
              </div>
@@ -127,7 +127,7 @@
                  <v-list dense class="pa-0">
                    <v-list-item v-for="item in cities" :key="item.code" @click="onCityClick(item)" :class="{'v-item--active v-list-item--active primary--text': internalValue.city === item.code}">
                       <v-list-item-content><v-list-item-title :title="item.name">{{ item.name }}</v-list-item-title></v-list-item-content>
-                      <v-list-item-action v-if="level > 2"><v-icon small>mdi-chevron-right</v-icon></v-list-item-action>
+                      <v-list-item-action v-if="level > 2"><jh-icon icon="mdi:chevron-right" width="16" height="16"></jh-icon></v-list-item-action>
                    </v-list-item>
                 </v-list>
              </div>
@@ -136,7 +136,7 @@
                  <v-list dense class="pa-0">
                    <v-list-item v-for="item in districts" :key="item.code" @click="onDistrictClick(item)" :class="{'v-item--active v-list-item--active primary--text': internalValue.district === item.code}">
                       <v-list-item-content><v-list-item-title :title="item.name">{{ item.name }}</v-list-item-title></v-list-item-content>
-                      <v-list-item-action v-if="level > 3"><v-icon small>mdi-chevron-right</v-icon></v-list-item-action>
+                      <v-list-item-action v-if="level > 3"><jh-icon icon="mdi:chevron-right" width="16" height="16"></jh-icon></v-list-item-action>
                    </v-list-item>
                 </v-list>
              </div>

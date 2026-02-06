@@ -18,7 +18,7 @@
             @click="editable && index < currentStepIndex - 1 && handleStepClick(index)"
           >
             <div class="step-number">
-              <v-icon v-if="currentStepIndex > index + 1" small color="success">mdi-check</v-icon>
+              <jh-icon v-if="currentStepIndex > index + 1" small color="success" icon="mdi:check"></jh-icon>
               <span v-else>{{ index + 1 }}</span>
             </div>
             <div class="step-info">
@@ -263,11 +263,13 @@
 
 <script>
 import JhForm from '../JhForm/JhForm.vue';
+import JhIcon from '../JhIcon/JhIcon.vue';
 
 export default {
   name: 'JhStepsForm',
   components: {
     JhForm,
+    JhIcon,
   },
   props: {
     // 步骤配置

@@ -8,7 +8,7 @@
       <div v-if="tooltip" class="jh-statistic-card-tooltip">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon small v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+            <jh-icon small v-bind="attrs" v-on="on" icon="mdi:help-circle-outline"></jh-icon>
           </template>
           <span>{{ tooltip }}</span>
         </v-tooltip>
@@ -31,13 +31,12 @@
         <!-- 趋势指标 -->
         <div v-if="trend || $slots.trend" class="jh-statistic-card-trend">
           <slot name="trend">
-            <v-icon 
+            <jh-icon 
               small 
               :color="trendColor"
+              :icon="trendIcon"
               class="jh-statistic-card-trend-icon"
-            >
-              {{ trendIcon }}
-            </v-icon>
+            ></jh-icon>
             <span :style="{ color: trendColor }">{{ trend }}</span>
           </slot>
         </div>
@@ -69,6 +68,8 @@
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue';
+
 // CDN 方式引入 echarts 和 vue-echarts
 // 在 HTML 中添加以下 CDN 链接：
 
@@ -156,6 +157,7 @@ export default {
 
   components: {
     VChart,
+    JhIcon,
   },
 
   props: {
@@ -275,7 +277,7 @@ export default {
 
     // 趋势图标
     trendIcon() {
-      return this.trendType === 'up' ? 'mdi-trending-up' : 'mdi-trending-down';
+      return this.trendType === 'up' ? 'mdi:trending-up' : 'mdi:trending-down';
     },
 
     // 趋势颜色

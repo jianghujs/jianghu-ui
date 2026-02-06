@@ -78,19 +78,21 @@
       class="drawer-close-float-btn"
       @click="handleCancel"
     >
-      <v-icon>mdi-close</v-icon>
+      <jh-icon icon="mdi:close" width="24" height="24"></jh-icon>
     </v-btn>
   </v-navigation-drawer>
 </template>
 
 <script>
 import JhForm from '../JhForm/JhForm.vue';
+import JhIcon from '../JhIcon/JhIcon.vue';
 
 export default {
   name: 'JhDrawerForm',
 
   components: {
     JhForm,
+    JhIcon
   },
 
   props: {

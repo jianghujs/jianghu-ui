@@ -2,9 +2,6 @@
     /* 全局 >>>>>> */
     body {
         --cPrimaryColor: <$ ctx.app.config.primaryColor $>;
-        --shadow-sm: 0px 1px 2px rgba(25, 39, 52, .05), 0px 0px 4px rgba(25, 39, 52, .1);
-        --gray-900: #1F272E;
-        --gray-800: #333C44;
     }
 
     body {
@@ -34,7 +31,7 @@
     }
 
     body .v-application .title {
-        font-size: 1rem !important;
+        font-size: var(--font-size-body) !important;
     }
     body .v-application .v-navigation-drawer .title {
         color: var(--cPrimaryColor);
@@ -57,7 +54,7 @@
     }
 
     .mdi-close::before {
-        font-size: 1rem;
+        font-size: var(--font-size-body);
     }
 
     /* 全局 >>>>>> */
@@ -91,16 +88,16 @@
 
     /* 表单 >>>>>> */
     .v-input--is-readonly .v-input__slot {
-      background: #eeeeee!important;
+      background: var(--color-bg-tertiary)!important;
     }
     .v-label,
     input,
     .v-input {
-        font-size: 0.875rem !important;
+        font-size: var(--font-size-body) !important;
     }
 
     body .v-text-field .v-label {
-        color: rgba(0, 0, 0, .3);
+        color: var(--color-text-tertiary);
     }
 
     body .theme--light.v-input,
@@ -108,7 +105,7 @@
     body .theme--light.v-input textarea,
     body .v-select.v-input--dense .v-select__selection--comma {
         font-size: var(--font-size-body) !important;
-        font-weight: 500 !important;
+        font-weight: var(--font-weight-medium) !important;
         color: var(--color-text-primary);
     }
 
@@ -159,15 +156,15 @@
         transform: translateY(-16px) scale(.75);
         background: var(--color-bg-primary);
         padding: 1px 5px;
-        border-radius: 30px;
+        border-radius: var(--radius-pill);
     }
 
     body .v-data-table__checkbox .v-input--selection-controls__input .v-icon.mdi-checkbox-blank-outline::before {
         content: "" !important;
-        background: #d6dde1;
+        background: var(--color-gray-300);
         width: 18px;
         height: 18px;
-        border-radius: 2px;
+        border-radius: var(--radius-sm);
     }
 
     .v-text-field.v-input--is-focused.v-input--dense:not(.v-text-field--outlined) .v-text-field__prefix {
@@ -175,7 +172,7 @@
     }
 
     .v-text-field.v-input--dense:not(.v-text-field--outlined) .v-text-field__prefix {
-        color: #a5a9ab;
+        color: var(--color-gray-400);
     }
 
     .v-text-field--filled.v-input--dense.v-text-field--outlined.v-text-field--filled>.v-input__control>.v-input__slot,
@@ -192,7 +189,7 @@
 
     .v-input .v-label {
         line-height: 14px;
-        font-size: .8125rem !important;
+        font-size: var(--font-size-small) !important;
     }
 
     .v-text-field--enclosed.v-input--dense:not(.v-text-field--solo).v-text-field--single-line .v-input__append-inner,
@@ -210,9 +207,9 @@
     body .theme--light.v-input input,
     body .theme--light.v-input textarea,
     body .v-select.v-input--dense .v-select__selection--comma {
-        font-size: .8125rem !important;
-        font-weight: normal !important;
-        color: var(--gray-900);
+        font-size: var(--font-size-small) !important;
+        font-weight: var(--font-weight-normal) !important;
+        color: var(--color-text-primary);
     }
 
     body .theme--light.v-text-field--filled>.v-input__control>.v-input__slot {
@@ -231,7 +228,7 @@
     }
 
     .v-select__selection--comma {
-        margin: 7px 4px;
+        margin: 7px var(--spacing-xs);
     }
 
     /* <<<<< 表单 */
@@ -267,7 +264,7 @@
         position: -webkit-sticky !important;
         right: 0;
         z-index: 10;
-        background: white;
+        background: var(--color-white);
         border: none;
         box-shadow: none;
         box-shadow: var(--shadow-sm); /* 添加阴影以区分固定列 */
@@ -305,13 +302,13 @@
     .v-data-table>.v-data-table__wrapper>table>tbody>tr>td,
     .v-data-table>.v-data-table__wrapper>table>tfoot>tr>td,
     .v-data-table>.v-data-table__wrapper>table>thead>tr>th {
-        padding: 0 8px !important;
+        padding: 0 var(--spacing-sm) !important;
     }
 
     .v-data-table>.v-data-table__wrapper>table>tbody>tr>td:first-child,
     .v-data-table>.v-data-table__wrapper>table>tfoot>tr>td:first-child,
     .v-data-table>.v-data-table__wrapper>table>thead>tr>th:first-child {
-        padding-left: 16px !important;
+        padding-left: var(--spacing-lg) !important;
     }
     .v-data-table>.v-data-table__wrapper>table>tbody>tr>td.noWarp,
     .v-data-table>.v-data-table__wrapper>table>tfoot>tr>td.noWarp {
@@ -324,8 +321,8 @@
 
     .theme--light.v-data-table>.v-data-table__wrapper>table>thead>tr>th {
         color: var(--color-text-secondary);
-        font-weight: 600;
-        font-size: 13px;
+        font-weight: var(--font-weight-semibold);
+        font-size: var(--font-size-small);
     }
 
     .v-data-table--fixed-header>.v-data-table__wrapper>table>thead>tr>th.fixed {
@@ -342,7 +339,7 @@
         position: -webkit-sticky !important;
         left: 0;
         z-index: 10;
-        background: white;
+        background: var(--color-white);
     }
 
     /* 固定表头部第一个字段 */
@@ -365,12 +362,12 @@
     .v-data-table>.v-data-table__wrapper>table>thead>tr>td {
        
         color: var(--color-text-primary);
-        font-size: .8125rem;
+        font-size: var(--font-size-small);
     }
 
     .theme--light.v-data-table>.v-data-table__wrapper>table>thead>tr>th {
         color: var(--color-text-secondary) !important;
-        font-weight: normal;
+        font-weight: var(--font-weight-normal);
     }
 
     /* 分组 */
@@ -439,15 +436,15 @@
 
     /* table 分页紧凑 */
     .v-application--is-ltr .v-data-footer__pagination {
-        margin: 0 12px 0 4px;
+        margin: 0 var(--spacing-md) 0 var(--spacing-xs);
     }
 
     .v-application--is-ltr .v-data-footer__select .v-select {
-        margin: 8px 0 8px 14px;
+        margin: var(--spacing-sm) 0 var(--spacing-sm) 14px;
     }
 
     .v-application--is-ltr .v-data-footer__select {
-        margin-right: 8px;
+        margin-right: var(--spacing-sm);
         margin-left: 20px;
     }
 
@@ -460,7 +457,7 @@
         position: -webkit-sticky !important;
         left: 0;
         z-index: 12 !important;
-        background: white;
+        background: var(--color-white);
         border-right: none;
     }
 
@@ -485,7 +482,7 @@
     .v-dialog--fullscreen .v-sheet .container {
         height: 100vh;
         margin: 15vh 0 0 0;
-        background: #ffffff;
+        background: var(--color-white);
         padding: 50px 0 0 0;
         position: relative;
     }
@@ -515,7 +512,7 @@
     }
 
     .theme--light.v-app-bar.v-toolbar.v-sheet {
-        background: #ffffff !important;
+        background: var(--color-white) !important;
         box-shadow: var(--shadow-md) !important;
     }
 
@@ -528,14 +525,14 @@
 
     /* tab >>>>>> */
     body .v-tab {
-        font-size: 14px !important;
+        font-size: var(--font-size-body) !important;
     }
 
     .theme--light.v-tabs>.v-tabs-bar .v-tab--disabled,
     .theme--light.v-tabs>.v-tabs-bar .v-tab:not(.v-tab--active),
     .theme--light.v-tabs>.v-tabs-bar .v-tab:not(.v-tab--active)>.v-btn,
     .theme--light.v-tabs>.v-tabs-bar .v-tab:not(.v-tab--active)>.v-icon {
-        color: var(--gray-900);
+        color: var(--color-text-primary);
     }
 
     /* <<<<< tab */
@@ -543,7 +540,7 @@
 
     /* 面包屑 >>>>>> */
     body .v-breadcrumbs li {
-        font-size: 12px !important;
+        font-size: var(--font-size-small) !important;
     }
 
     body .v-breadcrumbs li:nth-child(2n) {
@@ -555,7 +552,7 @@
 
     /* 菜单 >>>>>> */
     .v-menu__content {
-        background: white;
+        background: var(--color-white);
         box-shadow: var(--shadow-lg);
         z-index: 300 !important;
     }
@@ -567,11 +564,11 @@
     }
 
     .v-menu__content .v-list-item--link:before {
-        border-radius: 6px;
+        border-radius: var(--radius-md);
     }
 
     .v-menu__content .v-select-list {
-        padding: 10px;
+        padding: var(--spacing-md);
     }
 
     .v-menu__content .v-icon.mdi-close {
@@ -601,7 +598,7 @@
 
     .theme--light.v-treeview .v-treeview-node__root:before,
     .theme--light.v-treeview .v-treeview-node__root:hover:before {
-        border-radius: 6px;
+        border-radius: var(--radius-md);
     }
 
     .v-treeview-node__label {

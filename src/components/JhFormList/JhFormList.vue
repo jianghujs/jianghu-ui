@@ -11,7 +11,7 @@
     <!-- 空列表占位 -->
     <div v-if="listData.length === 0" class="jh-form-list-empty">
       <slot name="empty">
-        <v-icon size="48" color="grey lighten-1">mdi-inbox</v-icon>
+        <jh-icon icon="mdi:inbox" width="48" height="48" color="grey lighten-1"></jh-icon>
         <p class="grey--text mt-2">暂无数据</p>
       </slot>
     </div>
@@ -33,13 +33,13 @@
         <v-card-title class="jh-form-list-item-header py-2 px-4">
           <div class="d-flex align-center">
             <!-- 拖拽把手 -->
-            <v-icon
+            <jh-icon
               v-if="sortable && !disabled && !readonly"
+              icon="mdi:drag"
+              width="16"
+              height="16"
               class="jh-form-list-drag-handle mr-2"
-              small
-            >
-              mdi-drag
-            </v-icon>
+            ></jh-icon>
             <!-- 折叠按钮 -->
             <v-btn
               v-if="collapsible"
@@ -48,9 +48,7 @@
               @click="toggleCollapse(item)"
               class="mr-2"
             >
-              <v-icon small>
-                {{ isCollapsed(item) ? 'mdi-chevron-down' : 'mdi-chevron-up' }}
-              </v-icon>
+              <jh-icon :icon="isCollapsed(item) ? 'mdi:chevron-down' : 'mdi:chevron-up'" width="16" height="16"></jh-icon>
             </v-btn>
             <!-- 序号 -->
             <span v-if="showIndex && alwaysShowItemLabel" class="jh-form-list-item-index">
@@ -72,7 +70,7 @@
                   @click="copyItem(index)"
                   title="复制"
                 >
-                  <v-icon small>mdi-content-copy</v-icon>
+                  <jh-icon icon="mdi:content-copy" width="16" height="16"></jh-icon>
                 </v-btn>
                 <v-btn
                   icon
@@ -82,7 +80,7 @@
                   :disabled="listData.length <= min"
                   title="删除"
                 >
-                  <v-icon small>mdi-delete</v-icon>
+                  <jh-icon icon="mdi:delete" width="16" height="16"></jh-icon>
                 </v-btn>
               </template>
             </slot>
@@ -162,7 +160,7 @@
             <td v-if="showIndex" class="text-center">{{ index + 1 }}</td>
             <!-- 拖拽把手 -->
             <td v-if="sortable && !disabled && !readonly" class="text-center">
-              <v-icon class="jh-form-list-drag-handle" small>mdi-drag</v-icon>
+              <jh-icon icon="mdi:drag" width="16" height="16" class="jh-form-list-drag-handle"></jh-icon>
             </td>
             <!-- 字段列 -->
             <td v-for="field in fields" :key="field.key">
@@ -192,7 +190,7 @@
                   title="复制"
                   class="mr-1"
                 >
-                  <v-icon x-small>mdi-content-copy</v-icon>
+                  <jh-icon icon="mdi:content-copy" width="14" height="14"></jh-icon>
                 </v-btn>
                 <v-btn
                   icon
@@ -202,7 +200,7 @@
                   :disabled="listData.length <= min"
                   title="删除"
                 >
-                  <v-icon x-small>mdi-delete</v-icon>
+                  <jh-icon icon="mdi:delete" width="14" height="14"></jh-icon>
                 </v-btn>
               </slot>
             </td>
@@ -229,9 +227,7 @@
             @click:close="removeItem(index)"
             :draggable="sortable && !disabled && !readonly"
           >
-            <v-icon v-if="sortable && !disabled && !readonly" class="jh-form-list-drag-handle mr-1" x-small>
-              mdi-drag
-            </v-icon>
+            <jh-icon v-if="sortable && !disabled && !readonly" icon="mdi:drag" width="14" height="14" class="jh-form-list-drag-handle mr-1"></jh-icon>
             {{ getInlineItemDisplay(item) }}
           </v-chip>
         </slot>
@@ -279,13 +275,13 @@
     <div v-if="!disabled && !readonly && computedCreatorButtonProps !== false" class="jh-form-list-footer mt-4">
       <slot name="footer" :addItem="addItem" :canAdd="canAdd">
         <v-btn
-          v-bind="computedCreatorButtonProps"
-          :disabled="!canAdd"
-          @click="addItem()"
-        >
-          <v-icon left>mdi-plus</v-icon>
-          {{ computedCreatorButtonProps.text || addButtonText }}
-        </v-btn>
+            v-bind="computedCreatorButtonProps"
+            :disabled="!canAdd"
+            @click="addItem()"
+          >
+            <jh-icon icon="mdi:plus" width="16" height="16" left></jh-icon>
+            {{ computedCreatorButtonProps.text || addButtonText }}
+          </v-btn>
       </slot>
     </div>
   </div>
@@ -293,12 +289,14 @@
 
 <script>
 import JhForm from '../JhForm/JhForm.vue';
+import JhIcon from '../JhIcon/JhIcon.vue';
 
 export default {
   name: 'JhFormList',
 
   components: {
     JhForm,
+    JhIcon,
   },
 
   props: {

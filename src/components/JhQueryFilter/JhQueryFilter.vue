@@ -42,7 +42,7 @@
                 :loading="searching"
                 class="jh-query-filter-search-btn"
               >
-                <v-icon left small>mdi-magnify</v-icon>
+                <jh-icon left small icon="mdi:magnify"></jh-icon>
                 {{ searchText }}
               </v-btn>
 
@@ -54,7 +54,7 @@
                 @click="handleReset"
                 class="jh-query-filter-reset-btn"
               >
-                <v-icon left small>mdi-refresh</v-icon>
+                <jh-icon left small icon="mdi:refresh"></jh-icon>
                 {{ resetText }}
               </v-btn>
 
@@ -69,7 +69,7 @@
                 class="jh-query-filter-collapse-btn"
               >
                 {{ collapsed ? expandText : collapseText }}
-                <v-icon right small>{{ collapsed ? 'mdi-chevron-down' : 'mdi-chevron-up' }}</v-icon>
+                <jh-icon right small :icon="collapsed ? 'mdi:chevron-down' : 'mdi:chevron-up'"></jh-icon>
               </v-btn>
             </div>
           </slot>
@@ -81,12 +81,14 @@
 
 <script>
 import JhFormFields from '../JhFormFields/JhFormFields.vue';
+import JhIcon from '../JhIcon/JhIcon.vue';
 
 export default {
   name: 'JhQueryFilter',
 
   components: {
     JhFormFields,
+    JhIcon,
   },
 
   props: {

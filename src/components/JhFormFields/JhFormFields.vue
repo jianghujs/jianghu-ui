@@ -7,7 +7,7 @@
           {{ title }}
           <v-tooltip v-if="tooltip" bottom>
             <template v-slot:activator="{ on, attrs }">
-              <v-icon small class="ml-1" v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+              <jh-icon icon="mdi:help-circle-outline" width="16" height="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
             </template>
             <span>{{ tooltip }}</span>
           </v-tooltip>
@@ -51,7 +51,7 @@
               {{ field.label }}
               <v-tooltip v-if="field.tooltip" bottom>
                 <template v-slot:activator="{ on, attrs }">
-                  <v-icon small class="ml-1" v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+                  <jh-icon icon="mdi:help-circle-outline" width="16" height="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
                 </template>
                 <span>{{ field.tooltip }}</span>
               </v-tooltip>
@@ -68,7 +68,7 @@
                 {{ field.label }}
                 <v-tooltip v-if="field.tooltip" bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-icon small class="ml-1" v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+                    <jh-icon icon="mdi:help-circle-outline" width="16" height="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
                   </template>
                   <span>{{ field.tooltip }}</span>
                 </v-tooltip>
@@ -407,8 +407,13 @@
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue'
+
 export default {
   name: 'JhFormFields',
+  components: {
+    JhIcon
+  },
 
   props: {
     // 字段配置列表

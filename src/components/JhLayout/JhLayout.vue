@@ -16,7 +16,7 @@
       <template v-slot:title>
         <slot name="logo">
           <div class="d-flex align-center">
-            <v-icon v-if="logo" color="primary" class="mr-2">{{ logo }}</v-icon>
+            <jh-icon v-if="logo" :icon="`mdi:${logo}`" color="primary" width="24" height="24" class="mr-2"></jh-icon>
             <span class="text-h6 font-weight-bold primary--text">{{ title }}</span>
           </div>
         </slot>
@@ -48,7 +48,7 @@
         <v-toolbar-title>布局设置</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn icon @click="settingsDrawer = false">
-          <v-icon>mdi-close</v-icon>
+          <jh-icon icon="mdi:close" width="24" height="24"></jh-icon>
         </v-btn>
       </v-toolbar>
 
@@ -102,7 +102,7 @@
               class="mb-2"
               @click="applyPreset('default')"
             >
-              <v-icon left small>mdi-palette</v-icon>
+              <jh-icon icon="mdi:palette" width="16" height="16" left></jh-icon>
               默认主题
             </v-btn>
             <v-btn
@@ -112,7 +112,7 @@
               class="mb-2"
               @click="applyPreset('dark')"
             >
-              <v-icon left small>mdi-weather-night</v-icon>
+              <jh-icon icon="mdi:weather-night" width="16" height="16" left></jh-icon>
               暗色主题
             </v-btn>
             <v-btn
@@ -121,7 +121,7 @@
               small
               @click="applyPreset('compact')"
             >
-              <v-icon left small>mdi-arrow-collapse-vertical</v-icon>
+              <jh-icon icon="mdi:arrow-collapse-vertical" width="16" height="16" left></jh-icon>
               紧凑模式
             </v-btn>
           </v-list-item-content>
@@ -138,7 +138,7 @@
               outlined
               @click="resetSettings"
             >
-              <v-icon left>mdi-restore</v-icon>
+              <jh-icon icon="mdi:restore" width="16" height="16" left></jh-icon>
               重置为默认
             </v-btn>
           </v-list-item-content>
@@ -158,18 +158,20 @@
       class="jh-layout-settings-btn"
       elevation="4"
     >
-      <v-icon>mdi-cog</v-icon>
+      <jh-icon icon="mdi:cog" width="24" height="24"></jh-icon>
     </v-btn>
   </v-app>
 </template>
 
 <script>
 import JhMenu from '../JhMenu/JhMenu.vue';
+import JhIcon from '../JhIcon/JhIcon.vue';
 
 export default {
   name: 'JhLayout',
   components: {
-    JhMenu
+    JhMenu,
+    JhIcon
   },
   props: {
     // 应用标题

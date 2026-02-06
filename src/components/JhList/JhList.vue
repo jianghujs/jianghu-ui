@@ -7,11 +7,11 @@
           <slot name="header-title">
             <span class="jh-pro-list-title-text">{{ headerTitle }}</span>
             <v-tooltip v-if="tooltip" bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon small class="ml-1" v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
-              </template>
-              <span>{{ tooltip }}</span>
-            </v-tooltip>
+            <template v-slot:activator="{ on, attrs }">
+              <jh-icon icon="mdi:help-circle-outline" width="16" height="16" class="ml-1" v-bind="attrs" v-on="on"></jh-icon>
+            </template>
+            <span>{{ tooltip }}</span>
+          </v-tooltip>
           </slot>
         </div>
         <div v-if="$slots['toolbar-actions']" class="jh-pro-list-header-actions">
@@ -41,22 +41,22 @@
         ></v-text-field>
 
         <v-btn v-if="toolbarConfig.refresh" icon small @click="handleRefresh" title="刷新">
-          <v-icon>mdi-refresh</v-icon>
+          <jh-icon icon="mdi:refresh" width="16" height="16"></jh-icon>
         </v-btn>
 
         <v-menu v-if="toolbarConfig.layout" offset-y>
           <template v-slot:activator="{ on, attrs }">
             <v-btn icon small v-bind="attrs" v-on="on" title="布局">
-              <v-icon>{{ layoutIcon }}</v-icon>
+              <jh-icon :icon="`mdi:${layoutIcon}`" width="16" height="16"></jh-icon>
             </v-btn>
           </template>
           <v-list dense>
             <v-list-item @click="currentLayout = 'list'">
-              <v-list-item-icon><v-icon small>mdi-view-list</v-icon></v-list-item-icon>
+              <v-list-item-icon><jh-icon icon="mdi:view-list" width="16" height="16"></jh-icon></v-list-item-icon>
               <v-list-item-title>列表</v-list-item-title>
             </v-list-item>
             <v-list-item @click="currentLayout = 'grid'">
-              <v-list-item-icon><v-icon small>mdi-view-grid</v-icon></v-list-item-icon>
+              <v-list-item-icon><jh-icon icon="mdi:view-grid" width="16" height="16"></jh-icon></v-list-item-icon>
               <v-list-item-title>网格</v-list-item-title>
             </v-list-item>
           </v-list>
@@ -65,23 +65,23 @@
         <v-menu v-if="toolbarConfig.size" offset-y>
           <template v-slot:activator="{ on, attrs }">
             <v-btn icon small v-bind="attrs" v-on="on" title="尺寸">
-              <v-icon>mdi-format-line-spacing</v-icon>
+              <jh-icon icon="mdi:format-line-spacing" width="16" height="16"></jh-icon>
             </v-btn>
           </template>
           <v-list dense>
             <v-list-item @click="currentSize = 'large'">
               <v-list-item-title>
-                <v-icon v-if="currentSize === 'large'" small left>mdi-check</v-icon>大
+                <jh-icon v-if="currentSize === 'large'" icon="mdi:check" width="16" height="16" class="mr-2"></jh-icon>大
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="currentSize = 'default'">
               <v-list-item-title>
-                <v-icon v-if="currentSize === 'default'" small left>mdi-check</v-icon>默认
+                <jh-icon v-if="currentSize === 'default'" icon="mdi:check" width="16" height="16" class="mr-2"></jh-icon>默认
               </v-list-item-title>
             </v-list-item>
             <v-list-item @click="currentSize = 'small'">
               <v-list-item-title>
-                <v-icon v-if="currentSize === 'small'" small left>mdi-check</v-icon>小
+                <jh-icon v-if="currentSize === 'small'" icon="mdi:check" width="16" height="16" class="mr-2"></jh-icon>小
               </v-list-item-title>
             </v-list-item>
           </v-list>
@@ -93,7 +93,7 @@
     <div v-if="rowSelection && selectedItems.length > 0" class="jh-pro-list-alert">
       <div class="jh-pro-list-alert-info">
         <slot name="alert" :selected-row-keys="selectedRowKeys" :selected-rows="selectedItems">
-          <v-icon small class="mr-2" color="primary">mdi-checkbox-marked-circle</v-icon>
+          <jh-icon icon="mdi:checkbox-marked-circle" width="16" height="16" class="mr-2" color="primary"></jh-icon>
           <span>已选择 <strong class="primary--text">{{ selectedItems.length }}</strong> 项</span>
           <v-btn text x-small class="ml-2" @click="clearSelection">清空</v-btn>
         </slot>
@@ -111,7 +111,7 @@
 
     <!-- 空状态 -->
     <div v-else-if="currentItems.length === 0" class="jh-pro-list-empty">
-      <v-icon large color="grey lighten-1">mdi-inbox-outline</v-icon>
+      <jh-icon icon="mdi:inbox-outline" width="48" height="48" color="grey lighten-1"></jh-icon>
       <div class="mt-2 text-body-2 grey--text">暂无数据</div>
     </div>
 
@@ -169,7 +169,7 @@
                     :color="action.color || 'primary'"
                     @click.stop="handleActionClick(action, item)"
                   >
-                    <v-icon v-if="action.icon" small left>{{ action.icon }}</v-icon>
+                    <jh-icon v-if="action.icon" :icon="`mdi:${action.icon}`" width="14" height="14" left></jh-icon>
                     {{ action.text }}
                   </v-btn>
                 </slot>
@@ -226,7 +226,7 @@
                   :color="action.color || 'primary'"
                   @click.stop="handleActionClick(action, item)"
                 >
-                  <v-icon v-if="action.icon" small left>{{ action.icon }}</v-icon>
+                  <jh-icon v-if="action.icon" :icon="`mdi:${action.icon}`" width="14" height="14" left></jh-icon>
                   {{ action.text }}
                 </v-btn>
               </slot>
@@ -263,8 +263,13 @@
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue'
+
 export default {
   name: 'JhList',
+  components: {
+    JhIcon
+  },
   props: {
     // 静态数据源（非 request 模式）
     dataSource: {

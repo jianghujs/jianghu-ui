@@ -8,7 +8,7 @@
           <div v-if="value && isString(value)" class="relative aspect-square rounded overflow-hidden">
             <div class="w-full h-full flex flex-col items-center justify-center p-2 bg-gray-100">
               <img v-if="isImage(value)" :src="getImageUrl(value)" class="max-w-full max-h-full object-contain">
-              <v-icon v-else size="40" class="text-gray-500">mdi-file-document-outline</v-icon>
+              <jh-icon v-else icon="mdi:file-document-outline" width="40" height="40" class="text-gray-500"></jh-icon>
             </div>
             <!-- 删除按钮 -->
             <v-btn
@@ -18,18 +18,18 @@
               class="absolute top-1 right-1 !bg-black/50"
               @click="handleRemoveSingleFile"
             >
-              <v-icon small color="white">mdi-close</v-icon>
+              <jh-icon icon="mdi:close" width="16" height="16" color="white"></jh-icon>
             </v-btn>
           </div>
           <div v-else-if="value && Array.isArray(value)" v-for="(file, index) in value" :key="index" class="relative aspect-square border border-gray-200 rounded overflow-hidden">
             <!-- 预览图 -->
             <div v-if="isString(file)" class="w-full h-full flex flex-col items-center justify-center p-2 bg-gray-100">
               <img v-if="isImage(file)" :src="getImageUrl(file)" class="max-w-full max-h-full object-contain">
-              <v-icon v-else size="40" class="text-gray-500">mdi-file-document-outline</v-icon>
+              <jh-icon v-else icon="mdi:file-document-outline" width="40" height="40" class="text-gray-500"></jh-icon>
             </div>
             <div v-else class="w-full h-full flex flex-col items-center justify-center p-2 bg-gray-100">
               <img v-if="isImage(file)" :src="getObjectUrl(file)" class="max-w-full max-h-full object-contain">
-              <v-icon v-else size="40" class="text-gray-500">mdi-file-document-outline</v-icon>
+              <jh-icon v-else icon="mdi:file-document-outline" width="40" height="40" class="text-gray-500"></jh-icon>
             </div>
             <!-- 删除按钮 -->
             <v-btn
@@ -39,7 +39,7 @@
               class="absolute top-1 right-1 !bg-black/50"
               @click="removeFile(index)"
             >
-              <v-icon small color="white">mdi-close</v-icon>
+              <jh-icon icon="mdi:close" width="16" height="16" color="white"></jh-icon>
             </v-btn>
             <!-- 类型 -->
             <div class="absolute top-0 left-2 text-xs bg-green-500 text-white px-1 rounded-b-sm">
@@ -57,7 +57,7 @@
               @change="handleFileChange"
               class="hidden"
             >
-            <v-icon size="40" class="text-gray-500 transition-all group-hover:text-blue-500">mdi-plus</v-icon>
+            <jh-icon icon="mdi:plus" width="40" height="40" class="text-gray-500 transition-all group-hover:text-blue-500"></jh-icon>
           </div>
         </div>
 
@@ -76,8 +76,13 @@
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue'
+
 export default {
   name: 'JhFileInput',
+  components: {
+    JhIcon
+  },
   props: {
     // 已选文件集合，可为 File[]、字符串路径数组或单个字符串
     value: {

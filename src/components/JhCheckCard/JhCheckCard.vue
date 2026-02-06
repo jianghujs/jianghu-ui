@@ -6,12 +6,12 @@
   >
     <!-- 选择指示器 -->
     <div v-if="!hideCheckbox" class="jh-check-card-checkbox">
-      <v-icon
+      <jh-icon
+        :icon="isChecked ? 'mdi:checkbox-marked' : 'mdi:checkbox-blank-outline'"
         :color="isChecked ? 'primary' : 'grey'"
-        :size="checkboxSize"
-      >
-        {{ isChecked ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline' }}
-      </v-icon>
+        :width="checkboxSize"
+        :height="checkboxSize"
+      ></jh-icon>
     </div>
 
     <!-- 卡片内容 -->

@@ -70,7 +70,7 @@
                   @click="handlePreview(item)"
                   title="预览"
                 >
-                  <v-icon>mdi-eye</v-icon>
+                  <jh-icon icon="mdi:eye"></jh-icon>
                 </v-btn>
 
                 <!-- 下载按钮 -->
@@ -81,7 +81,7 @@
                   @click="handleDownload(item)"
                   title="下载"
                 >
-                  <v-icon>mdi-download</v-icon>
+                  <jh-icon icon="mdi:download"></jh-icon>
                 </v-btn>
 
                 <!-- 删除按钮 -->
@@ -92,7 +92,7 @@
                   @click="handleDelete(item)"
                   title="删除"
                 >
-                  <v-icon>mdi-trash-can-outline</v-icon>
+                  <jh-icon icon="mdi:trash-can-outline"></jh-icon>
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -121,7 +121,7 @@
             {{ previewItem ? previewItem.filename : '' }}
             <v-spacer></v-spacer>
             <v-btn icon @click="previewDialog = false">
-              <v-icon>mdi-close</v-icon>
+              <jh-icon icon="mdi:close"></jh-icon>
             </v-btn>
           </v-card-title>
           <v-card-text class="pa-0">
@@ -139,8 +139,13 @@
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue';
+
 export default {
   name: 'JhTableAttachment',
+  components: {
+    JhIcon
+  },
   props: {
     // 附件列表
     attachments: {

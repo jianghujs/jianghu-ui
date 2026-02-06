@@ -19,14 +19,14 @@
         <!-- Tooltip 提示 -->
         <v-tooltip v-if="tooltip" bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon
-              small
+            <jh-icon
+              icon="mdi:help-circle-outline"
+              width="16"
+              height="16"
               class="ml-2"
               v-bind="attrs"
               v-on="on"
-            >
-              mdi-help-circle-outline
-            </v-icon>
+            ></jh-icon>
           </template>
           <span>{{ tooltip }}</span>
         </v-tooltip>
@@ -45,7 +45,7 @@
         class="ml-2"
         @click="toggleCollapse"
       >
-        <v-icon>{{ isCollapsed ? 'mdi-chevron-down' : 'mdi-chevron-up' }}</v-icon>
+        <jh-icon :icon="isCollapsed ? 'mdi:chevron-down' : 'mdi:chevron-up'" width="24" height="24"></jh-icon>
       </v-btn>
     </div>
 
@@ -117,7 +117,7 @@
             v-bind="action.props"
             @click="action.onClick"
           >
-            <v-icon v-if="action.icon">{{ action.icon }}</v-icon>
+            <jh-icon v-if="action.icon" :icon="action.icon" width="24" height="24"></jh-icon>
             <span v-if="action.text">{{ action.text }}</span>
           </component>
           <v-divider

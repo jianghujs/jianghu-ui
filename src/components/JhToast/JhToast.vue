@@ -21,13 +21,12 @@
         indeterminate
         class="jh-toast__icon"
       ></v-progress-circular>
-      <v-icon
+      <jh-icon
         v-else-if="currentIcon"
         :color="iconColor"
+        :icon="currentIcon"
         class="jh-toast__icon"
-      >
-        {{ currentIcon }}
-      </v-icon>
+      ></jh-icon>
       <span class="jh-toast__message">{{ currentMessage }}</span>
     </div>
 
@@ -57,8 +56,13 @@
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue';
+
 export default {
   name: 'JhToast',
+  components: {
+    JhIcon
+  },
   props: {
     // 是否显示
     value: {
@@ -173,12 +177,12 @@ export default {
       if (this.type === 'loading') return '';
 
       const iconMap = {
-        success: 'mdi-check-circle',
-        error: 'mdi-alert-circle',
-        warning: 'mdi-alert',
-        info: 'mdi-information',
+        success: 'mdi:check-circle',
+        error: 'mdi:alert-circle',
+        warning: 'mdi:alert',
+        info: 'mdi:information',
       };
-      return iconMap[this.type] || 'mdi-check-circle';
+      return iconMap[this.type] || 'mdi:check-circle';
     },
     currentTimeout() {
       return this.type === 'loading' ? -1 : this.timeout;

@@ -11,14 +11,14 @@
           <div class="py-4 text-body-1 font-weight-bold align-center d-flex align-center">
             {{ pageName }}
             <!-- 帮助页按钮 -->
-            <v-icon
+            <jh-icon
               v-if="showHelpButton"
-              size="15"
+              icon="mdi:help-circle"
+              width="15"
+              height="15"
               class="black--text ml-1"
               @click="$emit('help-click')"
-            >
-              mdi-help-circle
-            </v-icon>
+            ></jh-icon>
           </div>
         </v-col>
 
@@ -53,8 +53,13 @@
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue'
+
 export default {
   name: 'JhPageContainer',
+  components: {
+    JhIcon
+  },
   props: {
     // 页面主标题，显示在顶部 Title 区域
     pageName: {

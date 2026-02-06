@@ -18,7 +18,7 @@
           small
           @click="handleCancel"
         >
-          <v-icon>mdi-close</v-icon>
+          <jh-icon icon="mdi:close"></jh-icon>
         </v-btn>
       </v-card-title>
 
@@ -60,8 +60,13 @@
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue'
+
 export default {
   name: 'JhModal',
+  components: {
+    JhIcon
+  },
   inheritAttrs: false,
 
   props: {

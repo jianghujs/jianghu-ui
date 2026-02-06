@@ -123,9 +123,7 @@
               </v-chip>
 
               <!-- 开关显示 -->
-              <v-icon v-else-if="column.type === 'switch'" :color="item[column.key] ? 'success' : 'grey'">
-                {{ item[column.key] ? 'mdi-check-circle' : 'mdi-circle-outline' }}
-              </v-icon>
+              <jh-icon v-else-if="column.type === 'switch'" :color="item[column.key] ? 'success' : 'grey'" :icon="item[column.key] ? 'mdi:check-circle' : 'mdi:circle-outline'" width="20" height="20"></jh-icon>
 
               <!-- 普通文本 -->
               <span v-else>{{ item[column.key] }}</span>
@@ -146,7 +144,7 @@
               @click="handleSave(item)"
               title="保存"
             >
-              <v-icon small>mdi-check</v-icon>
+              <jh-icon icon="mdi:check" width="16" height="16"></jh-icon>
             </v-btn>
             <v-btn
               icon
@@ -155,7 +153,7 @@
               @click="handleCancel(item)"
               title="取消"
             >
-              <v-icon small>mdi-close</v-icon>
+              <jh-icon icon="mdi:close" width="16" height="16"></jh-icon>
             </v-btn>
           </template>
 
@@ -169,7 +167,7 @@
               @click="handleEdit(item)"
               title="编辑"
             >
-              <v-icon small>mdi-pencil</v-icon>
+              <jh-icon icon="mdi:pencil" width="16" height="16"></jh-icon>
             </v-btn>
             <v-btn
               v-if="deletable"
@@ -179,7 +177,7 @@
               @click="handleDelete(item)"
               title="删除"
             >
-              <v-icon small>mdi-delete</v-icon>
+              <jh-icon icon="mdi:delete" width="16" height="16"></jh-icon>
             </v-btn>
 
             <!-- 自定义操作按钮 -->
@@ -192,14 +190,14 @@
       <template v-slot:footer v-if="recordCreator">
         <div class="jh-editable-footer pa-3">
           <v-btn
-            color="primary"
-            small
-            @click="handleAddRow"
-            :disabled="hasEditingRow"
-          >
-            <v-icon small left>mdi-plus</v-icon>
-            {{ recordCreatorProps.creatorButtonText || '添加一行数据' }}
-          </v-btn>
+              color="primary"
+              small
+              @click="handleAddRow"
+              :disabled="hasEditingRow"
+            >
+              <jh-icon icon="mdi:plus" width="16" height="16" left></jh-icon>
+              {{ recordCreatorProps.creatorButtonText || '添加一行数据' }}
+            </v-btn>
         </div>
       </template>
     </v-data-table>
@@ -207,8 +205,13 @@
 </template>
 
 <script>
+import JhIcon from '../JhIcon/JhIcon.vue'
+
 export default {
   name: 'JhEditableTable',
+  components: {
+    JhIcon
+  },
 
   props: {
     // 表格数据 (v-model)
